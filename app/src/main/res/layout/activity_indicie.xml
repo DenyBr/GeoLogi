@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.deny.taborofka_zpravy.IndicieActivity">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <ListView
+                android:layout_below="@+id/tblrow"
+                android:id="@+id/listview"
+
+                android:layout_span="10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:id="@+id/tvIndN"
+                android:layout_width="100pt"
+                android:layout_height="wrap_content"
+                android:minWidth="100pt"
+                android:width="100pt"
+                android:height="15pt"
+                android:text="Nová indicie: " />
+
+            <EditText
+                android:id="@+id/etIndH" android:enabled="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="100pt"
+                android:text="" />
+            <Button
+                android:id="@+id/btnUlozit"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="buttonClickHandler"
+                android:text="Uložit" />
+        </TableRow>
+    </TableLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.progress.Taborofka.com.deny.taborofka_zpravy.Settings">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+            <TextView
+                android:id="@+id/tvHra"
+                android:layout_width="30pt"
+                android:layout_height="wrap_content"
+                android:minWidth="30pt"
+                android:width="30pt"
+                android:height="15pt"
+                android:text="Hra" />
+
+            <Spinner
+                android:id="@+id/spinHry"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="100pt"
+                android:text=""
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+
+
+            <TextView
+                android:id="@+id/tvOddilN"
+                android:layout_width="30pt"
+                android:layout_height="wrap_content"
+                android:minWidth="30pt"
+                android:width="30pt"
+                android:height="15pt"
+                android:text="Oddíl" />
+
+            <Spinner
+                android:id="@+id/spinOddily" android:enabled="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="100pt"
+                android:text="" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+            <TextView
+                android:id="@+id/tvHeslolN"
+                android:layout_width="30pt"
+                android:layout_height="wrap_content"
+                android:minWidth="30pt"
+                android:width="30pt"
+                android:height="15pt"
+                android:text="Heslo" />
+
+            <EditText
+                android:id="@+id/etHesloH" android:enabled="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:minWidth="100pt"
+                android:text="" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/tblrow"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+            <Button
+                android:id="@+id/btnUlozit"
+
+                android:layout_span="10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="buttonClickHandler"
+                android:text="Uložit" />
+
+        </TableRow>
+    </TableLayout>
+
+</android.support.constraint.ConstraintLayout>

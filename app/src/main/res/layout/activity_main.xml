@@ -1,0 +1,132 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.deny.taborofka_zpravy.MainActivity">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+            >
+
+            <TextView
+                android:id="@+id/nadpisek"
+
+                android:layout_span="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/vzdalenost"
+
+                android:layout_span="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tblrow"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+            <Button
+                android:id="@+id/btnDownload" android:enabled="true"
+                android:onClick="syncClickHandler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:height="15pt"
+                android:text="Načíst zprávy" />
+
+            <Button
+                android:id="@+id/btnMapa" android:enabled="true"
+                android:onClick="MapaClickHandler"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:width="100dp"
+                android:height="15dp"
+                android:text="Mapa" />
+
+            <Button
+                android:id="@+id/btnNastenka" android:enabled="true"
+                android:onClick="NastenkaClickHandler"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:width="100dp"
+                android:height="15pt"
+                android:text="Nástěnka" />
+
+
+             <Button
+                android:id="@+id/btnIndicie" android:enabled="true"
+                android:onClick="IndicieClickHandler"
+                 android:layout_width="100dp"
+                 android:layout_height="wrap_content"
+                 android:minWidth="100dp"
+                 android:width="100dp"
+                 android:height="15pt"
+                 android:text="Indicie"
+                 />
+
+            <Button
+                android:id="@+id/btnSettings" android:enabled="true"
+                android:onClick="SettingsClickHandler"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:width="100dp"
+                android:height="15pt"
+                android:text="Nastavení"
+                android:layout_gravity="right"/>
+
+            <Button
+                android:id="@+id/btnClear" android:enabled="true"
+                android:onClick="clearClickHandler"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:minWidth="150dp"
+                android:width="150dp"
+                android:height="15pt"
+                android:text="Smazat data"
+                android:layout_gravity="right"/>
+            <Button
+                android:id="@+id/btnTest" android:enabled="true"
+                android:onClick="testClickHandler"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:minWidth="150dp"
+                android:width="150dp"
+                android:height="15pt"
+                android:text="Test"
+                android:layout_gravity="right"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ListView
+                android:layout_below="@+id/tblrow"
+                android:id="@+id/listview"
+
+                android:layout_span="10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+
+    </TableLayout>
+
+</RelativeLayout>

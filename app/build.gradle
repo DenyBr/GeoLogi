@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        applicationId 'com.deny.taborofka_zpravy'
+        minSdkVersion 15
+        targetSdkVersion 15
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:support-v4:21.0.3'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    //implementation 'com.google.android.gms:play-services-drive:11.8.0'
+    compile 'com.google.android.gms:play-services:6.5.87'
+
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.google.api-client:google-api-client:1.23.0'
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+    compile 'com.google.apis:google-api-services-drive:v3-rev107-1.23.0'
+
+
+    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'commons-net:commons-net:3.6'
+    compile 'org.osmdroid:osmdroid-android:5.6.5'
+    // implementation files('build/commons-net-3.6.jar')
+}
