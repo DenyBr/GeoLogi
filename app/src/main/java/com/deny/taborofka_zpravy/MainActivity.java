@@ -70,6 +70,15 @@ public class MainActivity extends ActionBarActivity {
         notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+/*        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        location = locationManager.getLastKnownLocation(bestProvider);
+*/
+
+        Nastaveni.getInstance(this);
+
         read(this);
 
         IndicieSeznam.getInstance(this).read(this);
@@ -78,14 +87,7 @@ public class MainActivity extends ActionBarActivity {
         zkontrolujZpravy(false);
 
 
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, false);
-        location = locationManager.getLastKnownLocation(bestProvider);
-
-
-
+/*
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -93,18 +95,17 @@ public class MainActivity extends ActionBarActivity {
                 //Do something after 100ms
                 casovyupdate();
             }
-        }, 10000);
+        }, 10000);*/
     }
 
     private void read (Context context) {
+        zpravyKomplet = new ArrayList<Zprava>();
         try {
-            zpravyKomplet = new ArrayList<Zprava>();
             InputStream inputStream =  context.openFileInput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            //Okynka.zobrazOkynko(this, "Pocet zprav" + iPocet);
 
             for (int i=0; i<iPocet; i++) {
                 Zprava z = (Zprava) in.readObject();

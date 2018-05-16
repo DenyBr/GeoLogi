@@ -107,7 +107,7 @@ public class Settings extends ActionBarActivity {
 
             for (int i = 0; i < hry.size(); i++) {
                 lHry.add(hry.get(i).getsHra());
-                if (Nastaveni.getInstance(this).getsHra().equals(hry.get(i).getsHra())) {
+                if ((Nastaveni.getInstance(this).getsHra()!=null) && (Nastaveni.getInstance(this).getsHra().equals(hry.get(i).getsHra()))) {
                     iPoziceVybraneho = i;
                 }
             }

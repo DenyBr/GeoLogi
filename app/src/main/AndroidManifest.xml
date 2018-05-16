@@ -11,12 +11,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_mazesphere"
-        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:label="GeoLogi"
         android:theme="@style/AppTheme">
         <activity
             android:name="com.deny.taborofka_zpravy.MainActivity"
-            android:label="@string/app_name">
+            android:label="GeoLogi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
