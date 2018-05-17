@@ -78,7 +78,7 @@ public class MapaActivity extends Activity {
 
         Paint textStyleNove = new Paint();
         textStyleNove.setStyle(Paint.Style.FILL);
-        textStyleNove.setColor(Color.parseColor("#0000ff"));
+        textStyleNove.setColor(Color.parseColor("#000000"));
         textStyleNove.setTextAlign(Paint.Align.CENTER);
         textStyleNove.setTextSize(24);
 

@@ -20,15 +20,28 @@
             <TextView
                 android:id="@+id/nadpisek"
 
-                android:layout_span="3"
+                android:layout_span="2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/vzdalenost"
 
-                android:layout_span="3"
+                android:layout_span="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/hledanebody"
+
+                android:layout_span="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/indicii"
+
+                android:layout_span="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </TableRow>
 
         <TableRow
@@ -42,7 +55,7 @@
                 android:onClick="syncClickHandler"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="100dp"
+                android:minWidth="140dp"
                 android:height="15pt"
                 android:text="Načíst zprávy" />
 
@@ -51,18 +64,18 @@
                 android:onClick="MapaClickHandler"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:width="100dp"
+                android:minWidth="140dp"
+                android:width="140dp"
                 android:height="15dp"
                 android:text="Mapa" />
 
             <Button
                 android:id="@+id/btnNastenka" android:enabled="true"
                 android:onClick="NastenkaClickHandler"
-                android:layout_width="100dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:width="100dp"
+                android:minWidth="140dp"
+                android:width="140dp"
                 android:height="15pt"
                 android:text="Nástěnka" />
 
@@ -70,10 +83,10 @@
              <Button
                 android:id="@+id/btnIndicie" android:enabled="true"
                 android:onClick="IndicieClickHandler"
-                 android:layout_width="100dp"
+                 android:layout_width="140dp"
                  android:layout_height="wrap_content"
-                 android:minWidth="100dp"
-                 android:width="100dp"
+                 android:minWidth="140dp"
+                 android:width="140dp"
                  android:height="15pt"
                  android:text="Indicie"
                  />
@@ -81,16 +94,17 @@
             <Button
                 android:id="@+id/btnSettings" android:enabled="true"
                 android:onClick="SettingsClickHandler"
-                android:layout_width="100dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:minWidth="100dp"
-                android:width="100dp"
+                android:minWidth="140dp"
+                android:width="140dp"
                 android:height="15pt"
                 android:text="Nastavení"
                 android:layout_gravity="right"/>
 
             <Button
                 android:id="@+id/btnClear" android:enabled="true"
+                android:visibility="invisible"
                 android:onClick="clearClickHandler"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -101,6 +115,7 @@
                 android:layout_gravity="right"/>
             <Button
                 android:id="@+id/btnTest" android:enabled="true"
+                android:visibility="invisible"
                 android:onClick="testClickHandler"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"

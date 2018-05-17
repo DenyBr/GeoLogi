@@ -92,10 +92,9 @@ public class MainActivity extends ActionBarActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //Do something after 100ms
                 casovyupdate();
             }
-        }, 10000);
+        }, 1000);
     }
 
     private void read (Context context) {
@@ -497,6 +496,22 @@ public class MainActivity extends ActionBarActivity {
             // "Color value constant"
             // myTitleText.setBackgroundColor(Color.GREEN);
         }
+        TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
+        if (hledanebody != null) {
+            hledanebody.setText("Cílové body: "+GeoBody.getInstance().aBodyNavstivene.size()+"/"+GeoBody.getInstance().aBodyHledane.size() );
+            // user can also set color using "Color" and then
+            // "Color value constant"
+            // myTitleText.setBackgroundColor(Color.GREEN);
+        }
+
+        TextView indicie = (TextView) findViewById(R.id.indicii);
+        if (indicie != null) {
+            indicie.setText("Indicie: "+IndicieSeznam.getInstance(this).aIndicieZiskane.size()+"/"+IndicieSeznam.getInstance(this).aIndicieVsechny.size() );
+            // user can also set color using "Color" and then
+            // "Color value constant"
+            // myTitleText.setBackgroundColor(Color.GREEN);
+        }
+
 
         GeoBody.getInstance().aBody=new ArrayList<GeoBod>();
 

@@ -35,6 +35,10 @@ class GeoBody {
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
     public ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<GeoBod>();
 
+    Criteria criteria = null;
+    String bestProvider = null;
+    Location location=null;
+
     List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
     List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();
 
@@ -119,14 +123,15 @@ class GeoBody {
         LocationManager locationManager = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
 
         try {
-            Criteria criteria = new Criteria();
-            String bestProvider = locationManager.getBestProvider(criteria, false);
+            criteria = new Criteria();
+            bestProvider = locationManager.getBestProvider(criteria, false);
 
             if (null!=bestProvider) {
-
-                Location location = locationManager.getLastKnownLocation(bestProvider);
+                location = locationManager.getLastKnownLocation(bestProvider);
 
                 if (null != location) {
+
+
 
                     //Projdi cilove body a eventuelne oznac navstivenej
                     for (int i = 0; i < aBody.size(); i++) {
