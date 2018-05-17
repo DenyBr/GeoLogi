@@ -54,22 +54,28 @@ public class Settings extends ActionBarActivity {
         //jinak zakaz vyber hry
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask(new AsyncResult() {
-                @Override
-                public void onResult(JSONObject object) {
-                    processJson(object);
-                }
-            }).execute("https://spreadsheets.google.com/tq?key=12GdpmQ9Y7tgEBs6k--t-zqH_fYRzooGhc3VEtgdrB7Q");
+        try {
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                new DownloadWebpageTask(new AsyncResult() {
+                    @Override
+                    public void onResult(JSONObject object) {
+                        processJson(object);
+                    }
+                }).execute("https://spreadsheets.google.com/tq?key=12GdpmQ9Y7tgEBs6k--t-zqH_fYRzooGhc3VEtgdrB7Q");
 
-        } else {
+            } else {
+                Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
+            }
+        }
+        catch (Exception e) {
             Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
         }
     }
 
 
     private void processJson(JSONObject object) {
+        //Okynka.zobrazOkynko(this, object.toString());
 
         try {
             JSONArray rows = object.getJSONArray("rows");
@@ -100,6 +106,7 @@ public class Settings extends ActionBarActivity {
                 hry.add(hra);
             }
 
+
             Spinner sp = (Spinner) findViewById(R.id.spinHry);
 
             List<String> lHry = new ArrayList<String>();
@@ -119,7 +126,6 @@ public class Settings extends ActionBarActivity {
 
             sp.setSelection(iPoziceVybraneho);
 
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -138,13 +144,12 @@ public class Settings extends ActionBarActivity {
 
             ArrayList<String> ao = new ArrayList<String>();
 
-
             for(int i = 0; i<Oddily.getInstance().aOddily.size();i++) {
                 ao.add(Oddily.getInstance().aOddily.get(i).getsNazev());
 
-                if (Oddily.getInstance().aOddily.get(i).getiId() == pNastaveni.getiIDOddilu()) {
+               /* if (Oddily.getInstance().aOddily.get(i).getiId() == pNastaveni.getiIDOddilu()) {
                     iVybranyOddil = i;
-                }
+                }*/
             }
 
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(Settings.this,
@@ -170,7 +175,6 @@ public class Settings extends ActionBarActivity {
 
     public void buttonClickHandler(View view) {
         TextView tvHeslo = (EditText) findViewById(R.id.etHesloH);
-
 
         //pNastaveni.setProperty("Oddil", tvOddil.getText().toString());
         Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);

@@ -118,67 +118,80 @@ class GeoBody {
 
         LocationManager locationManager = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
 
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, false);
-        Location location = locationManager.getLastKnownLocation(bestProvider);
+        try {
+            Criteria criteria = new Criteria();
+            String bestProvider = locationManager.getBestProvider(criteria, false);
 
-        //Projdi cilove body a eventuelne oznac navstivenej
-        for (int i=0; i<aBody.size(); i++) {
-            try {
-                GeoBod bodAct = aBody.get(i);
-                Location locAct = new Location("");
-                locAct.setLatitude(bodAct.getdLat());
-                locAct.setLongitude(bodAct.getdLong());
+            if (null!=bestProvider) {
 
-                iAct = (int) location.distanceTo(locAct);
+                Location location = locationManager.getLastKnownLocation(bestProvider);
 
-                if (iAct < iMin) {
-                    iMin = iAct;
+                if (null != location) {
+
+                    //Projdi cilove body a eventuelne oznac navstivenej
+                    for (int i = 0; i < aBody.size(); i++) {
+                        try {
+                            GeoBod bodAct = aBody.get(i);
+                            Location locAct = new Location("");
+                            locAct.setLatitude(bodAct.getdLat());
+                            locAct.setLongitude(bodAct.getdLong());
+
+                            iAct = (int) location.distanceTo(locAct);
+
+                            if (iAct < iMin) {
+                                iMin = iAct;
+                            }
+
+                            if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
+                                //pridame bod mezi navstivene
+                                aBodyNavstivene.add(bodAct);
+
+                                //a ulozime
+                                write_navstivene(ctx);
+
+                                aktualizujMapu();
+                            }
+
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    //projdi hledane cilove body a pripadne zapis, ze byl navstivenej
+                    for (int i = 0; i < aBodyHledane.size(); i++) {
+                        try {
+                            GeoBod bodAct = aBodyHledane.get(i);
+                            Location locAct = new Location("");
+                            locAct.setLatitude(bodAct.getdLat());
+                            locAct.setLongitude(bodAct.getdLong());
+
+                            iAct = (int) location.distanceTo(locAct);
+
+                            if (iAct < iMin) {
+                                iMin = iAct;
+                            }
+
+                            if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
+                                //pridame bod mezi navstivene
+                                aBodyNavstivene.add(bodAct);
+
+                                //a ulozime
+                                write_navstivene(ctx);
+
+                                aktualizujMapu();
+                            }
+
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-
-                if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
-                    //pridame bod mezi navstivene
-                    aBodyNavstivene.add(bodAct);
-
-                    //a ulozime
-                    write_navstivene(ctx);
-
-                    aktualizujMapu();
-                }
-
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        //projdi hledane cilove body a pripadne zapis, ze byl navstivenej
-        for (int i=0; i<aBodyHledane.size(); i++) {
-            try {
-                GeoBod bodAct = aBodyHledane.get(i);
-                Location locAct = new Location("");
-                locAct.setLatitude(bodAct.getdLat());
-                locAct.setLongitude(bodAct.getdLong());
-
-                iAct = (int) location.distanceTo(locAct);
-
-                if (iAct < iMin) {
-                    iMin = iAct;
-                }
-
-                if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
-                    //pridame bod mezi navstivene
-                    aBodyNavstivene.add(bodAct);
-
-                    //a ulozime
-                    write_navstivene(ctx);
-
-                    aktualizujMapu();
-                }
-
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
 
         //Okynka.zobrazOkynko(ctx, "nejblizsi je "+iMin);
         return iMin;

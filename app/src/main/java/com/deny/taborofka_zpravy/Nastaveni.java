@@ -45,12 +45,11 @@ public class Nastaveni extends Properties {
 
     public void reload (Context context) {
         try {
-            //File file = context.getFileStreamPath("config.properties");
+            File file = context.getFileStreamPath("config.properties");
 
-            //if(file != null && file.exists()) {
-                Okynka.zobrazOkynko(context, "Jo");
-                /*
-                InputStream inputStream =  context.openFileInput("config.properties");
+            if(file != null && file.exists()) {
+               // Okynka.zobrazOkynko(context, "Jo");
+               InputStream inputStream =  context.openFileInput("config.properties");
 
                load(inputStream);
 
@@ -59,9 +58,11 @@ public class Nastaveni extends Properties {
                sNastenka = getProperty("Nastenka", "");
                sIdWorkseet = getProperty("IdWorkseet", "");
 
-               inputStream.close();
-               */
-            //}
+                //Okynka.zobrazOkynko(context, sHra);
+
+                inputStream.close();
+
+            }
         }
         catch (Exception e) { //ignore error, file will be created later if it does not exist}
         }

@@ -87,7 +87,7 @@ public class MainActivity extends ActionBarActivity {
         zkontrolujZpravy(false);
 
 
-/*
+
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
                 //Do something after 100ms
                 casovyupdate();
             }
-        }, 10000);*/
+        }, 10000);
     }
 
     private void read (Context context) {
@@ -238,6 +238,8 @@ public class MainActivity extends ActionBarActivity {
     private void processJson(JSONObject object) {
        // Okynka.zobrazOkynko(this, "Odpoved prijata");
         //zpravyKomplet = new ArrayList<Zprava>();
+
+        //Okynka.zobrazOkynko(this, object.toString());
 
         try {
             JSONArray rows = object.getJSONArray("rows");
@@ -392,23 +394,25 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void casovyupdate () {
-        int iMin = GeoBody.getInstance().iVzdalenostNejblizsiho(this);
-
-        TextView vzd = (TextView) findViewById(R.id.vzdalenost);
-        if (vzd != null) {
-            if (iMin<1000) vzd.setText("Nebjižší cílový bod: "+iMin+" metrů");
-                    else vzd.setText("");
-        }
-
         int iTimeout = 60000;
 
-        //pri priblizovani zkratime timeout
-        if (iMin<20) iTimeout = 1000;
-        else if (iMin<30) iTimeout = 5000;
-        else if (iMin<50) iTimeout = 10000;
-        else if (iMin<100) iTimeout = 30000;
+        if (!Nastaveni.getInstance(this).getsHra().equals("")) {
+            int iMin = GeoBody.getInstance().iVzdalenostNejblizsiho(this);
 
-        zkontrolujZpravy(false);
+            TextView vzd = (TextView) findViewById(R.id.vzdalenost);
+            if (vzd != null) {
+                if (iMin < 1000) vzd.setText("Nebjižší cílový bod: " + iMin + " metrů");
+                else vzd.setText("");
+            }
+
+            //pri priblizovani zkratime timeout
+            if (iMin < 20) iTimeout = 1000;
+            else if (iMin < 30) iTimeout = 5000;
+            else if (iMin < 50) iTimeout = 10000;
+            else if (iMin < 100) iTimeout = 30000;
+
+            zkontrolujZpravy(false);
+        }
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
