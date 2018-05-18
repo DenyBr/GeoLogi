@@ -13,11 +13,13 @@ public class GeoBod implements Serializable {
     private double dLat;
     private double dLong;
     private String Popis;
+    private boolean bViditelny;
 
-    public GeoBod (double dLat, double dLong, String sPopis) {
+    public GeoBod (double dLat, double dLong, String sPopis, boolean bViditelny) {
         setdLat(dLat);
         setdLong(dLong);
         setPopis(sPopis);
+        setbViditelny(bViditelny);
     }
 
 
@@ -45,6 +47,14 @@ public class GeoBod implements Serializable {
         Popis = popis;
     }
 
+    public boolean getbViditelny() {
+        return bViditelny;
+    }
+
+    public void setbViditelny(boolean bViditelny) {
+        this.bViditelny = bViditelny;
+    }
+
     private void readObject(
             ObjectInputStream aInputStream
     ) throws ClassNotFoundException, IOException {
@@ -58,6 +68,7 @@ public class GeoBod implements Serializable {
         //perform the default serialization for all non-transient, non-static fields
         aOutputStream.defaultWriteObject();
     }
+
 
 
 }

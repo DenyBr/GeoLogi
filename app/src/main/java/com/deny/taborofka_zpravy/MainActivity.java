@@ -203,7 +203,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             OutputStream fileOut = openFileOutput(fileName, Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            GeoBod g1 = new GeoBod(49.1975289,16.6508889, "");
+            GeoBod g1 = new GeoBod(49.1975289,16.6508889, "", true);
             //GeoBod g2 = new GeoBod(49.302,	16.784, "");
 
             out.writeInt(1);
@@ -400,8 +400,11 @@ public class MainActivity extends ActionBarActivity {
 
             TextView vzd = (TextView) findViewById(R.id.vzdalenost);
             if (vzd != null) {
-                if (iMin < 1000) vzd.setText("Nebjižší cílový bod: " + iMin + " metrů");
-                else vzd.setText("");
+                if (iMin < 1000) {
+                    vzd.setText("Nebjižší cílový bod: " + iMin + " metrů");
+                } else {
+                    vzd.setText("Nebjižší cílový bod: ? metrů");
+                }
             }
 
             //pri priblizovani zkratime timeout
@@ -428,7 +431,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean zkontrolujLokaci (Zprava z) {
         if ((z.getfZobrazitNaLat()==0) || (z.getfZobrazitNaLong())==0) return true;
 
-        GeoBod b = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "");
+        GeoBod b = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
 
         //Okynka.zobrazOkynko(this, " "+z.getfZobrazitNaLat()+" " + z.getfZobrazitNaLong() );
 
@@ -498,7 +501,7 @@ public class MainActivity extends ActionBarActivity {
         }
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
         if (hledanebody != null) {
-            hledanebody.setText("Cílové body: "+GeoBody.getInstance().aBodyNavstivene.size()+"/"+GeoBody.getInstance().aBodyHledane.size() );
+            hledanebody.setText("Cílové body: "+GeoBody.getInstance().aBodyNavstivene.size()+"/"+GeoBody.getInstance().aBody.size() );
             // user can also set color using "Color" and then
             // "Color value constant"
             // myTitleText.setBackgroundColor(Color.GREEN);
@@ -525,26 +528,26 @@ public class MainActivity extends ActionBarActivity {
                 && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
                 && (IndicieSeznam.getInstance(this).aIndicieZiskane.size()>=z.getiPocetIndicii()) //maji dost indiciii
                 && (zkontrolujJestliMajiIndicie (z)) //a maji ty spravne
-                && (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
-            {   if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
-                {
-                //pokud ano, tak pridame zpravu do seznamu zobrazovanych
-                    zpravy.add(z);
+                && ((z.getsNezobrazovatPokudMajiIndicii().equals(""))||(!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
+            {
+                //Okynka.zobrazOkynko(this, "su tady "+z.getfZobrazitNaLat()+" "+z.getiId()+" lokace: "+zkontrolujLokaci(z));
 
-                    //debug
-                    //if (!z.getsNezobrazovatPokudMajiIndicii().equals(""))  Okynka.zobrazOkynko(this, z.getsNezobrazovatPokudMajiIndicii());
+                if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
+                {
+                    //pokud ano, tak pridame zpravu do seznamu zobrazovanych
+                    zpravy.add(z);
 
                     //pridame cilovy bod na mapu
                     if ((z.getfCilovyBodLat()!=0) || (z.getfCilovyBodLong()!=0))
                     {
-                        GeoBody.getInstance().aBody.add(new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis()));
+                        GeoBody.getInstance().aBody.add(new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true));
                         GeoBody.getInstance().aktualizujMapu();
                     }
 
                     //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
                     if ((z.getfZobrazitNaLat()!=0) || (z.getfZobrazitNaLong()!=0))
                     {
-                        GeoBody.getInstance().aBodyHledane.add(new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis()));
+                        GeoBody.getInstance().aBody.add(new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false));
                         GeoBody.getInstance().aktualizujMapu();
                     }
 
@@ -554,22 +557,21 @@ public class MainActivity extends ActionBarActivity {
                         bNova = true;
 
                         zpravyKomplet.get(i).setbZobrazeno(true);
+                    }
                 }
                 else
+                {
+                    //pokud je vsechno splneno, ale na lokaci jeste nebyli, je mozna potreba pridac cilovy bod do seznamu hledanych
+                    if ((z.getfZobrazitNaLong()!=0) || (z.getfZobrazitNaLat()!=0))
                     {
-                        //pokud je vsechno splneno, ale na lokaci jeste nebyli, je mozna potreba pridac cilovy bod do seznamu hledanych
-                        if ((z.getfZobrazitNaLong()!=0) && (z.getfZobrazitNaLat()!=0))
-                        {
-                            GeoBod bod=new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "");
-                            if (!GeoBody.getInstance().jeHledanej(bod) &&
-                                (!GeoBody.getInstance().bylNavstivenej(bod))) {
-                                GeoBody.getInstance().aBodyHledane.add(bod);
-                            }
+                        GeoBod bod=new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
+                        if (!GeoBody.getInstance().jeHledanej(bod) &&
+                            (!GeoBody.getInstance().bylNavstivenej(bod))) {
+                            GeoBody.getInstance().aBody.add(bod);
                         }
                     }
                 }
             }
-
         }
 
         if (bPrekreslit) {
@@ -601,12 +603,8 @@ public class MainActivity extends ActionBarActivity {
                 //zkus prehrat zvuk
                 notificationRingtone.play();
 
-                // Vibrate for 500 milliseconds
-               /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE))
-                }else{*/
-                    //deprecated in API 26
-                    v.vibrate(500);
+                //a zavibrovat - API bude deprecated ve verzi 26
+                v.vibrate(500);
                 //}
             } catch (Exception e) {
                 // nedelej nic
@@ -619,23 +617,19 @@ public class MainActivity extends ActionBarActivity {
 
     public void testClickHandler(View view) {
 
-
-        /*} catch (Exception e) {
-            Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům - chyba 3 " + e.getMessage());
+        /*
+        for (int i=0; i<GeoBody.getInstance().aBody.size(); i++) {
+            Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance().aBody.get(i).getdLat() +" "+ GeoBody.getInstance().aBody.get(i).getPopis()+" "+GeoBody.getInstance().aBody.get(i).getbViditelny());
         }*/
+        for (int i=0; i<zpravyKomplet.size(); i++) {
+            Okynka.zobrazOkynko(this, zpravyKomplet.get(i).getiId() + " cas: " + zkontrolujCas(zpravyKomplet.get(i))+ " lokace: " + zkontrolujLokaci(zpravyKomplet.get(i)) + " Indicie: " + zkontrolujJestliMajiIndicie(zpravyKomplet.get(i)) + " pocet indicii: " + zpravyKomplet.get(i).getiPocetIndicii());
+        }
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        startLocationUpdates();
     }
-
-    private void startLocationUpdates() {
-/*        location.requestLocationUpdates(mLocationRequest,
-                mLocationCallback,
-                null );*/
-    }
-
-
 }

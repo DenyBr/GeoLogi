@@ -27,10 +27,10 @@ import static java.lang.Math.abs;
 class GeoBody {
     private static final GeoBody ourInstance = new GeoBody();
     //seznam cilovych bodu - to jsou body, ktere budou zobrazeny na mape
-    public ArrayList<GeoBod> aBody = new ArrayList<GeoBod>();
-    //seznam hledanych bodu - to jsou body, na kterych bude zobrazena zprava -
+    //a bodu na kterych bude zobrazena zprava -
     //ne nutne musi byt zobrazeny na mape - mohou napriklad dostat popis, ze maji dojit k rybniku
-    public ArrayList<GeoBod> aBodyHledane = new ArrayList<GeoBod>();
+    public ArrayList<GeoBod> aBody = new ArrayList<GeoBod>();
+    //public ArrayList<GeoBod> aBodyHledane = new ArrayList<GeoBod>();
     //seznam navstivenych bodu - to jsou body, kam uz dosli
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
     public ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<GeoBod>();
@@ -49,8 +49,12 @@ class GeoBody {
         for (int i = 0; i < GeoBody.getInstance().aBody.size(); i++) {
             GeoBod actBod = GeoBody.getInstance().aBody.get(i);
 
-            if (!GeoBody.getInstance().bylNavstivenej(actBod)) aMapa_nove.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis ()));
-            else aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis ()));
+            if (actBod.getbViditelny()) {
+                if (!GeoBody.getInstance().bylNavstivenej(actBod))
+                    aMapa_nove.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
+                else
+                    aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
+            }
         }
 
     }
@@ -108,8 +112,8 @@ class GeoBody {
     }
 
     public boolean jeHledanej(GeoBod b) {
-        for (int i=0; i<aBodyHledane.size(); i++) {
-            if ( (abs(b.getdLat()- aBodyHledane.get(i).getdLat())<0.0001)  && (abs(b.getdLong()-aBodyHledane.get(i).getdLong())<0.0001)) return true;
+        for (int i=0; i<aBody.size(); i++) {
+            if ( (abs(b.getdLat()- aBody.get(i).getdLat())<0.0001)  && (abs(b.getdLong()-aBody.get(i).getdLong())<0.0001)) return true;
         }
         return false;
     }
@@ -137,35 +141,6 @@ class GeoBody {
                     for (int i = 0; i < aBody.size(); i++) {
                         try {
                             GeoBod bodAct = aBody.get(i);
-                            Location locAct = new Location("");
-                            locAct.setLatitude(bodAct.getdLat());
-                            locAct.setLongitude(bodAct.getdLong());
-
-                            iAct = (int) location.distanceTo(locAct);
-
-                            if (iAct < iMin) {
-                                iMin = iAct;
-                            }
-
-                            if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
-                                //pridame bod mezi navstivene
-                                aBodyNavstivene.add(bodAct);
-
-                                //a ulozime
-                                write_navstivene(ctx);
-
-                                aktualizujMapu();
-                            }
-
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //projdi hledane cilove body a pripadne zapis, ze byl navstivenej
-                    for (int i = 0; i < aBodyHledane.size(); i++) {
-                        try {
-                            GeoBod bodAct = aBodyHledane.get(i);
                             Location locAct = new Location("");
                             locAct.setLatitude(bodAct.getdLat());
                             locAct.setLongitude(bodAct.getdLong());

@@ -321,5 +321,6 @@ public class IndicieSeznam {
 
     private IndicieSeznam(Context context) {
         ctx = context;
+        read(context);
     }
 }
