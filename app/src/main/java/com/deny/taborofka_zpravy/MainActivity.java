@@ -493,7 +493,7 @@ public class MainActivity extends ActionBarActivity {
 
         //Okynka.zobrazOkynko(this, "kontroluju - pocet ziskanych indicii je "+IndicieActivity.aIndicieZiskane.size());
 
-        for (int i = 0; i < zpravyKomplet.size(); i++) {
+        for (int i = zpravyKomplet.size()-1; i>=0 ; i--) {
             Zprava z = zpravyKomplet.get(i);
 
             //zkotrnolujeme, ze se ma zprava zobrazit
