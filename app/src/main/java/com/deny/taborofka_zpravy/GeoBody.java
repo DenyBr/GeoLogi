@@ -1,9 +1,15 @@
 package com.deny.taborofka_zpravy;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
@@ -25,7 +31,7 @@ import static java.lang.Math.abs;
  */
 
 class GeoBody {
-    private static final GeoBody ourInstance = new GeoBody();
+    private static GeoBody ourInstance = null;
     //seznam cilovych bodu - to jsou body, ktere budou zobrazeny na mape
     //a bodu na kterych bude zobrazena zprava -
     //ne nutne musi byt zobrazeny na mape - mohou napriklad dostat popis, ze maji dojit k rybniku
@@ -33,24 +39,27 @@ class GeoBody {
     //public ArrayList<GeoBod> aBodyHledane = new ArrayList<GeoBod>();
     //seznam navstivenych bodu - to jsou body, kam uz dosli
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
-    public ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<GeoBod>();
+    public ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<>();
 
+
+    Context context = null;
     Criteria criteria = null;
     String bestProvider = null;
-    Location location=null;
+    Location location = null;
+    LocationManager locationManager = null;
 
     List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
     List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();
 
-    public void aktualizujMapu () {
+    public void aktualizujMapu() {
         aMapa_nove = new ArrayList<IGeoPoint>();
         aMapa_navstivene = new ArrayList<IGeoPoint>();
 
-        for (int i = 0; i < GeoBody.getInstance().aBody.size(); i++) {
-            GeoBod actBod = GeoBody.getInstance().aBody.get(i);
+        for (int i = 0; i < GeoBody.getInstance(context).aBody.size(); i++) {
+            GeoBod actBod = GeoBody.getInstance(context).aBody.get(i);
 
             if (actBod.getbViditelny()) {
-                if (!GeoBody.getInstance().bylNavstivenej(actBod))
+                if (!GeoBody.getInstance(context).bylNavstivenej(actBod))
                     aMapa_nove.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
                 else
                     aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
@@ -59,14 +68,35 @@ class GeoBody {
 
     }
 
-    static GeoBody getInstance() {
+    static GeoBody getInstance(Context context) {
+        if (null == ourInstance) ourInstance = new GeoBody(context);
+
         return ourInstance;
     }
 
-    private GeoBody() {
+    private void registrujGPS (Context ctx, int iTimeout, int iDistance) {
+        locationManager = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
+        try {
+            // Register the listener with the Location Manager to receive location updates
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, iTimeout, iDistance, locationListener);
+
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+       } catch (Exception e) {
+            //Okynka.zobrazOkynko(context, "" + e.getMessage());
+        }
+
     }
 
-    public void read_navstivene (Context context) {
+    private GeoBody(Context ctx) {
+        context = ctx;
+
+        registrujGPS(ctx, 1000, 10);
+    }
+
+
+
+    public void read_navstivene(Context context) {
         try {
             aBodyNavstivene = new ArrayList<GeoBod>();
             InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsHra() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt");
@@ -87,33 +117,36 @@ class GeoBody {
     }
 
 
-    public void write_navstivene (Context context) {
+    public void write_navstivene(Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"bodynavstivene.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(aBodyNavstivene.size());
 
-            for (int i=0; i<aBodyNavstivene.size(); i++) {
+            for (int i = 0; i < aBodyNavstivene.size(); i++) {
                 out.writeObject(aBodyNavstivene.get(i));
             }
 
             out.close();
             fileOut.close();
-        } catch (IOException ex) {Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
+        } catch (IOException ex) {
+            Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
         }
     }
 
     public boolean bylNavstivenej(GeoBod b) {
-        for (int i=0; i<aBodyNavstivene.size(); i++) {
-           if ( (abs(b.getdLat()- aBodyNavstivene.get(i).getdLat())<0.0001)  && (abs(b.getdLong()-aBodyNavstivene.get(i).getdLong())<0.0001)) return true;
+        for (int i = 0; i < aBodyNavstivene.size(); i++) {
+            if ((abs(b.getdLat() - aBodyNavstivene.get(i).getdLat()) < 0.0001) && (abs(b.getdLong() - aBodyNavstivene.get(i).getdLong()) < 0.0001))
+                return true;
         }
         return false;
     }
 
     public boolean jeHledanej(GeoBod b) {
-        for (int i=0; i<aBody.size(); i++) {
-            if ( (abs(b.getdLat()- aBody.get(i).getdLat())<0.0001)  && (abs(b.getdLong()-aBody.get(i).getdLong())<0.0001)) return true;
+        for (int i = 0; i < aBody.size(); i++) {
+            if ((abs(b.getdLat() - aBody.get(i).getdLat()) < 0.0001) && (abs(b.getdLong() - aBody.get(i).getdLong()) < 0.0001))
+                return true;
         }
         return false;
     }
@@ -121,49 +154,42 @@ class GeoBody {
 
     public int iVzdalenostNejblizsiho(Context ctx) {
         //zjisti aktualni polohu
-        int iMin=100000;
+        int iMin = 100000;
         int iAct;
 
-        LocationManager locationManager = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
-
         try {
-            criteria = new Criteria();
-            bestProvider = locationManager.getBestProvider(criteria, false);
 
-            if (null!=bestProvider) {
-                location = locationManager.getLastKnownLocation(bestProvider);
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                 if (null != location) {
 
 
+                //Projdi cilove body a eventuelne oznac navstivenej
+                for (int i = 0; i < aBody.size(); i++) {
+                    try {
+                        GeoBod bodAct = aBody.get(i);
+                        Location locAct = new Location("");
+                        locAct.setLatitude(bodAct.getdLat());
+                        locAct.setLongitude(bodAct.getdLong());
 
-                    //Projdi cilove body a eventuelne oznac navstivenej
-                    for (int i = 0; i < aBody.size(); i++) {
-                        try {
-                            GeoBod bodAct = aBody.get(i);
-                            Location locAct = new Location("");
-                            locAct.setLatitude(bodAct.getdLat());
-                            locAct.setLongitude(bodAct.getdLong());
+                        iAct = (int) location.distanceTo(locAct);
 
-                            iAct = (int) location.distanceTo(locAct);
-
-                            if (iAct < iMin) {
-                                iMin = iAct;
-                            }
-
-                            if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
-                                //pridame bod mezi navstivene
-                                aBodyNavstivene.add(bodAct);
-
-                                //a ulozime
-                                write_navstivene(ctx);
-
-                                aktualizujMapu();
-                            }
-
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
+                        if (iAct < iMin) {
+                            iMin = iAct;
                         }
+
+                        if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
+                            //pridame bod mezi navstivene
+                            aBodyNavstivene.add(bodAct);
+
+                            //a ulozime
+                            write_navstivene(ctx);
+
+                            aktualizujMapu();
+                        }
+
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -172,8 +198,36 @@ class GeoBody {
             e.printStackTrace();
         }
 
+        int iTimeout=100000;
+        int iDistance=100;
+
+        //pri priblizovani zkratime timeout
+        if (iMin < 20) { iTimeout = 1000; iDistance=0;}
+        else if (iMin < 30) {iTimeout = 5000; iDistance=1;}
+        else if (iMin < 50) {iTimeout = 10000; iDistance=5;}
+        else if (iMin < 100) {iTimeout = 30000; iDistance=20;}
+
+        registrujGPS(ctx, iTimeout, iDistance);
 
         //Okynka.zobrazOkynko(ctx, "nejblizsi je "+iMin);
         return iMin;
     }
+
+
+    // Define a listener that responds to location updates
+    LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+           //Okynka.zobrazOkynko(context, "location update");
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
 }

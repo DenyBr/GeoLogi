@@ -64,8 +64,8 @@ public class MapaActivity extends Activity {
 
         Marker.ENABLE_TEXT_LABELS_WHEN_NO_IMAGE = true;
 
-        List<IGeoPoint> nove = GeoBody.getInstance().aMapa_nove;
-        List<IGeoPoint> navstivene = GeoBody.getInstance().aMapa_navstivene;
+        List<IGeoPoint> nove = GeoBody.getInstance(this).aMapa_nove;
+        List<IGeoPoint> navstivene = GeoBody.getInstance(this).aMapa_navstivene;
 
         if (nove.size()>0) {
             mapController.animateTo(nove.get(nove.size()-1));

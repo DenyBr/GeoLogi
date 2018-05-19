@@ -1,7 +1,9 @@
 package com.deny.taborofka_zpravy;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -70,19 +73,21 @@ public class MainActivity extends ActionBarActivity {
         notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-/*        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, false);
-        location = locationManager.getLastKnownLocation(bestProvider);
-*/
+        if (this.checkSelfPermission( Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    1);
+        }
 
         Nastaveni.getInstance(this);
 
         read(this);
 
         IndicieSeznam.getInstance(this).read(this);
-        GeoBody.getInstance().read_navstivene(this);
+
+        GeoBody.getInstance(this).read_navstivene(this);
 
         zkontrolujZpravy(false);
 
@@ -396,14 +401,14 @@ public class MainActivity extends ActionBarActivity {
         int iTimeout = 60000;
 
         if (!Nastaveni.getInstance(this).getsHra().equals("")) {
-            int iMin = GeoBody.getInstance().iVzdalenostNejblizsiho(this);
+            int iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
 
             TextView vzd = (TextView) findViewById(R.id.vzdalenost);
             if (vzd != null) {
                 if (iMin < 1000) {
-                    vzd.setText("Nebjižší cílový bod: " + iMin + " metrů");
+                    vzd.setText("Nebjižší cílový bod: " + iMin + "m");
                 } else {
-                    vzd.setText("Nebjižší cílový bod: ? metrů");
+                    vzd.setText("Nebjižší cílový bod: ?m");
                 }
             }
 
@@ -435,7 +440,7 @@ public class MainActivity extends ActionBarActivity {
 
         //Okynka.zobrazOkynko(this, " "+z.getfZobrazitNaLat()+" " + z.getfZobrazitNaLong() );
 
-        return GeoBody.getInstance().bylNavstivenej(b);
+        return GeoBody.getInstance(this).bylNavstivenej(b);
     }
 
     private boolean zkontrolujCas (Zprava z) {
@@ -501,7 +506,7 @@ public class MainActivity extends ActionBarActivity {
         }
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
         if (hledanebody != null) {
-            hledanebody.setText("Cílové body: "+GeoBody.getInstance().aBodyNavstivene.size()+"/"+GeoBody.getInstance().aBody.size() );
+            hledanebody.setText("Cílové body: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
             // user can also set color using "Color" and then
             // "Color value constant"
             // myTitleText.setBackgroundColor(Color.GREEN);
@@ -516,7 +521,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
 
-        GeoBody.getInstance().aBody=new ArrayList<GeoBod>();
+        GeoBody.getInstance(this).aBody=new ArrayList<GeoBod>();
 
         //Okynka.zobrazOkynko(this, "kontroluju - pocet ziskanych indicii je "+IndicieActivity.aIndicieZiskane.size());
 
@@ -540,15 +545,15 @@ public class MainActivity extends ActionBarActivity {
                     //pridame cilovy bod na mapu
                     if ((z.getfCilovyBodLat()!=0) || (z.getfCilovyBodLong()!=0))
                     {
-                        GeoBody.getInstance().aBody.add(new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true));
-                        GeoBody.getInstance().aktualizujMapu();
+                        GeoBody.getInstance(this).aBody.add(new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true));
+                        GeoBody.getInstance(this).aktualizujMapu();
                     }
 
                     //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
                     if ((z.getfZobrazitNaLat()!=0) || (z.getfZobrazitNaLong()!=0))
                     {
-                        GeoBody.getInstance().aBody.add(new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false));
-                        GeoBody.getInstance().aktualizujMapu();
+                        GeoBody.getInstance(this).aBody.add(new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false));
+                        GeoBody.getInstance(this).aktualizujMapu();
                     }
 
                     //a pokud je to nova zprava, tak iniciujeme prekresleni
@@ -565,9 +570,9 @@ public class MainActivity extends ActionBarActivity {
                     if ((z.getfZobrazitNaLong()!=0) || (z.getfZobrazitNaLat()!=0))
                     {
                         GeoBod bod=new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
-                        if (!GeoBody.getInstance().jeHledanej(bod) &&
-                            (!GeoBody.getInstance().bylNavstivenej(bod))) {
-                            GeoBody.getInstance().aBody.add(bod);
+                        if (!GeoBody.getInstance(this).jeHledanej(bod) &&
+                            (!GeoBody.getInstance(this).bylNavstivenej(bod))) {
+                            GeoBody.getInstance(this).aBody.add(bod);
                         }
                     }
                 }

@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:minHeight="15dp">
-            >
 
             <TextView
                 android:id="@+id/nadpisek"
@@ -25,19 +24,19 @@
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/vzdalenost"
-
+                android:gravity="center"
                 android:layout_span="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/hledanebody"
-
+                android:gravity="center"
                 android:layout_span="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/indicii"
-
+                android:gravity= "center"
                 android:layout_span="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -72,10 +71,10 @@
             <Button
                 android:id="@+id/btnNastenka" android:enabled="true"
                 android:onClick="NastenkaClickHandler"
-                android:layout_width="140dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
-                android:minWidth="140dp"
-                android:width="140dp"
+                android:minWidth="160dp"
+                android:width="160dp"
                 android:height="15pt"
                 android:text="Nástěnka" />
 
@@ -85,8 +84,8 @@
                 android:onClick="IndicieClickHandler"
                  android:layout_width="140dp"
                  android:layout_height="wrap_content"
-                 android:minWidth="140dp"
-                 android:width="140dp"
+                 android:minWidth="160dp"
+                 android:width="160dp"
                  android:height="15pt"
                  android:text="Indicie"
                  />
@@ -94,10 +93,10 @@
             <Button
                 android:id="@+id/btnSettings" android:enabled="true"
                 android:onClick="SettingsClickHandler"
-                android:layout_width="140dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
-                android:minWidth="140dp"
-                android:width="140dp"
+                android:minWidth="160dp"
+                android:width="160dp"
                 android:height="15pt"
                 android:text="Nastavení"
                 android:layout_gravity="right"/>
