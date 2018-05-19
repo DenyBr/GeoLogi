@@ -35,18 +35,18 @@ class GeoBody {
     //seznam cilovych bodu - to jsou body, ktere budou zobrazeny na mape
     //a bodu na kterych bude zobrazena zprava -
     //ne nutne musi byt zobrazeny na mape - mohou napriklad dostat popis, ze maji dojit k rybniku
-    public ArrayList<GeoBod> aBody = new ArrayList<GeoBod>();
+    ArrayList<GeoBod> aBody = new ArrayList<>();
     //public ArrayList<GeoBod> aBodyHledane = new ArrayList<GeoBod>();
     //seznam navstivenych bodu - to jsou body, kam uz dosli
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
-    public ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<>();
+    ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<>();
 
 
-    Context context = null;
-    Criteria criteria = null;
-    String bestProvider = null;
-    Location location = null;
-    LocationManager locationManager = null;
+    private Context context = null;
+    private Criteria criteria = null;
+    private String bestProvider = null;
+    private Location location = null;
+    private LocationManager locationManager = null;
 
     List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
     List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();

@@ -164,7 +164,7 @@ public class Settings extends ActionBarActivity {
             sp.setSelection(iVybranyOddil);
 
         }
-    };
+    }
 
     public void hraVybrana(int iPozice) {
         //Okynka.zobrazOkynko(this, ""+iPozice + " " + hry.get(iPozice).getsIdWorkseet());
