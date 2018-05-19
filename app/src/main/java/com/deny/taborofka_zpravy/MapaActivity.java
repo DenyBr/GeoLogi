@@ -67,10 +67,11 @@ public class MapaActivity extends Activity {
         List<IGeoPoint> nove = GeoBody.getInstance(this).aMapa_nove;
         List<IGeoPoint> navstivene = GeoBody.getInstance(this).aMapa_navstivene;
 
+
         if (nove.size()>0) {
             mapController.animateTo(nove.get(nove.size()-1));
         } else if (navstivene.size()>0) {
-            mapController.animateTo(nove.get(navstivene.size()-1));
+            mapController.animateTo(navstivene.get(navstivene.size()-1));
         }
 
         SimplePointTheme pt_nove = new SimplePointTheme(nove, true);

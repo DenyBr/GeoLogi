@@ -150,7 +150,7 @@ public class IndicieSeznam {
             JSONArray rows = object.getJSONArray("rows");
             IndicieSeznam.getInstance().aIndicieVsechny = new ArrayList<Indicie>();
 
-            for (int r = 0; r < rows.length(); ++r) {
+            for (int r = 1; r < rows.length(); ++r) {
                 JSONObject row = rows.getJSONObject(r);
                 JSONArray columns = row.getJSONArray("c");
 

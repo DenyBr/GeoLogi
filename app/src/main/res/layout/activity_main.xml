@@ -54,7 +54,7 @@
                 android:onClick="syncClickHandler"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="140dp"
+                android:minWidth="130dp"
                 android:height="15pt"
                 android:text="Načíst zprávy" />
 
@@ -63,8 +63,8 @@
                 android:onClick="MapaClickHandler"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:minWidth="140dp"
-                android:width="140dp"
+                android:minWidth="120dp"
+                android:width="120dp"
                 android:height="15dp"
                 android:text="Mapa" />
 

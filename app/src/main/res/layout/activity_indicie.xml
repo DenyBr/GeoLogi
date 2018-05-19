@@ -13,11 +13,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+      <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:id="@+id/tvIndN"
+                android:layout_width="50pt"
+                android:layout_height="wrap_content"
+                android:minWidth="50pt"
+                android:width="50pt"
+                android:height="15pt"
+                android:text="Nová indicie: " />
+
+            <EditText
+                android:id="@+id/etIndH" android:enabled="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="80pt"
+                android:width="80pt"
+                android:text="" />
+            <Button
+                android:id="@+id/btnUlozit"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="buttonClickHandler"
+                android:text="Uložit" />
+        </TableRow>
+
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             >
 
             <ListView
@@ -27,35 +56,6 @@
                 android:layout_span="10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-            <TextView
-                android:id="@+id/tvIndN"
-                android:layout_width="100pt"
-                android:layout_height="wrap_content"
-                android:minWidth="100pt"
-                android:width="100pt"
-                android:height="15pt"
-                android:text="Nová indicie: " />
-
-            <EditText
-                android:id="@+id/etIndH" android:enabled="true"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:minWidth="100pt"
-                android:text="" />
-            <Button
-                android:id="@+id/btnUlozit"
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="buttonClickHandler"
-                android:text="Uložit" />
         </TableRow>
     </TableLayout>
 </android.support.constraint.ConstraintLayout>

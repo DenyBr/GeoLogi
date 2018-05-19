@@ -1,8 +1,12 @@
 package com.deny.taborofka_zpravy;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -16,6 +20,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -63,10 +68,14 @@ public class MainActivity extends ActionBarActivity {
     Vibrator v;
     Location location;
     ListView listview;
+    int iPocerzobr = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
+
         setContentView(R.layout.activity_main);
 
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -387,9 +396,6 @@ public class MainActivity extends ActionBarActivity {
     private boolean zkontrolujJestliMajiIndicie (Zprava z) {
         List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\s,]+"));
 
-       // Okynka.zobrazOkynko(this, "pocet povinnych: "+items.size()+" X"+items.get(0)+"X");
-
-
         for (int i=0; i<items.size(); i++) {
             if ((!items.get(i).equals(""))&&(!IndicieSeznam.getInstance(this).uzMajiIndicii(items.get(i)))) return false;
         }
@@ -401,24 +407,13 @@ public class MainActivity extends ActionBarActivity {
         int iTimeout = 60000;
 
         if (!Nastaveni.getInstance(this).getsHra().equals("")) {
-            int iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
-
-            TextView vzd = (TextView) findViewById(R.id.vzdalenost);
-            if (vzd != null) {
-                if (iMin < 1000) {
-                    vzd.setText("Nebjižší cílový bod: " + iMin + "m");
-                } else {
-                    vzd.setText("Nebjižší cílový bod: ?m");
-                }
-            }
+            int iMin = zkontrolujZpravy(false);
 
             //pri priblizovani zkratime timeout
             if (iMin < 20) iTimeout = 1000;
-            else if (iMin < 30) iTimeout = 5000;
-            else if (iMin < 50) iTimeout = 10000;
+            else if (iMin < 30) iTimeout = 2000;
+            else if (iMin < 50) iTimeout = 5000;
             else if (iMin < 100) iTimeout = 30000;
-
-            zkontrolujZpravy(false);
         }
 
         final Handler handler = new Handler();
@@ -430,8 +425,6 @@ public class MainActivity extends ActionBarActivity {
             }
         }, iTimeout);
     }
-
-
 
     private boolean zkontrolujLokaci (Zprava z) {
         if ((z.getfZobrazitNaLat()==0) || (z.getfZobrazitNaLong())==0) return true;
@@ -467,10 +460,7 @@ public class MainActivity extends ActionBarActivity {
                 //Okynka.zobrazOkynko(this, "po zprave " + z_po.getsPredmet());
 
                 if (z_po.getTsCasZobrazeni() == null) return false;
-
-
                 //Okynka.zobrazOkynko(this, "timestamp " + now.getTime() + " cas zobrazeni  " + z_po.getTsCasZobrazeni().getTime()+ " timeout " + (t.getTime()-t0.getTime()));
-
 
                 boolean res = new Timestamp(now.getTime()).after(new Timestamp(z_po.getTsCasZobrazeni().getTime()+ t.getTime()-t0.getTime()));
 
@@ -480,7 +470,7 @@ public class MainActivity extends ActionBarActivity {
             }
          }
          catch (Exception e) {
-            Okynka.zobrazOkynko(this, "chyba pri zpracovani casu zobrazeni zpravy: " + z.getiId() );
+            Okynka.zobrazOkynko(this, "chyba pri zpracovani času zobrazeni zpravy: " + z.getiId()+ " "+z.getsZobrazitPoCase() );
              return false;
         }
     }
@@ -492,34 +482,12 @@ public class MainActivity extends ActionBarActivity {
         return null;
     }
 
-    void zkontrolujZpravy (boolean bPrekreslit) {
+    int zkontrolujZpravy (boolean bPrekreslit) {
         ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
         bPrekreslit = bPrekreslit || (zpravyZobraz.size() == 0);
         boolean bNova = false;
 
-        TextView nadpis = (TextView) findViewById(R.id.nadpisek);
-        if (nadpis != null) {
-            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Oddil",""));
-            // user can also set color using "Color" and then
-            // "Color value constant"
-            // myTitleText.setBackgroundColor(Color.GREEN);
-        }
-        TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
-        if (hledanebody != null) {
-            hledanebody.setText("Cílové body: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
-            // user can also set color using "Color" and then
-            // "Color value constant"
-            // myTitleText.setBackgroundColor(Color.GREEN);
-        }
-
-        TextView indicie = (TextView) findViewById(R.id.indicii);
-        if (indicie != null) {
-            indicie.setText("Indicie: "+IndicieSeznam.getInstance(this).aIndicieZiskane.size()+"/"+IndicieSeznam.getInstance(this).aIndicieVsechny.size() );
-            // user can also set color using "Color" and then
-            // "Color value constant"
-            // myTitleText.setBackgroundColor(Color.GREEN);
-        }
-
+        iPocerzobr++;
 
         GeoBody.getInstance(this).aBody=new ArrayList<GeoBod>();
 
@@ -543,17 +511,26 @@ public class MainActivity extends ActionBarActivity {
                     zpravy.add(z);
 
                     //pridame cilovy bod na mapu
+
                     if ((z.getfCilovyBodLat()!=0) || (z.getfCilovyBodLong()!=0))
                     {
-                        GeoBody.getInstance(this).aBody.add(new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true));
-                        GeoBody.getInstance(this).aktualizujMapu();
+                        GeoBod cilovyBod = new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true);
+
+                        if (!GeoBody.getInstance(this).jeHledanej(cilovyBod)) {
+                            GeoBody.getInstance(this).aBody.add(cilovyBod);
+                            GeoBody.getInstance(this).aktualizujMapu();
+                        }
                     }
 
                     //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
                     if ((z.getfZobrazitNaLat()!=0) || (z.getfZobrazitNaLong()!=0))
                     {
-                        GeoBody.getInstance(this).aBody.add(new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false));
-                        GeoBody.getInstance(this).aktualizujMapu();
+                        GeoBod hledanyBod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false);
+
+                        if (!GeoBody.getInstance(this).jeHledanej(hledanyBod)) {
+                            GeoBody.getInstance(this).aBody.add(hledanyBod);
+                            GeoBody.getInstance(this).aktualizujMapu();
+                        }
                     }
 
                     //a pokud je to nova zprava, tak iniciujeme prekresleni
@@ -608,33 +585,93 @@ public class MainActivity extends ActionBarActivity {
                 //zkus prehrat zvuk
                 notificationRingtone.play();
 
-                //a zavibrovat - API bude deprecated ve verzi 26
-                v.vibrate(500);
-                //}
+                //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
             } catch (Exception e) {
                 // nedelej nic
-                //Okynka.zobrazOkynko(this, "nepodarilo se prehrat zpravu");
+            }
+        }
+        write(this);
+
+        TextView nadpis = (TextView) findViewById(R.id.nadpisek);
+        if (nadpis != null) {
+            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Oddil","")+" "+iPocerzobr);
+        }
+        TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
+
+        if (hledanebody != null) {
+            hledanebody.setText("Cílové body: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
+        }
+
+        TextView indicie = (TextView) findViewById(R.id.indicii);
+        if (indicie != null) {
+            indicie.setText("Indicie: "+IndicieSeznam.getInstance(this).aIndicieZiskane.size()+"/"+IndicieSeznam.getInstance(this).aIndicieVsechny.size() );
+        }
+
+        int iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
+
+        TextView vzd = (TextView) findViewById(R.id.vzdalenost);
+        if (vzd != null) {
+            if (iMin < 1000) {
+                vzd.setText("Nebjižší cílový bod: " + iMin + "m");
+            } else {
+                vzd.setText("Nebjižší cílový bod: ?m");
             }
         }
 
-        write(this);
+        return iMin;
     }
 
     public void testClickHandler(View view) {
 
+
+        for (int i=0; i<GeoBody.getInstance(this).aBody.size(); i++) {
+            Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance(this).aBody.get(i).getdLat() +" "+ GeoBody.getInstance(this).aBody.get(i).getPopis()+" "+GeoBody.getInstance(this).aBody.get(i).getbViditelny());
+        }
         /*
-        for (int i=0; i<GeoBody.getInstance().aBody.size(); i++) {
-            Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance().aBody.get(i).getdLat() +" "+ GeoBody.getInstance().aBody.get(i).getPopis()+" "+GeoBody.getInstance().aBody.get(i).getbViditelny());
-        }*/
         for (int i=0; i<zpravyKomplet.size(); i++) {
             Okynka.zobrazOkynko(this, zpravyKomplet.get(i).getiId() + " cas: " + zkontrolujCas(zpravyKomplet.get(i))+ " lokace: " + zkontrolujLokaci(zpravyKomplet.get(i)) + " Indicie: " + zkontrolujJestliMajiIndicie(zpravyKomplet.get(i)) + " pocet indicii: " + zpravyKomplet.get(i).getiPocetIndicii());
-        }
+        }*/
 
 
     }
 
+    private void sendNotification(String message, String tick, String title, boolean sound, boolean vibrate, int iconID) {
+        /*Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+        Notification notification = new Notification();
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
+
+        if (sound) {
+            notification.defaults |= Notification.DEFAULT_SOUND;
+        }
+
+        if (vibrate) {
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
+        }
+
+        notificationBuilder.setDefaults(notification.defaults);
+        notificationBuilder.setSmallIcon(iconID)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setTicker(tick)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, notificationBuilder.build());
+        */
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        zkontrolujZpravy(true);
     }
 }
