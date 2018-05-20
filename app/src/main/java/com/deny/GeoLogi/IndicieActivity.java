@@ -2,8 +2,9 @@ package com.deny.GeoLogi;
 
 import android.content.pm.ActivityInfo;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -12,7 +13,7 @@ import android.widget.ListView;
 import com.example.progress.Taborofka.R;
 
 
-public class IndicieActivity extends ActionBarActivity {
+public class IndicieActivity extends AppCompatActivity {
     private ListView listview;
     private Handler handler = new Handler();
 

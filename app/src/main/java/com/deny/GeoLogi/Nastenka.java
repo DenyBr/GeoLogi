@@ -1,17 +1,19 @@
 package com.deny.GeoLogi;
 
-import android.support.v7.app.ActionBarActivity;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.example.progress.Taborofka.R;
 
-public class Nastenka extends ActionBarActivity {
+public class Nastenka extends AppCompatActivity {
 
     private WebView mWebView;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

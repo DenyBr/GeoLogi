@@ -14,8 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -46,7 +46,7 @@ import java.util.List;
 
  */
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "Http";
     //ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
     ArrayList<Zprava> zpravyKomplet = new ArrayList<Zprava>();

@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,7 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Settings extends ActionBarActivity {
+public class Settings extends AppCompatActivity {
 
     Nastaveni pNastaveni = Nastaveni.getInstance(this);
     ArrayList<Hra> hry = new ArrayList<Hra>();

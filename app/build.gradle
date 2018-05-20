@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId 'com.deny.taborofka_zpravy'
         minSdkVersion 15
@@ -32,10 +32,10 @@ configurations {
 
 
 dependencies {
-    implementation 'com.android.support:support-v4:21.0.3'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     //implementation 'com.google.android.gms:play-services-drive:11.8.0'
-    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.google.android.gms:play-services:12.0.1'
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.api-client:google-api-client:1.23.0'
@@ -43,7 +43,7 @@ dependencies {
     compile 'com.google.apis:google-api-services-drive:v3-rev107-1.23.0'
 
 
-    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'commons-net:commons-net:3.6'
     compile 'org.osmdroid:osmdroid-android:5.6.5'
     // implementation files('build/commons-net-3.6.jar')
