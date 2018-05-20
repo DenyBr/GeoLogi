@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Handler;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,9 +23,14 @@ public class IndicieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+        if ((this.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+           setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else
+        {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         setContentView(R.layout.activity_indicie);
 

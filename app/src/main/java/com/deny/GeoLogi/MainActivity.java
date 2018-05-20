@@ -515,7 +515,7 @@ public class MainActivity extends AppCompatActivity {
                     //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
                     if ((z.getfZobrazitNaLat()!=0) || (z.getfZobrazitNaLong()!=0))
                     {
-                        GeoBod hledanyBod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), z.getsCilovyBodPopis(), false);
+                        GeoBod hledanyBod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
 
                         if (!GeoBody.getInstance(this).jeHledanej(hledanyBod)) {
                             GeoBody.getInstance(this).aBody.add(hledanyBod);

@@ -134,7 +134,7 @@ class GeoBody {
 
     public boolean bylNavstivenej(GeoBod b) {
         for (int i = 0; i < aBodyNavstivene.size(); i++) {
-            if ((abs(b.getdLat() - aBodyNavstivene.get(i).getdLat()) < 0.0001) && (abs(b.getdLong() - aBodyNavstivene.get(i).getdLong()) < 0.0001))
+            if ((abs(b.getdLat() - aBodyNavstivene.get(i).getdLat()) < 0.00001) && (abs(b.getdLong() - aBodyNavstivene.get(i).getdLong()) < 0.00001))
                 return true;
         }
         return false;
@@ -142,8 +142,19 @@ class GeoBody {
 
     public boolean jeHledanej(GeoBod b) {
         for (int i = 0; i < aBody.size(); i++) {
-            if ((abs(b.getdLat() - aBody.get(i).getdLat()) < 0.0001) && (abs(b.getdLong() - aBody.get(i).getdLong()) < 0.0001))
+            GeoBod bodzeseznamu = aBody.get(i);
+
+            if ((abs(b.getdLat() - bodzeseznamu.getdLat()) < 0.00001) && (abs(b.getdLong() - bodzeseznamu.getdLong()) < 0.00001)) {
+                //pokud je pod s seznamu neviditelny, ale ted se hleda viditelny, tak ho zviditelnime na mape
+                if (b.getbViditelny() && !bodzeseznamu.getbViditelny()) {
+                    bodzeseznamu.setbViditelny(true);
+                    bodzeseznamu.setPopis(b.getPopis());
+
+                    aktualizujMapu();
+                }
+
                 return true;
+            }
         }
         return false;
     }
@@ -155,7 +166,6 @@ class GeoBody {
         int iAct;
 
         try {
-
                 try {
                     location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 }
