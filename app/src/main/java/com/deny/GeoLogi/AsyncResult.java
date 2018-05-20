@@ -1,4 +1,4 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import org.json.JSONObject;
 

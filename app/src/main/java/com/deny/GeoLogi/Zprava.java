@@ -1,10 +1,9 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 public class Zprava implements Serializable {

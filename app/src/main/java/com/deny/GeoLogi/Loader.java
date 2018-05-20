@@ -1,4 +1,4 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 /**
  * Created by bruzlzde on 10.3.2018.

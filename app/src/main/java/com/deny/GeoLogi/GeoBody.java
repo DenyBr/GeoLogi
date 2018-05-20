@@ -1,15 +1,11 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
@@ -19,7 +15,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +77,9 @@ class GeoBody {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, iTimeout, iDistance, locationListener);
 
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-       } catch (Exception e) {
+        } catch (SecurityException e) {
+            Okynka.zobrazOkynko(context, "" + e.getMessage());
+        } catch (Exception e) {
             //Okynka.zobrazOkynko(context, "" + e.getMessage());
         }
 
@@ -159,7 +156,12 @@ class GeoBody {
 
         try {
 
-                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                try {
+                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                }
+                catch (SecurityException e) {
+                    //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
+                }
 
                 if (null != location) {
 

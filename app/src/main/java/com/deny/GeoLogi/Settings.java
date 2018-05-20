@@ -1,13 +1,9 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,7 +23,6 @@ import org.json.JSONObject;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class Settings extends ActionBarActivity {
 

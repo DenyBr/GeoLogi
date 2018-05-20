@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.deny.taborofka_zpravy.Settings">
+    tools:context="com.deny.GeoLogi.Settings">
 
     <TableLayout
         android:layout_width="match_parent"

@@ -1,8 +1,7 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import android.content.Context;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;

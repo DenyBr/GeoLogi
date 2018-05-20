@@ -1,13 +1,9 @@
-package com.deny.taborofka_zpravy;
-
-import com.google.common.base.Function;
+package com.deny.GeoLogi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**

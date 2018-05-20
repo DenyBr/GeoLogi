@@ -1,4 +1,4 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -1,4 +1,4 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;

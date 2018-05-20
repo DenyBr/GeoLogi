@@ -15,7 +15,7 @@
         android:label="GeoLogi"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.deny.taborofka_zpravy.MainActivity"
+            android:name="com.deny.GeoLogi.MainActivity"
             android:label="GeoLogi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.deny.taborofka_zpravy.Settings" />
-        <activity android:name="com.deny.taborofka_zpravy.Nastenka" />
-        <activity android:name="com.deny.taborofka_zpravy.MapaActivity" />
-        <activity android:name="com.deny.taborofka_zpravy.IndicieActivity"></activity>
+        <activity android:name="com.deny.GeoLogi.Settings" />
+        <activity android:name="com.deny.GeoLogi.Nastenka" />
+        <activity android:name="com.deny.GeoLogi.MapaActivity" />
+        <activity android:name="com.deny.GeoLogi.IndicieActivity"></activity>
     </application>
 
 </manifest>

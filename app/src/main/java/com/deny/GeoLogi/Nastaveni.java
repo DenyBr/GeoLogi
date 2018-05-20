@@ -1,11 +1,10 @@
-package com.deny.taborofka_zpravy;
+package com.deny.GeoLogi;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
 
-import android.app.Activity;
 import android.content.Context;
 
 
