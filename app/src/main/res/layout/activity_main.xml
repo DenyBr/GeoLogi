@@ -114,7 +114,7 @@
                 android:layout_gravity="right"/>
             <Button
                 android:id="@+id/btnTest" android:enabled="true"
-                android:visibility="visible"
+                android:visibility="invisible"
                 android:onClick="testClickHandler"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
