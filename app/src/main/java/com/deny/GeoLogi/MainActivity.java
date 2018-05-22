@@ -80,6 +80,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Init();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                casovyupdate();
+            }
+        }, 1000);
+    }
+
+    private void Init () {
+        //Okynka.zobrazOkynko(this, "sutady");
+
         Nastaveni.getInstance(this);
 
         read(this);
@@ -89,16 +103,6 @@ public class MainActivity extends AppCompatActivity {
         GeoBody.getInstance(this).read_navstivene(this);
 
         zkontrolujZpravy(false);
-
-
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                casovyupdate();
-            }
-        }, 1000);
     }
 
     private void read (Context context) {
@@ -141,7 +145,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void syncClickHandler(View view) {
-        //btnDownload = (Button) findViewById(R.id.btnDownload);
+        downloadJson();
+    }
+
+    private void downloadJson () {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         try {
@@ -162,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e) {
             Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům - chyba 2 ");
         }
-
     }
 
     public void SettingsClickHandler(View view) {
@@ -190,7 +196,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        zkontrolujZpravy(true);
+        if (resultCode==2) {
+            downloadJson();
+        } else {
+            Init();
+        }
     }
 
     public void clearClickHandler(View view) {
@@ -199,8 +209,7 @@ public class MainActivity extends AppCompatActivity {
         clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"indicievsecny.txt");
         clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
 
-        read(this);
-        zkontrolujZpravy(false);
+        Init();
     }
 
     public void zapisNavstivenyTest (String fileName) {
@@ -621,8 +630,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<zpravyKomplet.size(); i++) {
             Okynka.zobrazOkynko(this, zpravyKomplet.get(i).getiId() + " cas: " + zkontrolujCas(zpravyKomplet.get(i))+ " lokace: " + zkontrolujLokaci(zpravyKomplet.get(i)) + " Indicie: " + zkontrolujJestliMajiIndicie(zpravyKomplet.get(i)) + " pocet indicii: " + zpravyKomplet.get(i).getiPocetIndicii());
         }*/
-
-
     }
 
     private void sendNotification(String message, String tick, String title, boolean sound, boolean vibrate, int iconID) {
@@ -656,6 +663,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManager.notify(0, notificationBuilder.build());
         */
     }
+
 
 
     @Override
