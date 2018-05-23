@@ -73,7 +73,7 @@ public class MapaActivity extends Activity {
         textStyleNove.setStyle(Paint.Style.FILL);
         textStyleNove.setColor(Color.parseColor("#000000"));
         textStyleNove.setTextAlign(Paint.Align.CENTER);
-        textStyleNove.setTextSize(24);
+      //  textStyleNove.set setTextSize(24);
 
         SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
                 .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)

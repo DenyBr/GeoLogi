@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     Location location;
     ListView listview;
     int iPocerzobr = 0;
+    Timestamp tsLastUpdate = null;
+    boolean bConnectionLost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -402,6 +404,32 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private void serverUpdate () {
+        //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
+        //se zaktualizuje seznam zprav a odesla aktualni stav indicii a navstivenych bodu
+
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        try {
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                if ((tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + 1800000))) {
+                    bConnectionLost = false;
+                    tsLastUpdate = now;
+                    downloadJson();
+                }
+            } else {
+                bConnectionLost = true;
+            }
+        }
+        catch (Exception e) {
+            bConnectionLost = true;
+        }
+        tsLastUpdate = now;
+    }
+
+
     private void casovyupdate () {
         int iTimeout = 60000;
 
@@ -414,6 +442,8 @@ public class MainActivity extends AppCompatActivity {
             else if (iMin < 50) iTimeout = 5000;
             else if (iMin < 100) iTimeout = 30000;
         }
+
+        serverUpdate();
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
