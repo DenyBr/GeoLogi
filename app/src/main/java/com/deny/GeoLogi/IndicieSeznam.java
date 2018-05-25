@@ -3,6 +3,7 @@ package com.deny.GeoLogi;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -14,15 +15,26 @@ import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.DriveScopes;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,16 +108,24 @@ public class IndicieSeznam {
     public void write (Context context) {
         try {
             OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", Context.MODE_PRIVATE);
+            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsHra().replace(' ','_')+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskanec.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
 
             out.writeInt(aIndicieZiskane.size());
 
             for (int i=0; i<aIndicieZiskane.size(); i++) {
                 out.writeObject(aIndicieZiskane.get(i));
-            }
+
+                writer.write (aIndicieZiskane.get(i).getsTexty().get(0));
+                writer.write('\r');
+                writer.write('\n');
+             }
 
             out.close();
             fileOut.close();
+            writer.close();
+            fileOutC.close();
         } catch (IOException ex) {Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
         }
 
@@ -174,131 +194,6 @@ public class IndicieSeznam {
         }
     }
 
-
-    public void nactizgdrive(Context context) {
-        try {
-            authorize(context, "zdenek.bruzl@gmail.com");
-        } catch (IOException e) {
-            Okynka.zobrazOkynko(context, e.getMessage());
-
-        }
-
-    }
-
-    public void authorize(Context context, String userID) throws IOException {
-
-        Okynka.zobrazOkynko(context, "su tady");
-        // load client secrets
-
-        // set up authorization code flow
-        Collection<String> scopes = new ArrayList<String>();
-        scopes.add(DriveScopes.DRIVE_APPDATA);
-
-        java.io.File dts = context.getCacheDir();
-
-        HttpTransport httpTransport = null;
-        try {
-            httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        }
-        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
-        DataStoreFactory dataStoreFactory = new FileDataStoreFactory( dts);
-
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                clientSecrets, scopes). setDataStoreFactory(dataStoreFactory).build();
-        // authorize
-        /*Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()) {
-            // Override open browser not working well on Linux and maybe other
-            // OS.
-            protected void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws java.io.IOException {
-
-            }
-        }.authorize(userID);
-
-
-        Okynka.zobrazOkynko(this, "inicializovano");
-
-        Drive drive = new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("taborofka").build();
-
-        Okynka.zobrazOkynko(this, "drive vytvoren");
-
-
-        String folderId = "19D_IAwk4XNGqGNfaxrPXFKpSulWJydu5";
-
-        File fileMetadata = new File();
-        fileMetadata.setName("photo.jpg");
-        fileMetadata.setParents(Collections.singletonList(folderId));
-        java.io.File filePath = new java.io.File("indicieziskane.txt");
-        FileContent mediaContent = new FileContent("txt", filePath);
-        File file = drive.files().create(fileMetadata, mediaContent)
-                .setFields("id, parents")
-                .execute();
-        Okynka.zobrazOkynko(this, "File ID: " + file.getId());
-
-*/
-    }
-
-
-    public void nactizftp() {
-        connnectingwithFTP("ftp.volny.cz", "bruzl", "ASDKL.");
-    }
-
-
-    public void connnectingwithFTP(String ip, String userName, String pass) {
-   /*
-        boolean status = false;
-        //try {
-        try {
-
-            FTPClient mFtpClient = null;
-
-            mFtpClient = new FTPSClient();
-
-            if (mFtpClient!=null) {
-                Okynka.zobrazOkynko(this, "jsflksdjflks");
-
-                mFtpClient.setConnectTimeout(10 * 1000);
-                mFtpClient.connect(InetAddress.getByName(ip));
-
-                status = mFtpClient.login(userName, pass);
-
-                if (FTPReply.isPositiveCompletion(mFtpClient.getReplyCode())) {
-                    mFtpClient.setFileType(FTP.BINARY_FILE_TYPE);
-                    mFtpClient.enterLocalPassiveMode();
-                    //FTPFile[] mFileArray = mFtpClient.listFiles();
-                    FTPFile ftpFile = mFtpClient.mlistFile("tabor.JPG");
-
-                    if (ftpFile != null) {
-                        String name = ftpFile.getName();
-                        long size = ftpFile.getSize();
-                        String timestamp = ftpFile.getTimestamp().getTime().toString();
-                        String type = ftpFile.isDirectory() ? "Directory" : "File";
-
-                        Okynka.zobrazOkynko(this, "Name: " + name);
-                        System.out.println("Size: " + size);
-                        System.out.println("Type: " + type);
-                        Okynka.zobrazOkynko(this, "Timestamp: " + timestamp);
-                    } else {
-                        Okynka.zobrazOkynko(this, "The specified file/directory may not exist!");
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (Exception e) {
-            Okynka.zobrazOkynko(this, "chyba" + e.getMessage());
-        }
-*/
-    }
-
-
     public static boolean uzMajiIndicii(String uzMaji) {
         for (int i=0; i<aIndicieZiskane.size(); i++) {
             if (aIndicieZiskane.get(i).jeToOno(uzMaji)) {
@@ -307,17 +202,6 @@ public class IndicieSeznam {
         }
         return false;
     }
-
-  /*  public ArrayList<String> publikujZiskane() {
-        ArrayList<String> a = new ArrayList<String>();
-
-        for (int i=0; i<aIndicieZiskane.size(); i++) {
-            a.add(aIndicieZiskane.get(i).getsTexty().get(0));
-        }
-
-        return a;
-    }
-*/
 
     private IndicieSeznam(Context context) {
         ctx = context;

@@ -10,11 +10,14 @@ import android.os.Bundle;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,16 +120,25 @@ class GeoBody {
     public void write_navstivene(Context context) {
         try {
             OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt", Context.MODE_PRIVATE);
+            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsHra().replace(' ','_') + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.txt", Context.MODE_PRIVATE);
+
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
+
 
             out.writeInt(aBodyNavstivene.size());
 
             for (int i = 0; i < aBodyNavstivene.size(); i++) {
                 out.writeObject(aBodyNavstivene.get(i));
+
+                writer.write(aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis()+"\n\r");
             }
 
             out.close();
             fileOut.close();
+            writer.close();
+            fileOutC.close();
+
         } catch (IOException ex) {
             Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
         }

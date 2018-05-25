@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -59,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     int iPocerzobr = 0;
     Timestamp tsLastUpdate = null;
     boolean bConnectionLost = false;
+    //jak casto se bude stahovat a updatovat server
+    final int iTimeoutUpdate = 30000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +98,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Init () {
-        //Okynka.zobrazOkynko(this, "sutady");
-
         Nastaveni.getInstance(this);
 
         read(this);
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private void read (Context context) {
         zpravyKomplet = new ArrayList<Zprava>();
         try {
-            InputStream inputStream =  context.openFileInput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
+            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -137,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
-                //if (!zpravyKomplet.get(i).getbZobrazeno()) Okynka.zobrazOkynko(this, "nezobrazena zprava");
             }
 
             out.close();
@@ -199,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode==2) {
-            downloadJson();
+            serverUpdate(true);
         } else {
             Init();
         }
@@ -404,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void serverUpdate () {
+    private void serverUpdate (boolean bProvedHned) {
         //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
         //se zaktualizuje seznam zprav a odesla aktualni stav indicii a navstivenych bodu
 
@@ -414,10 +415,17 @@ public class MainActivity extends AppCompatActivity {
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                if ((tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + 1800000))) {
+                if ((bProvedHned) || (tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + iTimeoutUpdate))) {
                     bConnectionLost = false;
                     tsLastUpdate = now;
+
+                    Log.d("Main", "Stahuju aktualni seznam zprav a indicii");
                     downloadJson();
+                    IndicieSeznam.getInstance(this).nactizwebu(this);
+
+                    Log.d("Main", "Odesilam data na server");
+                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
+                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
                 }
             } else {
                 bConnectionLost = true;
@@ -443,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
             else if (iMin < 100) iTimeout = 30000;
         }
 
-        serverUpdate();
+        serverUpdate(false);
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -623,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView nadpis = (TextView) findViewById(R.id.nadpisek);
         if (nadpis != null) {
-            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Oddil","")+" "+iPocerzobr);
+            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Oddil","") /* + " "+iPocerzobr*/);
         }
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
 
@@ -651,11 +659,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void testClickHandler(View view) {
-
-
-        for (int i=0; i<GeoBody.getInstance(this).aBody.size(); i++) {
+        /*for (int i=0; i<GeoBody.getInstance(this).aBody.size(); i++) {
             Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance(this).aBody.get(i).getdLat() +" "+ GeoBody.getInstance(this).aBody.get(i).getPopis()+" "+GeoBody.getInstance(this).aBody.get(i).getbViditelny());
-        }
+        }*/
         /*
         for (int i=0; i<zpravyKomplet.size(); i++) {
             Okynka.zobrazOkynko(this, zpravyKomplet.get(i).getiId() + " cas: " + zkontrolujCas(zpravyKomplet.get(i))+ " lokace: " + zkontrolujLokaci(zpravyKomplet.get(i)) + " Indicie: " + zkontrolujJestliMajiIndicie(zpravyKomplet.get(i)) + " pocet indicii: " + zpravyKomplet.get(i).getiPocetIndicii());
@@ -692,6 +698,10 @@ public class MainActivity extends AppCompatActivity {
 
         notificationManager.notify(0, notificationBuilder.build());
         */
+    }
+
+    private void uploadFile (String sFileName) {
+        new UploadFTPFileTask(this).execute(sFileName);
     }
 
 
