@@ -14,11 +14,6 @@ import android.content.Context;
 
 public class Nastaveni extends Properties {
     private static Nastaveni instance = null;
-    private int iIDOddilu=0;
-    private String sHra="";
-    private String sIdWorkseet="";
-    private String sNastenka="";
-
 
     public static Nastaveni getInstance(Context context) {
         if (instance == null)
@@ -52,11 +47,6 @@ public class Nastaveni extends Properties {
 
                load(inputStream);
 
-               iIDOddilu = Integer.parseInt(getProperty("ID", "0"));
-               sHra = getProperty("Hra", "");
-               sNastenka = getProperty("Nastenka", "");
-               sIdWorkseet = getProperty("IdWorkseet", "");
-
                 //Okynka.zobrazOkynko(context, sHra);
 
                 inputStream.close();
@@ -68,11 +58,12 @@ public class Nastaveni extends Properties {
     }
 
 
-    public int getiIDOddilu() {return iIDOddilu;}
+    public int getiIDOddilu() {return Integer.parseInt(getProperty("ID", ""));}
 
-    public String getsHra() {return sHra;}
+    public String getsHra() {return getProperty("Hra", "");}
 
-    public String getsNastenka() {return sNastenka;}
+    public String getsNastenka() {return getProperty("Nastenka", "");}
 
-    public String getsIdWorkseet() {return sIdWorkseet; }
+    public String getsIdWorkseet() {return getProperty("IdWorkseet", "");
+    }
 }

@@ -76,7 +76,7 @@
                 android:minWidth="160dp"
                 android:width="160dp"
                 android:height="15pt"
-                android:text="Nástěnka" />
+                android:text="Informace" />
 
 
              <Button
@@ -93,6 +93,7 @@
             <Button
                 android:id="@+id/btnSettings" android:enabled="true"
                 android:onClick="SettingsClickHandler"
+                android:visibility="invisible"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:minWidth="160dp"

@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d("Main", "Odesilam data na server");
                     uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
-                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
+                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
                 }
             } else {
                 bConnectionLost = true;
@@ -614,6 +614,8 @@ public class MainActivity extends AppCompatActivity {
                     zkontrolujZpravy(true);
                 }
             });
+
+
          }
 
         if (bNova) {
@@ -631,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView nadpis = (TextView) findViewById(R.id.nadpisek);
         if (nadpis != null) {
-            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Oddil","") /* + " "+iPocerzobr*/);
+            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Uzivatel","") /* + " "+iPocerzobr*/);
         }
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
 

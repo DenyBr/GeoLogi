@@ -92,25 +92,39 @@ public class Settings extends AppCompatActivity {
                 JSONObject row = rows.getJSONObject(r);
                 JSONArray columns = row.getJSONArray("c");
 
+                String sId = "";
+                try {
+                    sId = columns.getJSONObject(0).getString("v");
+                } catch (Exception e) {
+                }
+
                 String sHra = "";
                 try {
-                    sHra = columns.getJSONObject(0).getString("v");
+                    sHra = columns.getJSONObject(1).getString("v");
                 } catch (Exception e) {
                 }
 
                 String sIdWorksheet = "";
                 try {
-                    sIdWorksheet = columns.getJSONObject(1).getString("v");
+                    sIdWorksheet = columns.getJSONObject(2).getString("v");
                 } catch (Exception e) {
                 }
 
                 String sNastenka = "";
                 try {
-                    sNastenka = columns.getJSONObject(2).getString("v");
+                    sNastenka = columns.getJSONObject(3).getString("v");
                 } catch (Exception e) {
                 }
 
-                Hra hra = new Hra(sHra, sIdWorksheet, sNastenka);
+                String sVerejna = "";
+                boolean bVerejna = false;
+                try {
+                    sVerejna = columns.getJSONObject(4).getString("v");
+                    bVerejna = (sVerejna.toLowerCase().equals("Ano"));
+                } catch (Exception e) {
+                }
+
+                Hra hra = new Hra(sId, sHra, sIdWorksheet, sNastenka, bVerejna);
                 hry.add(hra);
             }
 
@@ -144,7 +158,7 @@ public class Settings extends AppCompatActivity {
     public class VyberOddil implements Runnable {
 
         public void run() {
-            //Okynka.zobrazOkynko(Settings.this, "Oddilu je : "+ Oddily.getInstance().aOddily.size());
+            //Okynka.zobrazOkynko(Settings.this, "Oddilu je : "+ Uzivatele.getInstance().aOddily.size());
 
 
             Spinner sp = (Spinner) findViewById(R.id.spinOddily);
@@ -152,10 +166,10 @@ public class Settings extends AppCompatActivity {
 
             ArrayList<String> ao = new ArrayList<String>();
 
-            for(int i = 0; i<Oddily.getInstance().aOddily.size();i++) {
-                ao.add(Oddily.getInstance().aOddily.get(i).getsNazev());
+            for(int i = 0; i< Uzivatele.getInstance().aOddily.size(); i++) {
+                ao.add(Uzivatele.getInstance().aOddily.get(i).getsNazev());
 
-               /* if (Oddily.getInstance().aOddily.get(i).getiId() == pNastaveni.getiIDOddilu()) {
+               /* if (Uzivatele.getInstance().aOddily.get(i).getiId() == pNastaveni.getiIDOddilu()) {
                     iVybranyOddil = i;
                 }*/
             }
@@ -176,7 +190,7 @@ public class Settings extends AppCompatActivity {
         iVybranaHra = iPozice;
 
         if (!"".equals(hry.get(iPozice).getsIdWorkseet())) {
-            Oddily.getInstance().reload(hry.get(iPozice).getsIdWorkseet(), updateOddily);
+            Uzivatele.getInstance().reload(hry.get(iPozice).getsIdWorkseet(), updateOddily);
         }
 
     }
@@ -184,20 +198,20 @@ public class Settings extends AppCompatActivity {
     public void buttonClickHandler(View view) {
         TextView tvHeslo = (EditText) findViewById(R.id.etHesloH);
 
-        //pNastaveni.setProperty("Oddil", tvOddil.getText().toString());
+        //pNastaveni.setProperty("Uzivatel", tvOddil.getText().toString());
         Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
         Spinner spHra = (Spinner) findViewById(R.id.spinHry);
 
-        //Okynka.zobrazOkynko(Settings.this, "x"+Oddily.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
+        //Okynka.zobrazOkynko(Settings.this, "x"+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
 
-        if (!(Oddily.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString())))
+        if (!(Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString())))
         {
             Okynka.zobrazOkynko(this, "Neplatné heslo");
 
         } else {
             pNastaveni.setProperty("Heslo", tvHeslo.getText().toString());
-            pNastaveni.setProperty("ID", ""+Oddily.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
-            pNastaveni.setProperty("Oddil", Oddily.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
+            pNastaveni.setProperty("ID", ""+ Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
+            pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
             pNastaveni.setProperty("Hra", hry.get(spHra.getSelectedItemPosition()).getsHra());
             pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
             pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());

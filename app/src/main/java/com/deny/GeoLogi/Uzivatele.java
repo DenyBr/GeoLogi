@@ -10,23 +10,23 @@ import java.util.ArrayList;
  * Created by bruzlzde on 23.2.2018.
  */
 
-public class Oddily {
-    public ArrayList<Oddil> aOddily = new ArrayList<Oddil>();
-    private static Oddily instance=null;
+public class Uzivatele {
+    public ArrayList<Uzivatel> aOddily = new ArrayList<Uzivatel>();
+    private static Uzivatele instance=null;
     Runnable r_callback=null;
 
-    static public Oddily getInstance()
+    static public Uzivatele getInstance()
     {
         if (instance == null)
         {
             // Create the instance
-            instance = new Oddily();
+            instance = new Uzivatele();
         }
 
         return instance;
     }
 
-    private Oddily() {
+    private Uzivatele() {
 
     }
 
@@ -37,7 +37,7 @@ public class Oddily {
                 public void onResult(JSONObject object) {
                     processJson(object);
                 }
-            }).execute("https://docs.google.com/spreadsheets/d/" + wID + "/gviz/tq?sheet=Oddily");
+            }).execute("https://docs.google.com/spreadsheets/d/" + wID + "/gviz/tq?sheet=Uzivatele");
 
             r_callback = callback;
         }
@@ -47,7 +47,7 @@ public class Oddily {
 
         try {
             JSONArray rows = object.getJSONArray("rows");
-            aOddily = new ArrayList<Oddil>();
+            aOddily = new ArrayList<Uzivatel>();
 
             for (int r = 0; r < rows.length(); ++r) {
                 JSONObject row = rows.getJSONObject(r);
@@ -70,7 +70,15 @@ public class Oddily {
                 } catch (Exception e) {
                 }
 
-                Oddil o = new Oddil(iId, sOddil, sHeslo);
+                String sRoot = "";
+                boolean bRoot = false;
+                try {
+                    sRoot = columns.getJSONObject(3).getString("v");
+                    bRoot = (sRoot.toLowerCase().equals("Ano"));
+                } catch (Exception e) {
+                }
+
+                Uzivatel o = new Uzivatel(iId, sOddil, sHeslo, bRoot);
                 aOddily.add(o);
 
                 }

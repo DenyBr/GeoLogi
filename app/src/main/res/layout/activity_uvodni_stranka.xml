@@ -1,0 +1,94 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+
+    tools:context="com.deny.GeoLogi.UvodniStranka"
+    tools:ignore="ExtraText">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableRow
+            android:id="@+id/tblobraze"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:gravity="center_horizontal"
+            android:minHeight="15dp">
+
+            <ImageView
+                android:id="@+id/ivUvodni"
+                android:layout_width="350dp"
+                android:layout_height="120sp"
+                android:layout_below="@+id/tblbuttony"
+                android:layout_gravity="center_horizontal"
+                android:layout_span="4"
+                android:enabled="true"
+                android:src="@drawable/uvodni" />
+        </TableRow>
+
+    <TableRow
+        android:id="@+id/tbltext"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:gravity="center_horizontal"
+        android:minHeight="15dp">
+        >
+
+        <TextView
+            android:id="@+id/tvVybranaHra"
+            android:text="Vybraná hra"
+            android:layout_gravity="center_horizontal"
+            android:layout_span="4"
+            android:layout_below="@+id/tblbuttony"
+        />
+
+    </TableRow>
+
+        <TableRow
+            android:id="@+id/tblbuttony"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_horizontal"
+            android:minHeight="15dp">
+            <TextView
+                android:width="100dp"
+                />
+
+            <Button
+                android:id="@+id/btnVyberHry"
+                android:text="Výběr hry"
+                android:gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:minWidth="120dp"
+                android:width="120dp"
+                android:height="15dp"
+                android:onClick="vyberClickHandler"
+                />
+            <Button
+                android:id="@+id/btnPokracovat"
+                android:text="Pokračovat ve hře"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:width="200dp"
+                android:height="15dp"
+                android:gravity="center"
+                android:padding="15dp"
+                android:onClick="pokracujClickHandler"
+                />
+            <TextView
+                android:width="100dp"
+                />
+        </TableRow>
+    </TableLayout>>
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+
+</FrameLayout>

@@ -11,23 +11,26 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/ic_launcher"
         android:label="GeoLogi"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:theme="@style/AppTheme">
+        <activity android:name="com.deny.GeoLogi.MainActivity"/>
+        <activity android:name="com.deny.GeoLogi.Settings" />
+        <activity android:name="com.deny.GeoLogi.Nastenka" />
+        <activity android:name="com.deny.GeoLogi.MapaActivity" />
+        <activity android:name="com.deny.GeoLogi.IndicieActivity" />
         <activity
-            android:name="com.deny.GeoLogi.MainActivity"
-            android:label="GeoLogi">
+            android:name="com.deny.GeoLogi.UvodniStranka"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_uvodni_stranka"
+            android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.deny.GeoLogi.Settings" />
-        <activity android:name="com.deny.GeoLogi.Nastenka" />
-        <activity android:name="com.deny.GeoLogi.MapaActivity" />
-        <activity android:name="com.deny.GeoLogi.IndicieActivity"></activity>
     </application>
 
 </manifest>
