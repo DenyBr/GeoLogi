@@ -60,6 +60,12 @@ public class Nastaveni extends Properties {
 
     public int getiIDOddilu() {return Integer.parseInt(getProperty("ID", ""));}
 
+    public boolean getisRoot() {return Boolean.parseBoolean(getProperty("Root", ""));}
+
+    public boolean getisVerejna() {return Boolean.parseBoolean(getProperty("Verejna", ""));}
+
+    public String getsIdHry() {return getProperty("IdHra", "");}
+
     public String getsHra() {return getProperty("Hra", "");}
 
     public String getsNastenka() {return getProperty("Nastenka", "");}

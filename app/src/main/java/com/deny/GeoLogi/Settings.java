@@ -1,5 +1,6 @@
 package com.deny.GeoLogi;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -9,13 +10,14 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 
 import org.json.JSONArray;
@@ -38,16 +40,12 @@ public class Settings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if ((this.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else
-        {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-
         setContentView(R.layout.activity_settings);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //to remove the action bar (title bar)
+        getSupportActionBar().hide();
 
         Spinner spHra = (Spinner) findViewById(R.id.spinHry);
         spHra.setOnItemSelectedListener(new VyberHry());
@@ -83,8 +81,6 @@ public class Settings extends AppCompatActivity {
 
 
     private void processJson(JSONObject object) {
-        //Okynka.zobrazOkynko(this, object.toString());
-
         try {
             JSONArray rows = object.getJSONArray("rows");
 
@@ -213,8 +209,11 @@ public class Settings extends AppCompatActivity {
             pNastaveni.setProperty("ID", ""+ Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
             pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
             pNastaveni.setProperty("Hra", hry.get(spHra.getSelectedItemPosition()).getsHra());
+            pNastaveni.setProperty("IDHra", hry.get(spHra.getSelectedItemPosition()).getIdHra());
+            pNastaveni.setProperty("Verejna", ""+hry.get(spHra.getSelectedItemPosition()).isbVerejna());
             pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
             pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());
+            pNastaveni.setProperty("Root", ""+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbRoot());
 
             try {
                 OutputStream outputStream = openFileOutput("config.properties", Context.MODE_PRIVATE);
@@ -239,9 +238,6 @@ public class Settings extends AppCompatActivity {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
             Settings.this.hraVybrana(pos);
-            /*  Toast.makeText(parent.getContext(),
-                    "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
-                    Toast.LENGTH_SHORT).show();*/
         }
 
         @Override
@@ -254,7 +250,6 @@ public class Settings extends AppCompatActivity {
     class VyberOddilu implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-
             //asi nic
         }
 

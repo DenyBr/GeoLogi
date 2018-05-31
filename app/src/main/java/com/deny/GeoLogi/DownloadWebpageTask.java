@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +27,7 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
         try {
             return downloadUrl(urls[0]);
         } catch (IOException e) {
-            return "Unable to download the requested page.";
+            return "";
         }
     }
 
@@ -60,10 +61,18 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
             // Starts the query
             conn.connect();
             int responseCode = conn.getResponseCode();
+
+            Log.d("conn", "HTTP Response Code: "+responseCode);
+
             is = conn.getInputStream();
 
             String contentAsString = convertStreamToString(is);
-            return contentAsString;
+
+            Log.d("result: ", contentAsString);
+
+            if (responseCode==200) {
+                return contentAsString;
+            }
         }
         catch (Exception e) {
             //nedelej nic

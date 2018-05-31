@@ -1,13 +1,14 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ public class IndicieAdapter extends ArrayAdapter<Indicie> {
         Indicie o = indicies.get(position);
         if (o != null) {
             TextView predmet = (TextView) v.findViewById(R.id.textindicie);
-
+            predmet.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
             predmet.setText(String.valueOf(o.getsTexty().get(0)));
           }
         return v;

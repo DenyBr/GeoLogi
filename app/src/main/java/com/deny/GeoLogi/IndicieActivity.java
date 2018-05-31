@@ -7,11 +7,12 @@ import android.os.Handler;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 
 public class IndicieActivity extends AppCompatActivity {
@@ -23,6 +24,7 @@ public class IndicieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*
         if ((this.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
@@ -30,9 +32,14 @@ public class IndicieActivity extends AppCompatActivity {
         } else
         {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
+        }*/
 
         setContentView(R.layout.activity_indicie);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //to remove the action bar (title bar)
+        getSupportActionBar().hide();
 
         handler.postDelayed(update, 10);
     }

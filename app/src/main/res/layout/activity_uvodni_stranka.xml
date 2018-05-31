@@ -5,11 +5,16 @@
     android:background="#FFFFFF"
 
     tools:context="com.deny.GeoLogi.UvodniStranka"
-    tools:ignore="ExtraText">
+    >
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+    <TableLayout
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <TableRow
             android:id="@+id/tblobraze"
             android:layout_width="match_parent"
@@ -20,7 +25,7 @@
             <ImageView
                 android:id="@+id/ivUvodni"
                 android:layout_width="350dp"
-                android:layout_height="120sp"
+                android:layout_height="150dp"
                 android:layout_below="@+id/tblbuttony"
                 android:layout_gravity="center_horizontal"
                 android:layout_span="4"
@@ -33,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:gravity="center_horizontal"
-        android:minHeight="15dp">
+        android:minHeight="30dp">
         >
 
         <TextView
@@ -53,6 +58,7 @@
             android:gravity="center_horizontal"
             android:minHeight="15dp">
             <TextView
+                android:id="@+id/vypln1"
                 android:width="100dp"
                 />
 
@@ -69,7 +75,7 @@
                 />
             <Button
                 android:id="@+id/btnPokracovat"
-                android:text="Pokračovat ve hře"
+                android:text="Hra"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:minWidth="200dp"
@@ -79,7 +85,20 @@
                 android:padding="15dp"
                 android:onClick="pokracujClickHandler"
                 />
+            <Button
+                android:id="@+id/btnVysledky"
+                android:enabled="false"
+                android:text="Výsledky"
+                android:gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:minWidth="120dp"
+                android:width="120dp"
+                android:height="15dp"
+                android:onClick="vysledkyClickHandler"
+                />
             <TextView
+                android:id="@+id/vypln2"
                 android:width="100dp"
                 />
         </TableRow>
@@ -91,4 +110,5 @@
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
+    </LinearLayout>
 </FrameLayout>

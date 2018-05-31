@@ -2,13 +2,14 @@ package com.deny.GeoLogi;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 import java.util.ArrayList;
 
@@ -37,6 +38,7 @@ public class ZpravyAdapter extends ArrayAdapter<Zprava> {
             if (!o.getbRead()) {predmet.setTypeface(null, Typeface.BOLD);}
             else {predmet.setTypeface(null, Typeface.NORMAL);}
 
+            predmet.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
             predmet.setText(String.valueOf(o.getsPredmet() /*+ " " + o.getTsCasZobrazeni().toString()*/));
           }
         return v;

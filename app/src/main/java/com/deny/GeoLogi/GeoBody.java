@@ -39,7 +39,6 @@ class GeoBody {
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
     ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<>();
 
-
     private Context context = null;
     private Criteria criteria = null;
     private String bestProvider = null;
@@ -99,7 +98,7 @@ class GeoBody {
     public void read_navstivene(Context context) {
         try {
             aBodyNavstivene = new ArrayList<GeoBod>();
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsHra() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt");
+            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -119,8 +118,8 @@ class GeoBody {
 
     public void write_navstivene(Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt", Context.MODE_PRIVATE);
-            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsHra().replace(' ','_') + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt", Context.MODE_PRIVATE);
+            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.txt", Context.MODE_PRIVATE);
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
@@ -178,20 +177,21 @@ class GeoBody {
         int iAct;
 
         try {
-                try {
-                    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                }
-                catch (SecurityException e) {
-                    //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
-                }
+            try
+            {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+            catch (SecurityException e) {
+                //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
+            }
 
-                if (null != location) {
-
-
+            if (null != location) {
                 //Projdi cilove body a eventuelne oznac navstivenej
                 for (int i = 0; i < aBody.size(); i++) {
-                    try {
-                        GeoBod bodAct = aBody.get(i);
+                try {
+                    GeoBod bodAct = aBody.get(i);
+
+                    if (!bylNavstivenej(bodAct)) {
                         Location locAct = new Location("");
                         locAct.setLatitude(bodAct.getdLat());
                         locAct.setLongitude(bodAct.getdLong());
@@ -211,25 +211,25 @@ class GeoBody {
 
                             aktualizujMapu();
                         }
-
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
                     }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 
         int iTimeout=100000;
         int iDistance=100;
 
         //pri priblizovani zkratime timeout
-        if (iMin < 20) { iTimeout = 1000; iDistance=0;}
+        if (iMin < 20) { iTimeout = 1000; iDistance=1;}
         else if (iMin < 30) {iTimeout = 2000; iDistance=1;}
         else if (iMin < 50) {iTimeout = 3000; iDistance=2;}
-        else if (iMin < 100) {iTimeout = 30000; iDistance=20;}
+        else if (iMin < 100) {iTimeout = 10000; iDistance=20;}
 
         registrujGPS(ctx, iTimeout, iDistance);
 

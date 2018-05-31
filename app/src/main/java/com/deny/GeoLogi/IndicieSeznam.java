@@ -68,7 +68,7 @@ public class IndicieSeznam {
     public void read (Context context) {
         try {
             aIndicieZiskane = new ArrayList<Indicie>();
-            InputStream inputStream =  context.openFileInput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt");
+            InputStream inputStream =  context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -87,7 +87,7 @@ public class IndicieSeznam {
 
         try {
             aIndicieVsechny = new ArrayList<Indicie>();
-            InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt");
+            InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -107,8 +107,8 @@ public class IndicieSeznam {
 
     public void write (Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", Context.MODE_PRIVATE);
-            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsHra().replace(' ','_')+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskanec.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", Context.MODE_PRIVATE);
+            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskanec.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
 
@@ -130,7 +130,7 @@ public class IndicieSeznam {
         }
 
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(aIndicieVsechny.size());

@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
@@ -73,7 +73,8 @@ public class MapaActivity extends Activity {
         textStyleNove.setStyle(Paint.Style.FILL);
         textStyleNove.setColor(Color.parseColor("#000000"));
         textStyleNove.setTextAlign(Paint.Align.CENTER);
-      //  textStyleNove.set setTextSize(24);
+        textStyleNove.setTextSize(36);
+
 
         SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
                 .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
@@ -87,7 +88,7 @@ public class MapaActivity extends Activity {
         textStyleNavstivene.setStyle(Paint.Style.FILL);
         textStyleNavstivene.setColor(Color.parseColor("#AAAAAA"));
         textStyleNavstivene.setTextAlign(Paint.Align.CENTER);
-        textStyleNavstivene.setTextSize(24);
+        textStyleNavstivene.setTextSize(36);
 
         Paint ps_navstivene = new Paint();
         ps_navstivene.setColor(textStyleNavstivene.getColor());

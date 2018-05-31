@@ -16,6 +16,9 @@ public class Hra {
         this.sHra = sHra;
         this.sIdWorkseet = sIdWorkseet;
         this.sNastenka = sNastenka;
+        this.bVerejna = bVerejna;
+        this.idHra = idHra;
+
     }
 
     public String getsHra() {
@@ -32,15 +35,9 @@ public class Hra {
         return idHra;
     }
 
-    public void setIdHra(String idHra) {
-        this.idHra = idHra;
-    }
-
     public boolean isbVerejna() {
         return bVerejna;
     }
 
-    public void setbVerejna(boolean bVerejna) {
-        this.bVerejna = bVerejna;
-    }
+
 }

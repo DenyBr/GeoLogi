@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -11,6 +12,7 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -18,11 +20,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.progress.Taborofka.R;
+import com.deny.GeoLogi.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
     Timestamp tsLastUpdate = null;
     boolean bConnectionLost = false;
     //jak casto se bude stahovat a updatovat server
-    final int iTimeoutUpdate = 30000;
+    //jednou za 20 minut staci
+    final int iTimeoutUpdate = 1200000;
+    int iSirka=0;
 
 
     @Override
@@ -71,30 +78,27 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
 
         setContentView(R.layout.activity_main);
+        Log.d("Main", "Spusteno");
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //to remove the action bar (title bar)
+        getSupportActionBar().hide();
 
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED
-                    && this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                        1);
-            }
-        }
-
         Init();
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                casovyupdate();
-            }
-        }, 1000);
+        iSirka = this.getResources().getConfiguration().screenWidthDp;
+        resize();
+
+        Button btnT = (Button) findViewById(R.id.btnTest);
+        btnT.setVisibility ((Nastaveni.getInstance(this).getisRoot()?View.VISIBLE:View.INVISIBLE));
+
+        serverUpdate(true);
+        casovyupdate();
     }
 
     private void Init () {
@@ -109,10 +113,26 @@ public class MainActivity extends AppCompatActivity {
         zkontrolujZpravy(false);
     }
 
+    private void resize () {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                TextView tvVyplne = (TextView) findViewById(R.id.tvVyplne);
+
+                if (iSirka>800) {
+                    tvVyplne.getLayoutParams().width=iSirka-600;
+                }
+            }
+        }, 1);
+
+    }
+
     private void read (Context context) {
         zpravyKomplet = new ArrayList<Zprava>();
         try {
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
+            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -132,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void write (Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsHra()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(zpravyKomplet.size());
@@ -148,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void syncClickHandler(View view) {
+        Log.d("main", "Download ze serveru");
         downloadJson();
     }
 
@@ -183,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     public void NastenkaClickHandler(View view) {
         // Do something in response to button
         Intent intent = new Intent(this, Nastenka.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
     }
 
     public void MapaClickHandler(View view) {
@@ -199,18 +220,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode==2) {
-            serverUpdate(true);
-        } else {
-            Init();
-        }
+        zkontrolujZpravy(false);
+
+        resize();
     }
 
     public void clearClickHandler(View view) {
-        clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"zpravy.txt");
-        clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskane.txt");
-        clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"indicievsecny.txt");
-        clearfile(Nastaveni.getInstance(this).getsHra()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"zpravy.txt");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskane.txt");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicievsecny.txt");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
 
         Init();
     }
@@ -424,8 +443,8 @@ public class MainActivity extends AppCompatActivity {
                     IndicieSeznam.getInstance(this).nactizwebu(this);
 
                     Log.d("Main", "Odesilam data na server");
-                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
-                    uploadFile(Nastaveni.getInstance(this).getsHra().replace(' ','_')+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
+                    uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
+                    uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
                 }
             } else {
                 bConnectionLost = true;
@@ -439,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void casovyupdate () {
-        int iTimeout = 60000;
+        int iTimeout = 30000;
 
         if (!Nastaveni.getInstance(this).getsHra().equals("")) {
             int iMin = zkontrolujZpravy(false);
@@ -448,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
             if (iMin < 20) iTimeout = 1000;
             else if (iMin < 30) iTimeout = 2000;
             else if (iMin < 50) iTimeout = 5000;
-            else if (iMin < 100) iTimeout = 30000;
+            else if (iMin < 100) iTimeout = 10000;
         }
 
         serverUpdate(false);
@@ -612,10 +631,9 @@ public class MainActivity extends AppCompatActivity {
                     if (null==zpravyZobraz.get(position).getTsCasZobrazeni()) zpravyZobraz.get(position).setTsCasZobrazeni(new Timestamp(System.currentTimeMillis()));
 
                     zkontrolujZpravy(true);
+                    resize();
                 }
             });
-
-
          }
 
         if (bNova) {
@@ -633,12 +651,12 @@ public class MainActivity extends AppCompatActivity {
 
         TextView nadpis = (TextView) findViewById(R.id.nadpisek);
         if (nadpis != null) {
-            nadpis.setText(Nastaveni.getInstance(this).getsHra()+" "+Nastaveni.getInstance(this).getProperty("Uzivatel","") /* + " "+iPocerzobr*/);
+            nadpis.setText(Nastaveni.getInstance(this).getsHra()+"\n"+Nastaveni.getInstance(this).getProperty("Uzivatel","") /* + " "+iPocerzobr*/);
         }
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
 
         if (hledanebody != null) {
-            hledanebody.setText("Cílové body: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
+            hledanebody.setText("Cíle: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
         }
 
         TextView indicie = (TextView) findViewById(R.id.indicii);
@@ -651,9 +669,9 @@ public class MainActivity extends AppCompatActivity {
         TextView vzd = (TextView) findViewById(R.id.vzdalenost);
         if (vzd != null) {
             if (iMin < 1000) {
-                vzd.setText("Nebjižší cílový bod: " + iMin + "m");
+                vzd.setText("Vzdálenost: " + iMin + "m");
             } else {
-                vzd.setText("Nebjižší cílový bod: ?m");
+                vzd.setText("Vzdálenost: ?m");
             }
         }
 
@@ -713,5 +731,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         zkontrolujZpravy(true);
+
+        resize();
     }
 }
