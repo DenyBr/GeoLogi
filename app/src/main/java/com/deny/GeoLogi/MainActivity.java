@@ -33,6 +33,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -62,47 +64,30 @@ public class MainActivity extends AppCompatActivity {
     Vibrator v;
     Location location;
     ListView listview;
-    int iPocerzobr = 0;
+    int iPocetAkt = 0;
+    boolean bPaused = false;
     Timestamp tsLastUpdate = null;
     boolean bConnectionLost = false;
     //jak casto se bude stahovat a updatovat server
     //jednou za 20 minut staci
     final int iTimeoutUpdate = 1200000;
     int iSirka=0;
-
+    final Object lock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
 
-        setContentView(R.layout.activity_main);
-        Log.d("Main", "Spusteno");
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //to remove the action bar (title bar)
-        getSupportActionBar().hide();
-
-        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-        Init();
-
-        iSirka = this.getResources().getConfiguration().screenWidthDp;
-        resize();
-
-        Button btnT = (Button) findViewById(R.id.btnTest);
-        btnT.setVisibility ((Nastaveni.getInstance(this).getisRoot()?View.VISIBLE:View.INVISIBLE));
-
-        serverUpdate(true);
-        casovyupdate();
     }
 
     private void Init () {
-        Nastaveni.getInstance(this);
+        Log.d("Main", "Init");
+
+        //Okynka.zobrazOkynko(this, "init");
+
+        Nastaveni.getInstance(this).reload(this);
 
         read(this);
 
@@ -110,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         GeoBody.getInstance(this).read_navstivene(this);
 
-        zkontrolujZpravy(false);
+        zkontrolujZpravy(true);
     }
 
     private void resize () {
@@ -131,45 +116,58 @@ public class MainActivity extends AppCompatActivity {
 
     private void read (Context context) {
         zpravyKomplet = new ArrayList<Zprava>();
+        //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
+
         try {
             InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
+            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
+            Log.d("Main", "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
 
             for (int i=0; i<iPocet; i++) {
                 Zprava z = (Zprava) in.readObject();
                 zpravyKomplet.add(z);
             }
             in.close();
+            inputStream.close();
         }
         catch(Exception e) {
-            //Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
+            Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
         }
     }
 
 
     private void write (Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
+            //Okynka.zobrazOkynko(this, "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
+
+            FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(zpravyKomplet.size());
 
+            Log.d("Main" , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
+
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
-            }
 
+                //if (zpravyKomplet.get(i).getbRead()) Okynka.zobrazOkynko(this, "jo");
+            }
+            out.flush();
             out.close();
+
+            fileOut.flush();
             fileOut.close();
-        } catch (IOException ex) {Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
+        } catch (IOException ex) {
+            Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
         }
     }
 
     public void syncClickHandler(View view) {
-        Log.d("main", "Download ze serveru");
-        downloadJson();
+       serverUpdate(true);
     }
 
     private void downloadJson () {
@@ -193,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e) {
             Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům - chyba 2 ");
         }
+
+        resize();
     }
 
     public void SettingsClickHandler(View view) {
@@ -220,9 +220,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        zkontrolujZpravy(false);
+        super.onActivityResult(requestCode, resultCode, data);
+        //zkontrolujZpravy(false);
 
-        resize();
+        //resize();
     }
 
     public void clearClickHandler(View view) {
@@ -460,24 +461,29 @@ public class MainActivity extends AppCompatActivity {
     private void casovyupdate () {
         int iTimeout = 30000;
 
-        if (!Nastaveni.getInstance(this).getsHra().equals("")) {
-            int iMin = zkontrolujZpravy(false);
+        if (!bPaused) {
+            if (!Nastaveni.getInstance(this).getsHra().equals("")) {
+                int iMin = zkontrolujZpravy(false);
 
-            //pri priblizovani zkratime timeout
-            if (iMin < 20) iTimeout = 1000;
-            else if (iMin < 30) iTimeout = 2000;
-            else if (iMin < 50) iTimeout = 5000;
-            else if (iMin < 100) iTimeout = 10000;
+                //pri priblizovani zkratime timeout
+                if (iMin < 20) iTimeout = 1000;
+                else if (iMin < 30) iTimeout = 2000;
+                else if (iMin < 50) iTimeout = 3000;
+                else if (iMin < 100) iTimeout = 5000;
+            }
+
+            serverUpdate(false);
+
+            iPocetAkt++;
         }
-
-        serverUpdate(false);
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //Do something after 100ms
-                casovyupdate();
+                if (!Thread.currentThread().isInterrupted()) {
+                    casovyupdate();
+                }
             }
         }, iTimeout);
     }
@@ -486,8 +492,6 @@ public class MainActivity extends AppCompatActivity {
         if ((z.getfZobrazitNaLat()==0) || (z.getfZobrazitNaLong())==0) return true;
 
         GeoBod b = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
-
-        //Okynka.zobrazOkynko(this, " "+z.getfZobrazitNaLat()+" " + z.getfZobrazitNaLong() );
 
         return GeoBody.getInstance(this).bylNavstivenej(b);
     }
@@ -505,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
             }
             else
             {
-                //Okynka.zobrazOkynko(this, "no su tady");
                 Time t = Time.valueOf(z.getsZobrazitPoCase());
                 Time t0 = Time.valueOf("0:00:00");
 
@@ -513,14 +516,10 @@ public class MainActivity extends AppCompatActivity {
                 Zprava z_po = zpravaPodleId(z.getiPoZpraveCislo());
 
                 if (z_po == null) return false;
-                //Okynka.zobrazOkynko(this, "po zprave " + z_po.getsPredmet());
 
                 if (z_po.getTsCasZobrazeni() == null) return false;
-                //Okynka.zobrazOkynko(this, "timestamp " + now.getTime() + " cas zobrazeni  " + z_po.getTsCasZobrazeni().getTime()+ " timeout " + (t.getTime()-t0.getTime()));
 
                 boolean res = new Timestamp(now.getTime()).after(new Timestamp(z_po.getTsCasZobrazeni().getTime()+ t.getTime()-t0.getTime()));
-
-                //Okynka.zobrazOkynko(this, "po zprave " + z_po.getsPredmet() + " " + res);
 
                 return res;
             }
@@ -542,143 +541,165 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
         bPrekreslit = bPrekreslit || (zpravyZobraz.size() == 0);
         boolean bNova = false;
+        int iMin = 100000;
 
-        iPocerzobr++;
-
-        GeoBody.getInstance(this).aBody=new ArrayList<GeoBod>();
-
-        //Okynka.zobrazOkynko(this, "kontroluju - pocet ziskanych indicii je "+IndicieActivity.aIndicieZiskane.size());
-
-        for (int i = zpravyKomplet.size()-1; i>=0 ; i--) {
-            Zprava z = zpravyKomplet.get(i);
-
-            //zkotrnolujeme, ze se ma zprava zobrazit
-            if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
-                && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
-                && (IndicieSeznam.getInstance(this).aIndicieZiskane.size()>=z.getiPocetIndicii()) //maji dost indiciii
-                && (zkontrolujJestliMajiIndicie (z)) //a maji ty spravne
-                && ((z.getsNezobrazovatPokudMajiIndicii().equals(""))||(!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
-            {
-                //Okynka.zobrazOkynko(this, "su tady "+z.getfZobrazitNaLat()+" "+z.getiId()+" lokace: "+zkontrolujLokaci(z));
-
-                if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
-                {
-                    //pokud ano, tak pridame zpravu do seznamu zobrazovanych
-                    zpravy.add(z);
-
-                    //pridame cilovy bod na mapu
-
-                    if ((z.getfCilovyBodLat()!=0) || (z.getfCilovyBodLong()!=0))
-                    {
-                        GeoBod cilovyBod = new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true);
-
-                        if (!GeoBody.getInstance(this).jeHledanej(cilovyBod)) {
-                            GeoBody.getInstance(this).aBody.add(cilovyBod);
-                            GeoBody.getInstance(this).aktualizujMapu();
-                        }
-                    }
-
-                    //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
-                    if ((z.getfZobrazitNaLat()!=0) || (z.getfZobrazitNaLong()!=0))
-                    {
-                        GeoBod hledanyBod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
-
-                        if (!GeoBody.getInstance(this).jeHledanej(hledanyBod)) {
-                            GeoBody.getInstance(this).aBody.add(hledanyBod);
-                            GeoBody.getInstance(this).aktualizujMapu();
-                        }
-                    }
-
-                    //a pokud je to nova zprava, tak iniciujeme prekresleni
-                    if (! (z.getbZobrazeno())) {
-                        bPrekreslit = true;
-                        bNova = true;
-
-                        zpravyKomplet.get(i).setbZobrazeno(true);
-                    }
-                }
-                else
-                {
-                    //pokud je vsechno splneno, ale na lokaci jeste nebyli, je mozna potreba pridac cilovy bod do seznamu hledanych
-                    if ((z.getfZobrazitNaLong()!=0) || (z.getfZobrazitNaLat()!=0))
-                    {
-                        GeoBod bod=new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
-                        if (!GeoBody.getInstance(this).jeHledanej(bod) &&
-                            (!GeoBody.getInstance(this).bylNavstivenej(bod))) {
-                            GeoBody.getInstance(this).aBody.add(bod);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (bPrekreslit) {
-            zpravyZobraz = zpravy;
-
-            setContentView(R.layout.activity_main);
-            listview = (ListView) findViewById(R.id.listview);
-
-            //Predame adamteru aktualni seznam zprav
-            final ZpravyAdapter adapter = new ZpravyAdapter(this, R.layout.zprava, zpravyZobraz);
-            listview.setAdapter(adapter);
-
-            //a zaregistrujeme listener na kliknuti
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                    Okynka.zobrazOkynko(arg0.getContext(), zpravyZobraz.get(position).getsZprava());
-                    zpravyZobraz.get(position).setbRead(true);
-                    if (null==zpravyZobraz.get(position).getTsCasZobrazeni()) zpravyZobraz.get(position).setTsCasZobrazeni(new Timestamp(System.currentTimeMillis()));
-
-                    zkontrolujZpravy(true);
-                    resize();
-                }
-            });
-         }
-
-        if (bNova) {
-            Okynka.zobrazOkynko(this, "Máte novou zprávu");
+        synchronized (lock) {
             try {
-                //zkus prehrat zvuk
-                notificationRingtone.play();
+                GeoBody.getInstance(this).aBody = new ArrayList<GeoBod>();
 
-                //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
-            } catch (Exception e) {
-                // nedelej nic
+                for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
+                    Zprava z = zpravyKomplet.get(i);
+
+                    //zkotrnolujeme, ze se ma zprava zobrazit
+                    if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
+                            && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
+                            && (IndicieSeznam.getInstance(this).aIndicieZiskane.size() >= z.getiPocetIndicii()) //maji dost indiciii
+                            && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
+                            && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
+                    {
+                        if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
+                        {
+                            //pokud ano, tak pridame zpravu do seznamu zobrazovanych
+                            zpravy.add(z);
+
+                            //pridame cilovy bod na mapu
+                            if ((z.getfCilovyBodLat() != 0) || (z.getfCilovyBodLong() != 0)) {
+                                GeoBod cilovyBod = new GeoBod(z.getfCilovyBodLat(), z.getfCilovyBodLong(), z.getsCilovyBodPopis(), true);
+
+                                if (!GeoBody.getInstance(this).jeHledanej(cilovyBod)) {
+                                    GeoBody.getInstance(this).aBody.add(cilovyBod);
+                                }
+                            }
+
+                            //ulozime si hledany (ale mozna nezobrazovany bod na mapu)
+                            if ((z.getfZobrazitNaLat() != 0) || (z.getfZobrazitNaLong() != 0)) {
+                                GeoBod hledanyBod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
+
+                                if (!GeoBody.getInstance(this).jeHledanej(hledanyBod)) {
+                                    GeoBody.getInstance(this).aBody.add(hledanyBod);
+                                }
+                            }
+
+                            //a pokud je to nova zprava, tak iniciujeme prekresleni
+                            if (!(z.getbZobrazeno())) {
+                                bPrekreslit = true;
+                                bNova = true;
+
+                                z.setbZobrazeno(true);
+                            }
+                        } else {
+                            //pokud je vsechno splneno, ale na lokaci jeste nebyli, je mozna potreba pridac cilovy bod do seznamu hledanych
+                            if ((z.getfZobrazitNaLong() != 0) || (z.getfZobrazitNaLat() != 0)) {
+                                GeoBod bod = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
+                                if (!GeoBody.getInstance(this).jeHledanej(bod) &&
+                                        (!GeoBody.getInstance(this).bylNavstivenej(bod))) {
+                                    GeoBody.getInstance(this).aBody.add(bod);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                if (bPrekreslit) {
+                    zpravyZobraz = zpravy;
+
+                    setContentView(R.layout.activity_main);
+                    listview = (ListView) findViewById(R.id.listview);
+
+                    //Predame adamteru aktualni seznam zprav
+                    final ZpravyAdapter adapter = new ZpravyAdapter(this, R.layout.zprava, zpravyZobraz);
+                    listview.setAdapter(adapter);
+
+                    //a zaregistrujeme listener na kliknuti
+                    listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                            Okynka.zobrazOkynko(arg0.getContext(), zpravyZobraz.get(position).getsZprava());
+                            zpravyZobraz.get(position).setbRead(true);
+                            if (null == zpravyZobraz.get(position).getTsCasZobrazeni())
+                                zpravyZobraz.get(position).setTsCasZobrazeni(new Timestamp(System.currentTimeMillis()));
+
+                            zkontrolujZpravy(true);
+                            resize();
+                        }
+                    });
+                }
+
+                if (bNova) {
+                    bNova = false;
+
+                    Okynka.zobrazOkynko(this, "Máte novou zprávu");
+                    try {
+                        //zkus prehrat zvuk
+                        notificationRingtone.play();
+
+                        //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
+                    } catch (Exception e) {
+                        // nedelej nic
+                    }
+                }
+
+                TextView nadpis = (TextView) findViewById(R.id.nadpisek);
+                if (nadpis != null) {
+                    nadpis.setText(Nastaveni.getInstance(this).getsHra() + "\n" + Nastaveni.getInstance(this).getProperty("Uzivatel", "") /* + " "+iPocerzobr*/);
+                }
+                TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
+
+                if (hledanebody != null) {
+                    hledanebody.setText("Cíle: " + GeoBody.getInstance(this).aBodyNavstivene.size() + "/" + GeoBody.getInstance(this).aBody.size());
+                }
+
+                TextView indicie = (TextView) findViewById(R.id.indicii);
+                if (indicie != null) {
+                    indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).aIndicieZiskane.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
+                }
+
+                iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
+
+                TextView vzd = (TextView) findViewById(R.id.vzdalenost);
+                if (vzd != null) {
+                    if (iMin < 1000) {
+                        vzd.setText("Vzdálenost: " + iMin + "m");
+                    } else {
+                        vzd.setText("Vzdálenost: ?m");
+                    }
+                }
+                GeoBody.getInstance(this).aktualizujMapu();
+
+
+                if (zpravyKomplet.size() > 0) {
+                    write(this);
+                    //read(this);
+                }
+
+            }
+            catch (Exception e) {
             }
         }
-        write(this);
-
-        TextView nadpis = (TextView) findViewById(R.id.nadpisek);
-        if (nadpis != null) {
-            nadpis.setText(Nastaveni.getInstance(this).getsHra()+"\n"+Nastaveni.getInstance(this).getProperty("Uzivatel","") /* + " "+iPocerzobr*/);
-        }
-        TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
-
-        if (hledanebody != null) {
-            hledanebody.setText("Cíle: "+GeoBody.getInstance(this).aBodyNavstivene.size()+"/"+GeoBody.getInstance(this).aBody.size() );
-        }
-
-        TextView indicie = (TextView) findViewById(R.id.indicii);
-        if (indicie != null) {
-            indicie.setText("Indicie: "+IndicieSeznam.getInstance(this).aIndicieZiskane.size()+"/"+IndicieSeznam.getInstance(this).aIndicieVsechny.size() );
-        }
-
-        int iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
-
-        TextView vzd = (TextView) findViewById(R.id.vzdalenost);
-        if (vzd != null) {
-            if (iMin < 1000) {
-                vzd.setText("Vzdálenost: " + iMin + "m");
-            } else {
-                vzd.setText("Vzdálenost: ?m");
-            }
-        }
-
         return iMin;
     }
 
     public void testClickHandler(View view) {
+
+        //read(this);
+        try {
+            InputStream inputStream = this.openFileInput(Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.txt");
+
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+
+            int iPocet = (int) in.readInt();
+            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.txt" + "Pocet: " + iPocet);
+            //Log.d("")
+
+            in.close();
+            inputStream.close();
+        }
+        catch(Exception e) {
+           // Okynka.zobrazOkynko(this, e.getMessage());
+        }
+
+
         /*for (int i=0; i<GeoBody.getInstance(this).aBody.size(); i++) {
             Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance(this).aBody.get(i).getdLat() +" "+ GeoBody.getInstance(this).aBody.get(i).getPopis()+" "+GeoBody.getInstance(this).aBody.get(i).getbViditelny());
         }*/
@@ -728,10 +749,40 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        bPaused = false;
+
         super.onResume();
 
-        zkontrolujZpravy(true);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
 
+        setContentView(R.layout.activity_main);
+        Log.d("Main", "Spusteno");
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //to remove the action bar (title bar)
+        getSupportActionBar().hide();
+
+        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        Init();
+
+        iSirka = this.getResources().getConfiguration().screenWidthDp;
         resize();
+
+        Button btnT = (Button) findViewById(R.id.btnTest);
+        btnT.setVisibility ((Nastaveni.getInstance(this).getisRoot()?View.VISIBLE:View.INVISIBLE));
+
+        casovyupdate();
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+
+        bPaused = true;
+////        finish();
     }
 }

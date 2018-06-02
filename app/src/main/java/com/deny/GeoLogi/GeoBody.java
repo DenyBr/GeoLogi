@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
@@ -124,13 +125,16 @@ class GeoBody {
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
 
-
             out.writeInt(aBodyNavstivene.size());
 
             for (int i = 0; i < aBodyNavstivene.size(); i++) {
                 out.writeObject(aBodyNavstivene.get(i));
 
-                writer.write(aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis()+"\n\r");
+                writer.write("" + aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis());
+                writer.write('\r');
+                writer.write('\n');
+
+                Log.d("GeoBody", "" + aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis());
             }
 
             out.close();

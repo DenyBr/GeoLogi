@@ -45,6 +45,7 @@ public class UvodniStranka extends AppCompatActivity {
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+    private int  iSirka;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -63,6 +64,8 @@ public class UvodniStranka extends AppCompatActivity {
         }
     };
     private View mControlsView;
+    Intent intentSettings = null;
+    Intent intentMain = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,29 +80,6 @@ public class UvodniStranka extends AppCompatActivity {
         //to remove the action bar (title bar)
         getSupportActionBar().hide();
 
-        ImageView iv=(ImageView) findViewById(R.id.ivUvodni);
-        TextView tvV1= (TextView) findViewById(R.id.vypln1);
-        TextView tvV2= (TextView) findViewById(R.id.vypln2);
-        TableRow trObr= (TableRow) findViewById(R.id.tblobraze);
-
-        //otestuj rozliseni a zmen velikost obrazku
-        if ((this.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
-            iv.getLayoutParams().width = 800;
-            iv.getLayoutParams().height = 240;
-            trObr.getLayoutParams().height = 500;
-
-            tvV1.getLayoutParams().width=300;
-            tvV2.getLayoutParams().width=300;
-        } else
-        {
-            iv.getLayoutParams().width = 400;
-            iv.getLayoutParams().height = 120;
-            tvV1.getLayoutParams().width=100;
-            tvV2.getLayoutParams().width=100;
-
-        }
         pristupy();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -123,8 +103,41 @@ public class UvodniStranka extends AppCompatActivity {
                         1);
             }
         }
+        resize();
+
+        intentSettings = new Intent(this, Settings.class);
+        intentMain = new Intent(this, MainActivity.class);
+
     }
 
+
+    private void resize() {
+        final Handler handler = new Handler();
+
+        iSirka = this.getResources().getConfiguration().screenWidthDp;
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            //otestuj rozliseni a zmen velikost obrazku
+            TextView tvV1= (TextView) findViewById(R.id.vypln1);
+            TextView tvV2= (TextView) findViewById(R.id.vypln2);
+            TableRow trObr= (TableRow) findViewById(R.id.tblobraze);
+
+            if (iSirka>800) {
+                tvV1.getLayoutParams().width=(iSirka-400)/2;
+                tvV2.getLayoutParams().width=(iSirka-400)/2;
+            } else
+            {
+                tvV1.getLayoutParams().width=100;
+                tvV2.getLayoutParams().width=100;
+
+            }
+            }
+        }, 1);
+
+
+    }
 
 
     private void pristupy() {
@@ -135,6 +148,7 @@ public class UvodniStranka extends AppCompatActivity {
 
         //vyber hry jde vzdycky
         btnVyber.setEnabled(true);
+        Nastaveni.getInstance(this).reload(this);
 
         if (Nastaveni.getInstance(this).getsHra().equals("")){
             btnPokracovat.setEnabled(false);
@@ -152,14 +166,12 @@ public class UvodniStranka extends AppCompatActivity {
 
     public void vyberClickHandler(View view) {
         // Do something in response to button
-        Intent intent = new Intent(this, Settings.class);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intentSettings, 1);
     }
 
     public void pokracujClickHandler(View view) {
         // Do something in response to button
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivityForResult(intent, 2);
+        startActivityForResult(intentMain, 2);
     }
 
     public void vysledkyClickHandler(View view) {
@@ -168,7 +180,7 @@ public class UvodniStranka extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-         pristupy();
+        pristupy();
     }
 
 

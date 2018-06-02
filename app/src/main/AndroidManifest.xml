@@ -15,11 +15,16 @@
         android:icon="@drawable/ic_launcher"
         android:label="GeoLogi"
         android:theme="@style/AppTheme">
-        <activity android:name="com.deny.GeoLogi.MainActivity"/>
-        <activity android:name="com.deny.GeoLogi.Settings" />
-        <activity android:name="com.deny.GeoLogi.Nastenka" />
-        <activity android:name="com.deny.GeoLogi.MapaActivity" />
-        <activity android:name="com.deny.GeoLogi.IndicieActivity" />
+        <activity android:name="com.deny.GeoLogi.MainActivity"
+            android:launchMode = "singleTop" />
+        <activity android:name="com.deny.GeoLogi.Settings"
+            android:launchMode = "singleTop" />
+        <activity android:name="com.deny.GeoLogi.Nastenka"
+            android:launchMode = "singleTop" />
+        <activity android:name="com.deny.GeoLogi.MapaActivity"
+            android:launchMode = "singleTop" />
+        <activity android:name="com.deny.GeoLogi.IndicieActivity"
+            android:launchMode = "singleTop" />
         <activity
             android:name="com.deny.GeoLogi.UvodniStranka"
             android:configChanges="orientation|keyboardHidden|screenSize"

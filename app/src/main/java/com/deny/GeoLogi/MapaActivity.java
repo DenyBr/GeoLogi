@@ -31,6 +31,12 @@ public class MapaActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+ }
+
+
+    public void onResume(){
+        super.onResume();
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
@@ -102,17 +108,8 @@ public class MapaActivity extends Activity {
         map.getOverlays().add(sfpoNavstivene);
 
         setResult(RESULT_OK);
- }
-
-
-    public void onResume(){
-        super.onResume();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
-        //map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
     }
+
 
     public void onPause(){
         super.onPause();
@@ -120,6 +117,8 @@ public class MapaActivity extends Activity {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().save(this, prefs);
-        //map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+        //map.onPause();  //needed for compass, my location overlays, v6.0.0 and up\
+
+        finish();
     }
 }

@@ -39,44 +39,6 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_settings);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //to remove the action bar (title bar)
-        getSupportActionBar().hide();
-
-        Spinner spHra = (Spinner) findViewById(R.id.spinHry);
-        spHra.setOnItemSelectedListener(new VyberHry());
-
-        Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
-        spOddil.setOnItemSelectedListener(new VyberOddilu());
-
-        EditText tvHeslo = (EditText) findViewById(R.id.etHesloH);
-        tvHeslo.setText(pNastaveni.getProperty("Heslo", ""));
-
-        //zjisti jestli jsme na internetu a pokud ano, tak stahni seznam her
-        //jinak zakaz vyber hry
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        try {
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                new DownloadWebpageTask(new AsyncResult() {
-                    @Override
-                    public void onResult(JSONObject object) {
-                        processJson(object);
-                    }
-                }).execute("https://spreadsheets.google.com/tq?key=12GdpmQ9Y7tgEBs6k--t-zqH_fYRzooGhc3VEtgdrB7Q");
-
-            } else {
-                Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
-            }
-        }
-        catch (Exception e) {
-            Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
-        }
     }
 
 
@@ -258,6 +220,48 @@ public class Settings extends AppCompatActivity {
             // TODO Auto-generated method stub
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setContentView(R.layout.activity_settings);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //to remove the action bar (title bar)
+        getSupportActionBar().hide();
+
+        Spinner spHra = (Spinner) findViewById(R.id.spinHry);
+        spHra.setOnItemSelectedListener(new VyberHry());
+
+        Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
+        spOddil.setOnItemSelectedListener(new VyberOddilu());
+
+        EditText tvHeslo = (EditText) findViewById(R.id.etHesloH);
+        tvHeslo.setText(pNastaveni.getProperty("Heslo", ""));
+
+        //zjisti jestli jsme na internetu a pokud ano, tak stahni seznam her
+        //jinak zakaz vyber hry
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        try {
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                new DownloadWebpageTask(new AsyncResult() {
+                    @Override
+                    public void onResult(JSONObject object) {
+                        processJson(object);
+                    }
+                }).execute("https://spreadsheets.google.com/tq?key=12GdpmQ9Y7tgEBs6k--t-zqH_fYRzooGhc3VEtgdrB7Q");
+
+            } else {
+                Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
+            }
+        } catch (Exception e) {
+            Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
+        }
     }
 }
 

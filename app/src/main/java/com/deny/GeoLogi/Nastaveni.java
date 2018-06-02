@@ -64,7 +64,7 @@ public class Nastaveni extends Properties {
 
     public boolean getisVerejna() {return Boolean.parseBoolean(getProperty("Verejna", ""));}
 
-    public String getsIdHry() {return getProperty("IdHra", "");}
+    public String getsIdHry() {return getProperty("IDHra", "");}
 
     public String getsHra() {return getProperty("Hra", "");}
 

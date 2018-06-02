@@ -40,8 +40,6 @@ public class IndicieActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //to remove the action bar (title bar)
         getSupportActionBar().hide();
-
-        handler.postDelayed(update, 10);
     }
 
 
@@ -57,6 +55,12 @@ public class IndicieActivity extends AppCompatActivity {
         }
     };
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        handler.postDelayed(update, 10);
+    }
 
     public void buttonClickHandler(View view) {
 
@@ -89,5 +93,13 @@ public class IndicieActivity extends AppCompatActivity {
 
         final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).aIndicieZiskane);
         listview.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+
+        finish();
     }
 }
