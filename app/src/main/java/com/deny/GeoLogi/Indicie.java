@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.Normalizer;
 import java.util.ArrayList;
 
 /**
  * Created by bruzlzde on 23.2.2018.
+ *
+ *  objekt drzici informace o jedne indicii - indicie muze mit az pet tvaru
  */
 
 public class Indicie implements Serializable {
@@ -17,11 +20,17 @@ public class Indicie implements Serializable {
         this.setsTexty(sTexty);
     }
 
+    //porovnani
     public boolean jeToOno(String sInd) {
-        for (int i=0; i<sTexty.size(); i++) {
-            if (sInd.toLowerCase().equals(sTexty.get(i).toLowerCase())) return true;
-        }
+        String sIndBezHacku=Normalizer.normalize(sInd, Normalizer.Form.NFD);
+        sIndBezHacku = sIndBezHacku.replaceAll("[^\\p{ASCII}]", "");
 
+        for (int i=0; i<sTexty.size(); i++) {
+            String sHledanaBezHacku = Normalizer.normalize(sTexty.get(i), Normalizer.Form.NFD);
+            sHledanaBezHacku = sHledanaBezHacku.replaceAll("[^\\p{ASCII}]", "");
+
+            if (sIndBezHacku.toLowerCase().equals(sHledanaBezHacku.toLowerCase())) return true;
+        }
         return false;
     }
 

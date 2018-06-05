@@ -7,6 +7,10 @@ import java.io.Serializable;
 
 /**
  * Created by bruzlzde on 27.2.2018.
+ *
+ * Interni format bodu GPS v decimalnim formatu.
+ * Pouziva se pro zobrazovani na mape a detekci navstiveni daneho ciloveho bodu
+ *
  */
 
 public class GeoBod implements Serializable {

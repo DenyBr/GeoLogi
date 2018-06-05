@@ -13,6 +13,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/* inspired by kstancev
+    AsyncTask pouzivany pro zpracovani json formatu google spreadsheet
+ */
+
 public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
     AsyncResult callback;
 
@@ -31,7 +35,6 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
         if (!result.equals("")) {

@@ -3,7 +3,9 @@ package com.deny.GeoLogi;
 import org.json.JSONObject;
 
 /**
- * Created by kstanoev on 1/14/2015.
+ * Inspired by kstanoev
+ *
+ *  Interface pouzivany pro zpracovani json formatu google spreadsheet
  */
 interface AsyncResult
 {

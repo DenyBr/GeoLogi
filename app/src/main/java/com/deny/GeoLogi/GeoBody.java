@@ -27,6 +27,9 @@ import static java.lang.Math.abs;
 
 /**
  * Created by bruzlzde on 27.2.2018.
+ *
+ * Singleton udrzujici eeznam navstivenych bodu
+ * a meri vzdalenost k nejblizsimu z nich
  */
 
 class GeoBody {
@@ -237,7 +240,6 @@ class GeoBody {
 
         registrujGPS(ctx, iTimeout, iDistance);
 
-        //Okynka.zobrazOkynko(ctx, "nejblizsi je "+iMin);
         return iMin;
     }
 
@@ -245,7 +247,6 @@ class GeoBody {
     // Define a listener that responds to location updates
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
-           //Okynka.zobrazOkynko(context, "location update");
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {

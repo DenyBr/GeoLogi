@@ -1,7 +1,5 @@
 package com.deny.GeoLogi;
 
-import android.Manifest;
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,8 +10,6 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.opengl.Visibility;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.os.Bundle;
@@ -33,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,6 +46,7 @@ import java.util.List;
 
 
 /*Hlavni obrazovka aplikace
+
 
 
 
@@ -73,19 +71,21 @@ public class MainActivity extends AppCompatActivity {
     final int iTimeoutUpdate = 1200000;
     int iSirka=0;
     final Object lock = new Object();
+    String sVybrano;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
+        v = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     private void Init () {
         Log.d("Main", "Init");
 
         //Okynka.zobrazOkynko(this, "init");
+        sVybrano = Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
 
         Nastaveni.getInstance(this).reload(this);
 
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void read (Context context) {
         zpravyKomplet = new ArrayList<Zprava>();
-        //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
 
         try {
             InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
@@ -124,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
             Log.d("Main", "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
 
             for (int i=0; i<iPocet; i++) {
@@ -134,6 +132,9 @@ public class MainActivity extends AppCompatActivity {
             in.close();
             inputStream.close();
         }
+        catch (FileNotFoundException e) {
+            //ignoruj
+        }
         catch(Exception e) {
             Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
         }
@@ -142,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void write (Context context) {
         try {
-            //Okynka.zobrazOkynko(this, "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
-
             FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
@@ -153,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
-
-                //if (zpravyKomplet.get(i).getbRead()) Okynka.zobrazOkynko(this, "jo");
             }
             out.flush();
             out.close();
@@ -427,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void serverUpdate (boolean bProvedHned) {
         //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
-        //se zaktualizuje seznam zprav a odesla aktualni stav indicii a navstivenych bodu
+        //se zaktualizuje seznam zpra a odesla aktualni stav indicii a navstivenych bodu
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -460,8 +457,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void casovyupdate () {
         int iTimeout = 30000;
+        boolean bZmenaHry = !sVybrano.equals(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu());
 
-        if (!bPaused) {
+        if (!bZmenaHry) {
             if (!Nastaveni.getInstance(this).getsHra().equals("")) {
                 int iMin = zkontrolujZpravy(false);
 
@@ -629,10 +627,14 @@ public class MainActivity extends AppCompatActivity {
                 if (bNova) {
                     bNova = false;
 
-                    Okynka.zobrazOkynko(this, "Máte novou zprávu");
+                    //pokud jsme na hlavni obrazovce, tak ukaz okynko, jinak pouze zapipej
+                    //tim se predejde tomu, ze se zobrazuje nekolik okynek s informaci, ze maji novou zpravu
+                    if (!bPaused) Okynka.zobrazOkynko(this, "Máte novou zprávu");
+
                     try {
                         //zkus prehrat zvuk
                         notificationRingtone.play();
+                        v.vibrate(500);
 
                         //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
                     } catch (Exception e) {
@@ -758,15 +760,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d("Main", "Spusteno");
 
+        //chceme full screan kvuli malejm telefonum
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //to remove the action bar (title bar)
         getSupportActionBar().hide();
 
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
         Init();
 
         iSirka = this.getResources().getConfiguration().screenWidthDp;
@@ -783,6 +783,5 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         bPaused = true;
-////        finish();
     }
 }

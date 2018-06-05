@@ -2,6 +2,8 @@ package com.deny.GeoLogi;
 
 /**
  * Created by bruzlzde on 22.3.2018.
+ *
+ *  Objekt drzici informace o hre
  */
 
 public class Hra {
