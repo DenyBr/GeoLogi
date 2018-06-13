@@ -6,16 +6,16 @@ import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
+public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String> {
     Context ctx = null;
-    AsyncResultFTPDownload callback = null;
+    AsyncResultFTPCheckSizeAndDate callback = null;
 
-    DownloadFTPFileTask(Context context, AsyncResultFTPDownload callback) {
+    CheckFTPFileSizeAndDateTask(Context context, AsyncResultFTPCheckSizeAndDate callback) {
         ctx = context;
         this.callback = callback;
     }
@@ -23,10 +23,9 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... sFile) {
 
-        // params comes from the execute() call: params[0] is the name of the remote file.
-        //params[1] is the local name of the downloaded file
+        // params comes from the execute() call: params[0] is name of the file.
         try {
-            return downloadFile(sFile[0], sFile[1]);
+            return check(sFile[0]);
         } catch (Exception e) {
             //nedelej nic
         }
@@ -36,19 +35,17 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
-        //
-        boolean bResult = (new Boolean(result)).booleanValue();
-        callback.onResult(bResult);
+        callback.onResult(result);
     }
 
-    private String downloadFile(String sFilenameServer, String sFileNameLocal) throws IOException {
-        boolean result = false;
+    private String check (String sFilename) throws IOException {
+        String sResult = "";
 
         try
         {
             FTPClient con = null;
 
-            Log.d("ftp", "Download " + sFilenameServer + " do "+ sFileNameLocal);
+            Log.d("ftp", "Check file " + sFilename);
 
             con = new FTPClient();
             con.connect("109.205.76.29");
@@ -58,13 +55,13 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);
 
-                FileOutputStream out = ctx.openFileOutput(sFileNameLocal, Context.MODE_PRIVATE);
+                FTPFile ftpFile = con.mlistFile(sFilename);
+                if (ftpFile != null) {
+                    String size = (new Long(ftpFile.getSize())).toString();
+                    String timestamp = ftpFile.getTimestamp().getTime().toString();
 
-                result = con.retrieveFile(sFilenameServer, out);
-
-                Log.d("ftp", "Vysledek downloadu:  " + result);
-
-                out.close();
+                    sResult=size+timestamp;
+                }
                 con.logout();
                 con.disconnect();
             }
@@ -74,6 +71,6 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
 
-        return ""+result;
+        return sResult;
     }
 }
