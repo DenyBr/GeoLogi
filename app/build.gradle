@@ -7,10 +7,10 @@ android {
         applicationId 'com.deny.taborofka_zpravy'
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 11
-        versionName "1.11"
+        versionCode 12
+        versionName "1.12"
         vectorDrawables.useSupportLibrary = true
-        multiDexEnabled true
+//        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -25,28 +25,17 @@ android {
 
 configurations {
     all {
-        exclude module: 'httpclient'
-        exclude module: 'commons-logging'
+      //  exclude module: 'httpclient'
+        //exclude module: 'commons-logging'
     }
 }
 
 
 dependencies {
-    implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    //implementation 'com.google.android.gms:play-services-drive:11.8.0'
-    compile 'com.google.android.gms:play-services:12.0.1'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'org.osmdroid:osmdroid-android:5.6.5'
+    implementation files('commons-net-3.6.jar')
 
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.api-client:google-api-client:1.23.0'
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
-    compile 'com.google.apis:google-api-services-drive:v3-rev107-1.23.0'
-
-
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'commons-net:commons-net:3.6'
-    compile 'org.osmdroid:osmdroid-android:5.6.5'
-    // implementation files('build/commons-net-3.6.jar')
 }
 
 

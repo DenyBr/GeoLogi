@@ -3,7 +3,6 @@ package com.deny.GeoLogi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -16,14 +15,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.deny.GeoLogi.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +27,6 @@ import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -174,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
 
-                new DownloadWebpageTask(new AsyncResult() {
+                new DownloadWebpageTask(new AsyncResultJSON() {
                     @Override
                     public void onResult(JSONObject object) {
                         processJson(object);

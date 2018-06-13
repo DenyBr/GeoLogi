@@ -7,7 +7,7 @@ import org.json.JSONObject;
  *
  *  Interface pouzivany pro zpracovani json formatu google spreadsheet
  */
-interface AsyncResult
+interface AsyncResultJSON
 {
     void onResult(JSONObject object);
 }

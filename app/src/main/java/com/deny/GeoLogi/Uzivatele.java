@@ -32,7 +32,7 @@ public class Uzivatele {
 
     public void reload(String wID, Runnable callback) {
         if (wID != null) {
-            new DownloadWebpageTask(new AsyncResult() {
+            new DownloadWebpageTask(new AsyncResultJSON() {
                 @Override
                 public void onResult(JSONObject object) {
                     processJson(object);

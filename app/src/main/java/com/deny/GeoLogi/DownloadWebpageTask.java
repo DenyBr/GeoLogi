@@ -18,9 +18,9 @@ import java.net.URL;
  */
 
 public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
-    AsyncResult callback;
+    AsyncResultJSON callback;
 
-    public DownloadWebpageTask(AsyncResult callback) {
+    public DownloadWebpageTask(AsyncResultJSON callback) {
         this.callback = callback;
     }
 

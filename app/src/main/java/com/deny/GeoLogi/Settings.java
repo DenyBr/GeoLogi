@@ -1,9 +1,6 @@
 package com.deny.GeoLogi;
 
-import android.app.ActionBar;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 //import android.support.v7.app.ActionBarActivity;
@@ -16,8 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.deny.GeoLogi.R;
 
 
 import org.json.JSONArray;
@@ -249,7 +244,7 @@ public class Settings extends AppCompatActivity {
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                new DownloadWebpageTask(new AsyncResult() {
+                new DownloadWebpageTask(new AsyncResultJSON() {
                     @Override
                     public void onResult(JSONObject object) {
                         processJson(object);
