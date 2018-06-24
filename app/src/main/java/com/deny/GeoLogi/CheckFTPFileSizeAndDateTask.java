@@ -7,6 +7,7 @@ import android.util.Log;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,11 +44,11 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
 
         try
         {
-            FTPClient con = null;
+            FTPSClient con = null;
 
             Log.d("ftp", "Check file " + sFilename);
 
-            con = new FTPClient();
+            con = new FTPSClient();
             con.connect("109.205.76.29");
 
             if (con.login("bruzl", "ASDKL."))

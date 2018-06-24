@@ -6,13 +6,18 @@ import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+
 public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
+    private final String TAG = "UploadFtp";
     Context ctx = null;
+
+
 
     UploadFTPFileTask(Context context) {
         ctx = context;
@@ -40,11 +45,11 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
     private String uploadFile(String sFilename) throws IOException {
         try
         {
-            FTPClient con = null;
+            FTPSClient con = null;
 
-            Log.d("ftp", "su tady " + sFilename);
+            Log.d(TAG, "Upload: " + sFilename);
 
-            con = new FTPClient();
+            con = new FTPSClient();
             con.connect("109.205.76.29");
 
             if (con.login("bruzl", "ASDKL."))
@@ -56,7 +61,7 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
 
                 boolean result = con.storeFile(sFilename, in);
 
-                Log.d("ftp", "Vysledek uploadu:  " + result);
+                Log.d(TAG, "Vysledek uploadu:  " + result);
 
                 in.close();
                 con.logout();
@@ -65,7 +70,7 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.d (TAG, "ERROR: "+e.getMessage());
         }
 
         return "";

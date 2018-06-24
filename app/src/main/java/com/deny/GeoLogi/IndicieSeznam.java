@@ -38,8 +38,10 @@ import java.util.ArrayList;
 public class IndicieSeznam {
     private static IndicieSeznam ourInstance = null;
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
-    public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
+    //public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
     private static Context ctx = null;
+
+    public static SyncFiles<Indicie> sfSynchronizer;
 
     public static IndicieSeznam getInstance(Context context)  {
         if (ourInstance == null) {
@@ -47,6 +49,7 @@ public class IndicieSeznam {
         }
 
         ctx = context;
+
         return ourInstance;
     }
 
@@ -58,25 +61,6 @@ public class IndicieSeznam {
 
 
     public void read (Context context) {
-        try {
-            aIndicieZiskane = new ArrayList<Indicie>();
-            InputStream inputStream =  context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt");
-
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-
-            int iPocet = (int) in.readInt();
-            //Okynka.zobrazOkynko(this, "Pocet zprav" + iPocet);
-
-            for (int i=0; i<iPocet; i++) {
-                Indicie ind = (Indicie) in.readObject();
-                aIndicieZiskane.add(ind);
-            }
-            in.close();
-        }
-        catch(Exception e) {
-            //Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
-        }
-
         try {
             aIndicieVsechny = new ArrayList<Indicie>();
             InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt");
@@ -98,29 +82,6 @@ public class IndicieSeznam {
     }
 
     public void write (Context context) {
-        try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", Context.MODE_PRIVATE);
-            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskanec.txt", Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
-
-            out.writeInt(aIndicieZiskane.size());
-
-            for (int i=0; i<aIndicieZiskane.size(); i++) {
-                out.writeObject(aIndicieZiskane.get(i));
-
-                writer.write (aIndicieZiskane.get(i).getsTexty().get(0));
-                writer.write('\r');
-                writer.write('\n');
-             }
-
-            out.close();
-            fileOut.close();
-            writer.close();
-            fileOutC.close();
-        } catch (IOException ex) {Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
-        }
-
         try {
             OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -187,8 +148,8 @@ public class IndicieSeznam {
     }
 
     public static boolean uzMajiIndicii(String uzMaji) {
-        for (int i=0; i<aIndicieZiskane.size(); i++) {
-            if (aIndicieZiskane.get(i).jeToOno(uzMaji)) {
+        for (int i=0; i<sfSynchronizer.localList.size(); i++) {
+            if (sfSynchronizer.localList.get(i).jeToOno(uzMaji)) {
                 return true;
             }
         }
@@ -198,5 +159,7 @@ public class IndicieSeznam {
     private IndicieSeznam(Context context) {
         ctx = context;
         read(context);
+
+        sfSynchronizer = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", 60000);
     }
 }

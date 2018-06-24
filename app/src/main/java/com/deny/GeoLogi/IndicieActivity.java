@@ -24,7 +24,7 @@ public class IndicieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*
+        /* Commented out, since the screen is big eough after removing the action bar
         if ((this.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
@@ -72,8 +72,11 @@ public class IndicieActivity extends AppCompatActivity {
             } else {
                 for (int i = 0; i < IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.size(); i++) {
                     if (IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i).jeToOno(etIndH.getText().toString())) {
-                        IndicieSeznam.getInstance(IndicieActivity.this).aIndicieZiskane.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
-                        IndicieSeznam.getInstance(IndicieActivity.this).write(this);
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.localList.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.writeFile();
+
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.syncFileNow();
+
                         prekresli();
 
                         setResult(RESULT_OK);
@@ -91,7 +94,7 @@ public class IndicieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_indicie);
         listview = (ListView) findViewById(R.id.listview);
 
-        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).aIndicieZiskane);
+        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfSynchronizer.localList);
         listview.setAdapter(adapter);
     }
 

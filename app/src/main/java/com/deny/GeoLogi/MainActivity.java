@@ -48,7 +48,7 @@ import java.util.List;
  */
 
 public class MainActivity extends AppCompatActivity {
-    private static final String DEBUG_TAG = "Http";
+    private static final String TAG = "MAIN";
     //ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
     ArrayList<Zprava> zpravyKomplet = new ArrayList<Zprava>();
     ArrayList<Zprava> zpravyZobraz = new ArrayList<Zprava>();
@@ -70,14 +70,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "ENTER: OnCreate");
+
         super.onCreate(savedInstanceState);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         v = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+        Log.d(TAG, "LEAVE: OnCreate");
     }
 
     private void Init () {
-        Log.d("Main", "Init");
+        Log.d(TAG, "ENTER: Init");
 
         //Okynka.zobrazOkynko(this, "init");
         sVybrano = Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
@@ -91,9 +93,13 @@ public class MainActivity extends AppCompatActivity {
         GeoBody.getInstance(this).read_navstivene(this);
 
         zkontrolujZpravy(true);
+
+        Log.d(TAG, "LEAVE: Init");
     }
 
     private void resize () {
+        //auxiliary method to set width of the screen
+
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -110,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void read (Context context) {
+        Log.d(TAG, "ENTER: read");
+
         zpravyKomplet = new ArrayList<Zprava>();
 
         try {
@@ -118,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            Log.d("Main", "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
+            Log.d(TAG, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
 
             for (int i=0; i<iPocet; i++) {
                 Zprava z = (Zprava) in.readObject();
@@ -133,17 +141,20 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e) {
             Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
         }
+
+        Log.d(TAG, "LEAVE: read");
     }
 
 
     private void write (Context context) {
+        Log.d(TAG, "ENTER: write");
         try {
             FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(zpravyKomplet.size());
 
-            Log.d("Main" , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
+            Log.d(TAG , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
 
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
@@ -156,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException ex) {
             Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
         }
+        Log.d(TAG, "LEAVE: write");
     }
 
     public void syncClickHandler(View view) {
@@ -163,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void downloadJson () {
+        Log.d(TAG, "ENTER: downloadJSON");
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         try {
@@ -183,14 +196,7 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e) {
             Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům - chyba 2 ");
         }
-
-        resize();
-    }
-
-    public void SettingsClickHandler(View view) {
-        // Do something in response to button
-        Intent intent = new Intent(this, Settings.class);
-        startActivityForResult(intent, 2);
+       Log.d(TAG, "LEAVE: downloadJSON");
     }
 
     public void NastenkaClickHandler(View view) {
@@ -263,10 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void processJson(JSONObject object) {
-       // Okynka.zobrazOkynko(this, "Odpoved prijata");
-        //zpravyKomplet = new ArrayList<Zprava>();
-
-        //Okynka.zobrazOkynko(this, object.toString());
+        Log.d(TAG, "ENTER: processJSON");
 
         try {
             JSONArray rows = object.getJSONArray("rows");
@@ -380,6 +383,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        Log.d(TAG, "LEAVE: processJSON");
     }
 
     private void pridejNeboPrepis (Zprava z) {
@@ -435,9 +440,9 @@ public class MainActivity extends AppCompatActivity {
                     downloadJson();
                     IndicieSeznam.getInstance(this).nactizwebu(this);
 
-                    Log.d("Main", "Odesilam data na server");
-                    uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
-                    uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
+                    //Log.d("Main", "Odesilam data na server");
+                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
+                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
                 }
             } else {
                 bConnectionLost = true;
@@ -536,17 +541,30 @@ public class MainActivity extends AppCompatActivity {
         boolean bNova = false;
         int iMin = 100000;
 
+        Log.d(TAG, "ENTER: zkontrolujZpravy: " + zpravyKomplet.size());
+
         synchronized (lock) {
             try {
+                Log.d(TAG, "su tady " + zpravyKomplet.size());
+
                 GeoBody.getInstance(this).aBody = new ArrayList<GeoBod>();
 
                 for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
                     Zprava z = zpravyKomplet.get(i);
+                    Log.d(TAG, "su tady " + i);
+
+                    Log.d(TAG, "Zprava: " + z.getiId() +
+                                    "  Oddil? " + ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu())) +
+                                    "  Cas? " + (zkontrolujCas(z)) +
+                                    "  Pocet indicii? " + (IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() >= z.getiPocetIndicii()) +
+                                    "  Spravne indicie? " + zkontrolujJestliMajiIndicie(z) +
+                                    "  Nezobrazovaci indicie? " + ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))) +
+                                    "  Lokace? " + zkontrolujLokaci(z));
 
                     //zkotrnolujeme, ze se ma zprava zobrazit
                     if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
                             && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
-                            && (IndicieSeznam.getInstance(this).aIndicieZiskane.size() >= z.getiPocetIndicii()) //maji dost indiciii
+                            && (IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() >= z.getiPocetIndicii()) //maji dost indiciii
                             && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
                             && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
                     {
@@ -649,7 +667,7 @@ public class MainActivity extends AppCompatActivity {
 
                 TextView indicie = (TextView) findViewById(R.id.indicii);
                 if (indicie != null) {
-                    indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).aIndicieZiskane.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
+                    indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
                 }
 
                 iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
@@ -672,8 +690,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
             catch (Exception e) {
+                Log.e(TAG, "ERROR: Zkontroluj zpravy: " + e.getMessage());
+
             }
         }
+        Log.d(TAG, "LEAVE: zkontrolujZpravy: celkem zprav: "+ zpravyKomplet.size()+" viditelnych zprav: " + zpravy.size() + " nejbizsi bod: "+iMin);
+
         return iMin;
     }
 
@@ -695,53 +717,7 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e) {
            // Okynka.zobrazOkynko(this, e.getMessage());
         }
-
-
-        /*for (int i=0; i<GeoBody.getInstance(this).aBody.size(); i++) {
-            Okynka.zobrazOkynko(this, zpravyKomplet.size() + " " + GeoBody.getInstance(this).aBody.get(i).getdLat() +" "+ GeoBody.getInstance(this).aBody.get(i).getPopis()+" "+GeoBody.getInstance(this).aBody.get(i).getbViditelny());
-        }*/
-        /*
-        for (int i=0; i<zpravyKomplet.size(); i++) {
-            Okynka.zobrazOkynko(this, zpravyKomplet.get(i).getiId() + " cas: " + zkontrolujCas(zpravyKomplet.get(i))+ " lokace: " + zkontrolujLokaci(zpravyKomplet.get(i)) + " Indicie: " + zkontrolujJestliMajiIndicie(zpravyKomplet.get(i)) + " pocet indicii: " + zpravyKomplet.get(i).getiPocetIndicii());
-        }*/
-    }
-
-    private void sendNotification(String message, String tick, String title, boolean sound, boolean vibrate, int iconID) {
-        /*Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-        Notification notification = new Notification();
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-
-        if (sound) {
-            notification.defaults |= Notification.DEFAULT_SOUND;
-        }
-
-        if (vibrate) {
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
-        }
-
-        notificationBuilder.setDefaults(notification.defaults);
-        notificationBuilder.setSmallIcon(iconID)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setTicker(tick)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0, notificationBuilder.build());
-        */
-    }
-
-    private void uploadFile (String sFileName) {
-        new UploadFTPFileTask(this).execute(sFileName);
-    }
-
+  }
 
 
     @Override
