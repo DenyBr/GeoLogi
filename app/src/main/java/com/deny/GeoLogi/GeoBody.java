@@ -102,7 +102,7 @@ class GeoBody {
     public void read_navstivene(Context context) {
         try {
             aBodyNavstivene = new ArrayList<GeoBod>();
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt");
+            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -122,8 +122,8 @@ class GeoBody {
 
     public void write_navstivene(Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.txt", Context.MODE_PRIVATE);
-            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin", Context.MODE_PRIVATE);
+            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.bin", Context.MODE_PRIVATE);
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));

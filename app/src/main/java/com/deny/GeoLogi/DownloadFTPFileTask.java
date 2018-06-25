@@ -6,7 +6,6 @@ import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,11 +46,11 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
 
         try
         {
-            FTPSClient con = null;
+            FTPClient con = null;
 
             Log.d("ftp", "Download " + sFilenameServer + " do "+ sFileNameLocal);
 
-            con = new FTPSClient();
+            con = new FTPClient();
             con.connect("109.205.76.29");
 
             if (con.login("bruzl", "ASDKL."))

@@ -27,7 +27,7 @@ import java.util.TimerTask;
    with the common file on ftp server
  */
 
-public class SyncFiles<T extends Serializable> {
+public class SyncFiles<T extends OverWriter&Serializable> {
     private final String TAG = "SyncFiles";
 
     private String sFilename;
@@ -44,7 +44,7 @@ public class SyncFiles<T extends Serializable> {
 
         localList = new ArrayList<>();
 
-        readFile(sFilename, localList);
+        readFile();
 
         timer = new Timer();
         timer.schedule(
@@ -95,9 +95,9 @@ public class SyncFiles<T extends Serializable> {
         //ted zjistime velikost a datum verze na zarizeni
         Log.d(TAG, "ENTER: processDateAndSize. RemoteFile: " + res);
 
-        File localFile = new File (sFilename);
+        File localFile = new File (ctx.getFilesDir().getAbsolutePath() + "/" + sFilename);
 
-        Log.d(TAG, "processDateAndSize. Local file: " + localFile.length()+ new TimeStamp(localFile.lastModified()).toString());
+        Log.d(TAG, "processDateAndSize. Local file: " + localFile.length()+ (localFile.lastModified()/100000));
 
         if (!res.equals(""+localFile.length()+ new TimeStamp(localFile.lastModified()).toString())) {
             if (res.equals("")) {
@@ -116,6 +116,36 @@ public class SyncFiles<T extends Serializable> {
         Log.d(TAG, "LEAVE: processDateAndSize: ");
     }
 
+    private void addOrRewrite (T remoteItem) {
+        boolean bAdd = true;
+
+        //go through the list and check if the item is already there
+        for (int i=0; i<localList.size(); i++) {
+            if (remoteItem.bEquals((T) localList.get(i))) {
+                bAdd = false;
+
+                //if yes, check if it should be rewritten
+                if (remoteItem.bOverWrite((T) localList.get(i))) {
+                    localList.get(i).overwrite(remoteItem);                }
+
+                //the item was found, break the cycle
+                break;
+            }
+        }
+
+        if (bAdd) {
+            localList.add(remoteItem);
+        }
+    }
+
+
+
+    private void mergeRemoteList(ArrayList<T> remoteList) {
+        for (int i=0; i<remoteList.size(); i++) {
+            addOrRewrite(remoteList.get(i));
+        }
+    }
+
     private void processDownload(boolean res) {
         int iPocetLocalPred = localList.size();
         Log.d(TAG, "ENTER: processDownload: " + res);
@@ -127,7 +157,8 @@ public class SyncFiles<T extends Serializable> {
 
         Log.d(TAG, "Lokalni pocet= " + localList.size() + " ftp pocet= " +remoteList.size());
 
-        localList.addAll(remoteList);
+        //merge the remote list into the local one
+        mergeRemoteList(remoteList);
 
         Log.d(TAG, "Pocet po spojeni " + localList.size() + " ftp pocet= " +remoteList.size());
 
@@ -155,11 +186,17 @@ public class SyncFiles<T extends Serializable> {
         new UploadFTPFileTask(ctx).execute(sFilename);
     }
 
+        public void readFile () {
+            localList = new ArrayList<T>();
+            readFile(sFilename, localList);
 
-    public void readFile (String sFilename, ArrayList<T> arrayList) {
+            Log.d(TAG, "LEAVE: lokalni seznam - nacteno: " + localList.size());
+        }
+
+
+        private void readFile (String sFilename, ArrayList<T> arrayList) {
         Log.d(TAG, "ENTER: readFile: "+sFilename);
         try {
-            arrayList = new ArrayList<T>();
             InputStream inputStream =  ctx.openFileInput(sFilename);
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
@@ -180,22 +217,24 @@ public class SyncFiles<T extends Serializable> {
     }
 
     public void writeFile () {
-        Log.d(TAG, "ENTER: writeFile: "+sFilename);
+        Log.d(TAG, "ENTER: writeFile: "+sFilename + " pocet zapisovanych " + localList.size());
         try {
-            OutputStream fileOut = ctx.openFileOutput(Nastaveni.getInstance(ctx).getsIdHry()+Nastaveni.getInstance(ctx).getiIDOddilu()+"indicieziskane.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = ctx.openFileOutput(sFilename, Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(localList.size());
 
             for (int i=0; i<localList.size(); i++) {
-                out.writeObject(localList.get(i));
+                out.writeObject((T) localList.get(i));
             }
 
             out.close();
             fileOut.close();
-        } catch (IOException ex) {Okynka.zobrazOkynko(ctx, "Chyba: " + ex.getMessage());
         }
-        Log.d(TAG, "LEAVE: writeFile: ");
-
+            catch (IOException ex) {
+                Okynka.zobrazOkynko(ctx, "Chyba: " + ex.getMessage());
+                Log.d(TAG, "ERROR: "+"writeFile " + ex.getMessage());
+        }
+        Log.d(TAG, "LEAVE: writeFile");
     }
 }

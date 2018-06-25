@@ -7,9 +7,6 @@ import android.util.Log;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPSClient;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String> {
@@ -44,11 +41,11 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
 
         try
         {
-            FTPSClient con = null;
+            FTPClient con = null;
 
             Log.d("ftp", "Check file " + sFilename);
 
-            con = new FTPSClient();
+            con = new FTPClient();
             con.connect("109.205.76.29");
 
             if (con.login("bruzl", "ASDKL."))
@@ -56,10 +53,11 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);
 
-                FTPFile ftpFile = con.mlistFile(sFilename);
-                if (ftpFile != null) {
-                    String size = (new Long(ftpFile.getSize())).toString();
-                    String timestamp = ftpFile.getTimestamp().getTime().toString();
+                FTPFile[] ftpFile = con.listFiles(sFilename);
+
+                if ((null!=ftpFile) && (null!=ftpFile[0])) {
+                    String size = (new Long(ftpFile[0].getSize())).toString();
+                    Long timestamp =  ftpFile[0].getTimestamp().getTimeInMillis()/100000;
 
                     sResult=size+timestamp;
                 }

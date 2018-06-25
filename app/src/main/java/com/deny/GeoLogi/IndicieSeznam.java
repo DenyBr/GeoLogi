@@ -63,7 +63,7 @@ public class IndicieSeznam {
     public void read (Context context) {
         try {
             aIndicieVsechny = new ArrayList<Indicie>();
-            InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt");
+            InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
@@ -83,7 +83,7 @@ public class IndicieSeznam {
 
     public void write (Context context) {
         try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.txt", Context.MODE_PRIVATE);
+            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.bin", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(aIndicieVsechny.size());
@@ -160,6 +160,7 @@ public class IndicieSeznam {
         ctx = context;
         read(context);
 
-        sfSynchronizer = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.txt", 60000);
+        sfSynchronizer = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000);
+
     }
 }

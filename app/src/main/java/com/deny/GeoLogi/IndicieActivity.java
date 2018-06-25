@@ -6,6 +6,7 @@ import android.os.Handler;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -16,9 +17,9 @@ import com.deny.GeoLogi.R;
 
 
 public class IndicieActivity extends AppCompatActivity {
+    private final String TAG = "IndicieActivity";
     private ListView listview;
     private Handler handler = new Handler();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,10 @@ public class IndicieActivity extends AppCompatActivity {
         @Override
         public void run() {
             IndicieSeznam.getInstance(IndicieActivity.this).read(IndicieActivity.this);
+            IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.readFile();
+
+
+
             prekresli();
 
             IndicieSeznam.getInstance(IndicieActivity.this).nactizwebu(IndicieActivity.this);
@@ -84,7 +89,6 @@ public class IndicieActivity extends AppCompatActivity {
                         return;
                     }
                 }
-
                 Okynka.zobrazOkynko(this, "Neplatná indicie");
             }
         }
@@ -93,6 +97,8 @@ public class IndicieActivity extends AppCompatActivity {
     private void prekresli () {
         setContentView(R.layout.activity_indicie);
         listview = (ListView) findViewById(R.id.listview);
+
+        Log.d(TAG, "prekresli Pocet indicii: "+IndicieSeznam.getInstance(this).sfSynchronizer.localList.size());
 
         final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfSynchronizer.localList);
         listview.setAdapter(adapter);

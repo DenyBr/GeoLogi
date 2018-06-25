@@ -6,7 +6,6 @@ import android.util.Log;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPSClient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,11 +44,11 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
     private String uploadFile(String sFilename) throws IOException {
         try
         {
-            FTPSClient con = null;
+            FTPClient con = null;
 
             Log.d(TAG, "Upload: " + sFilename);
 
-            con = new FTPSClient();
+            con = new FTPClient();
             con.connect("109.205.76.29");
 
             if (con.login("bruzl", "ASDKL."))

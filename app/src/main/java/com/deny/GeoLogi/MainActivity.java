@@ -121,12 +121,12 @@ public class MainActivity extends AppCompatActivity {
         zpravyKomplet = new ArrayList<Zprava>();
 
         try {
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt");
+            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            Log.d(TAG, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + "Pocet: " + iPocet);
+            Log.d(TAG, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + "Pocet: " + iPocet);
 
             for (int i=0; i<iPocet; i++) {
                 Zprava z = (Zprava) in.readObject();
@@ -149,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
     private void write (Context context) {
         Log.d(TAG, "ENTER: write");
         try {
-            FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt", Context.MODE_PRIVATE);
+            FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(zpravyKomplet.size());
 
-            Log.d(TAG , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.txt" + " pocet: " + zpravyKomplet.size());
+            Log.d(TAG , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + " pocet: " + zpravyKomplet.size());
 
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
@@ -225,10 +225,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearClickHandler(View view) {
-        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"zpravy.txt");
-        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskane.txt");
-        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicievsecny.txt");
-        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.txt");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"zpravy.bin");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskane.bin");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicievsecny.bin");
+        clearfile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivene.bin");
 
         Init();
     }
@@ -441,8 +441,8 @@ public class MainActivity extends AppCompatActivity {
                     IndicieSeznam.getInstance(this).nactizwebu(this);
 
                     //Log.d("Main", "Odesilam data na server");
-                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.txt");
-                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.txt");
+                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.bin");
+                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.bin");
                 }
             } else {
                 bConnectionLost = true;
@@ -703,12 +703,12 @@ public class MainActivity extends AppCompatActivity {
 
         //read(this);
         try {
-            InputStream inputStream = this.openFileInput(Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.txt");
+            InputStream inputStream = this.openFileInput(Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.txt" + "Pocet: " + iPocet);
+            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.bin" + "Pocet: " + iPocet);
             //Log.d("")
 
             in.close();

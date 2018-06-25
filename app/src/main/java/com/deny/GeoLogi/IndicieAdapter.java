@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 
 public class IndicieAdapter extends ArrayAdapter<Indicie> {
+    private final String TAG = "IndicieAdapter";
 
     Context context;
     private ArrayList<Indicie> indicies;
@@ -22,6 +24,8 @@ public class IndicieAdapter extends ArrayAdapter<Indicie> {
         super(context, textViewResourceId, items);
         this.context = context;
         this.indicies = items;
+
+        Log.d(TAG, "Adapter: "+items.size());
     }
 
     @Override

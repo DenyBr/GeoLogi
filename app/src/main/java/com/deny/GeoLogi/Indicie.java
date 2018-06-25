@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.ArrayList;
 
@@ -13,8 +14,9 @@ import java.util.ArrayList;
  *  objekt drzici informace o jedne indicii - indicie muze mit az pet tvaru
  */
 
-public class Indicie implements Serializable {
+public class Indicie implements Serializable, OverWriter<Indicie> {
     private ArrayList<String> sTexty;
+    private Timestamp time;
 
     public Indicie(ArrayList<String> sTexty) {
         this.setsTexty(sTexty);
@@ -53,5 +55,23 @@ public class Indicie implements Serializable {
     ) throws IOException {
         //perform the default serialization for all non-transient, non-static fields
         aOutputStream.defaultWriteObject();
+    }
+
+    @Override
+    public boolean bEquals (Indicie to) {
+        return sTexty.get(0).equals(to.sTexty.get(0));
+    }
+
+    public boolean bOverWrite(Indicie by) {
+        if ( sTexty.get(0).equals(by.sTexty.get(0)) &&
+            time.after(by.time)) return true;
+
+        return false;
+    }
+
+    @Override
+    public void overwrite (Indicie by) {
+        sTexty = by.sTexty;
+        time = by.time;
     }
 }
