@@ -153,7 +153,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         ArrayList<T> remoteList = new ArrayList<>();
 
         readFile(sFilename+"tmp", remoteList);
-        int iPocetRemotePred = localList.size();
+        int iPocetRemotePred = remoteList.size();
 
         Log.d(TAG, "Lokalni pocet= " + localList.size() + " ftp pocet= " +remoteList.size());
 

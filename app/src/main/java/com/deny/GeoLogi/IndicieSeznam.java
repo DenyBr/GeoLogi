@@ -21,14 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 
 /**
@@ -41,7 +38,7 @@ public class IndicieSeznam {
     //public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
     private static Context ctx = null;
 
-    public static SyncFiles<Indicie> sfSynchronizer;
+    public static SyncFiles<Indicie> sfIndicie;
 
     public static IndicieSeznam getInstance(Context context)  {
         if (ourInstance == null) {
@@ -148,8 +145,8 @@ public class IndicieSeznam {
     }
 
     public static boolean uzMajiIndicii(String uzMaji) {
-        for (int i=0; i<sfSynchronizer.localList.size(); i++) {
-            if (sfSynchronizer.localList.get(i).jeToOno(uzMaji)) {
+        for (int i = 0; i< sfIndicie.localList.size(); i++) {
+            if (sfIndicie.localList.get(i).jeToOno(uzMaji)) {
                 return true;
             }
         }
@@ -160,7 +157,7 @@ public class IndicieSeznam {
         ctx = context;
         read(context);
 
-        sfSynchronizer = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000);
+        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000);
 
     }
 }

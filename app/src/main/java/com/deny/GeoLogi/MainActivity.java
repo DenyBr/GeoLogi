@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         IndicieSeznam.getInstance(this).read(this);
 
-        GeoBody.getInstance(this).read_navstivene(this);
+        GeoBody.getInstance(this);
 
         zkontrolujZpravy(true);
 
@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Zprava: " + z.getiId() +
                                     "  Oddil? " + ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu())) +
                                     "  Cas? " + (zkontrolujCas(z)) +
-                                    "  Pocet indicii? " + (IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() >= z.getiPocetIndicii()) +
+                                    "  Pocet indicii? " + (IndicieSeznam.getInstance(this).sfIndicie.localList.size() >= z.getiPocetIndicii()) +
                                     "  Spravne indicie? " + zkontrolujJestliMajiIndicie(z) +
                                     "  Nezobrazovaci indicie? " + ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))) +
                                     "  Lokace? " + zkontrolujLokaci(z));
@@ -564,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
                     //zkotrnolujeme, ze se ma zprava zobrazit
                     if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
                             && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
-                            && (IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() >= z.getiPocetIndicii()) //maji dost indiciii
+                            && (IndicieSeznam.getInstance(this).sfIndicie.localList.size() >= z.getiPocetIndicii()) //maji dost indiciii
                             && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
                             && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
                     {
@@ -662,12 +662,12 @@ public class MainActivity extends AppCompatActivity {
                 TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
 
                 if (hledanebody != null) {
-                    hledanebody.setText("Cíle: " + GeoBody.getInstance(this).aBodyNavstivene.size() + "/" + GeoBody.getInstance(this).aBody.size());
+                    hledanebody.setText("Cíle: " + GeoBody.getInstance(this).sfBodyNavsvivene.localList.size() + "/" + GeoBody.getInstance(this).aBody.size());
                 }
 
                 TextView indicie = (TextView) findViewById(R.id.indicii);
                 if (indicie != null) {
-                    indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfSynchronizer.localList.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
+                    indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfIndicie.localList.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
                 }
 
                 iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);

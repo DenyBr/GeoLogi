@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Created by bruzlzde on 27.2.2018.
@@ -13,11 +14,12 @@ import java.io.Serializable;
  *
  */
 
-public class GeoBod implements Serializable {
+public class GeoBod implements Serializable, OverWriter<GeoBod> {
     private double dLat;
     private double dLong;
     private String Popis;
     private boolean bViditelny;
+    private Timestamp time;
 
     public GeoBod (double dLat, double dLong, String sPopis, boolean bViditelny) {
         setdLat(dLat);
@@ -59,6 +61,10 @@ public class GeoBod implements Serializable {
         this.bViditelny = bViditelny;
     }
 
+    public void setTime(Timestamp time) {
+        this.time = time;
+    }
+
     private void readObject(
             ObjectInputStream aInputStream
     ) throws ClassNotFoundException, IOException {
@@ -74,5 +80,18 @@ public class GeoBod implements Serializable {
     }
 
 
+    @Override
+    public boolean bOverWrite(GeoBod member) {
+        return false;
+    }
 
+    @Override
+    public void overwrite(GeoBod member) {
+
+    }
+
+    @Override
+    public boolean bEquals(GeoBod member) {
+        return false;
+    }
 }

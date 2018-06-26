@@ -39,6 +39,10 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
     public void setsTexty(ArrayList <String> sTexty) {
         this.sTexty = sTexty;
     }
+    public void setTime(Timestamp time) {
+        this.time = time;
+    }
+
     public ArrayList<String> getsTexty() {
         return sTexty;
     }

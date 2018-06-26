@@ -38,10 +38,11 @@ class GeoBody {
     //a bodu na kterych bude zobrazena zprava -
     //ne nutne musi byt zobrazeny na mape - mohou napriklad dostat popis, ze maji dojit k rybniku
     ArrayList<GeoBod> aBody = new ArrayList<>();
-    //public ArrayList<GeoBod> aBodyHledane = new ArrayList<GeoBod>();
+
     //seznam navstivenych bodu - to jsou body, kam uz dosli
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
-    ArrayList<GeoBod> aBodyNavstivene = aBody = new ArrayList<>();
+    //navstivene body se synchronizuji na ftp server
+    public static SyncFiles<GeoBod> sfBodyNavsvivene;
 
     private Context context = null;
     private Criteria criteria = null;
@@ -94,65 +95,14 @@ class GeoBody {
     private GeoBody(Context ctx) {
         context = ctx;
 
+        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin", 600000);
         registrujGPS(ctx, 1000, 10);
     }
 
 
-
-    public void read_navstivene(Context context) {
-        try {
-            aBodyNavstivene = new ArrayList<GeoBod>();
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin");
-
-            ObjectInputStream in = new ObjectInputStream(inputStream);
-
-            int iPocet = (int) in.readInt();
-
-            for (int i = 0; i < iPocet; i++) {
-                GeoBod bod = (GeoBod) in.readObject();
-                aBodyNavstivene.add(bod);
-            }
-            in.close();
-        } catch (Exception e) {
-            //Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
-        }
-        aktualizujMapu();
-    }
-
-
-    public void write_navstivene(Context context) {
-        try {
-            OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin", Context.MODE_PRIVATE);
-            OutputStream fileOutC = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivenec.bin", Context.MODE_PRIVATE);
-
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutC));
-
-            out.writeInt(aBodyNavstivene.size());
-
-            for (int i = 0; i < aBodyNavstivene.size(); i++) {
-                out.writeObject(aBodyNavstivene.get(i));
-
-                writer.write("" + aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis());
-                writer.write('\r');
-                writer.write('\n');
-
-                Log.d("GeoBody", "" + aBodyNavstivene.get(i).getdLat()+":"+aBodyNavstivene.get(i).getdLong()+":"+aBodyNavstivene.get(i).getPopis());
-            }
-
-            out.close();
-            fileOut.close();
-            writer.close();
-            fileOutC.close();
-
-        } catch (IOException ex) {
-            Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
-        }
-    }
-
     public boolean bylNavstivenej(GeoBod b) {
-        for (int i = 0; i < aBodyNavstivene.size(); i++) {
-            if ((abs(b.getdLat() - aBodyNavstivene.get(i).getdLat()) < 0.00001) && (abs(b.getdLong() - aBodyNavstivene.get(i).getdLong()) < 0.00001))
+        for (int i = 0; i < sfBodyNavsvivene.localList.size(); i++) {
+            if ((abs(b.getdLat() - sfBodyNavsvivene.localList.get(i).getdLat()) < 0.00001) && (abs(b.getdLong() - sfBodyNavsvivene.localList.get(i).getdLong()) < 0.00001))
                 return true;
         }
         return false;
@@ -211,10 +161,10 @@ class GeoBody {
 
                         if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
                             //pridame bod mezi navstivene
-                            aBodyNavstivene.add(bodAct);
+                            sfBodyNavsvivene.localList.add(bodAct);
 
                             //a ulozime
-                            write_navstivene(ctx);
+                            sfBodyNavsvivene.syncFileNow();
 
                             aktualizujMapu();
                         }

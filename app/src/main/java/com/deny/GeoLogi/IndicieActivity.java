@@ -1,7 +1,5 @@
 package com.deny.GeoLogi;
 
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Handler;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
-import com.deny.GeoLogi.R;
+import java.sql.Timestamp;
 
 
 public class IndicieActivity extends AppCompatActivity {
@@ -48,9 +46,7 @@ public class IndicieActivity extends AppCompatActivity {
         @Override
         public void run() {
             IndicieSeznam.getInstance(IndicieActivity.this).read(IndicieActivity.this);
-            IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.readFile();
-
-
+            IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.readFile();
 
             prekresli();
 
@@ -77,10 +73,15 @@ public class IndicieActivity extends AppCompatActivity {
             } else {
                 for (int i = 0; i < IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.size(); i++) {
                     if (IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i).jeToOno(etIndH.getText().toString())) {
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.localList.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.writeFile();
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
+                        //set timestamp\
+                        Long tsLong = System.currentTimeMillis()/1000;
 
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfSynchronizer.syncFileNow();
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.get(IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.size()-1).setTime(new Timestamp(System.currentTimeMillis()));
+
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.writeFile();
+
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.syncFileNow();
 
                         prekresli();
 
@@ -98,9 +99,9 @@ public class IndicieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_indicie);
         listview = (ListView) findViewById(R.id.listview);
 
-        Log.d(TAG, "prekresli Pocet indicii: "+IndicieSeznam.getInstance(this).sfSynchronizer.localList.size());
+        Log.d(TAG, "prekresli Pocet indicii: "+IndicieSeznam.getInstance(this).sfIndicie.localList.size());
 
-        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfSynchronizer.localList);
+        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfIndicie.localList);
         listview.setAdapter(adapter);
     }
 
