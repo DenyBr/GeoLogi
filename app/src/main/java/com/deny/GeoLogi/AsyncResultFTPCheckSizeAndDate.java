@@ -10,5 +10,5 @@ import java.sql.Timestamp;
  */
 interface AsyncResultFTPCheckSizeAndDate
 {
-    void onResult(String sSizeTime);
+    void onResult(long lSize, long lTimestamp);
 }

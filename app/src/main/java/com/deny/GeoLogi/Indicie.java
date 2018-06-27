@@ -78,4 +78,5 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
         sTexty = by.sTexty;
         time = by.time;
     }
+
 }

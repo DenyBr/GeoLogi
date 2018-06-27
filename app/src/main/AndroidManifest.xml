@@ -15,18 +15,23 @@
         android:icon="@drawable/ic_launcher"
         android:label="GeoLogi"
         android:theme="@style/AppTheme">
-        <activity android:name="com.deny.GeoLogi.MainActivity"
-            android:launchMode = "singleTop" />
-        <activity android:name="com.deny.GeoLogi.Settings"
-            android:launchMode = "singleTop" />
-        <activity android:name="com.deny.GeoLogi.Nastenka"
-            android:launchMode = "singleTop" />
-        <activity android:name="com.deny.GeoLogi.MapaActivity"
-            android:launchMode = "singleTop" />
-        <activity android:name="com.deny.GeoLogi.IndicieActivity"
-            android:launchMode = "singleTop" />
         <activity
-            android:name="com.deny.GeoLogi.UvodniStranka"
+            android:name=".MainActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".Settings"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".Nastenka"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".MapaActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".IndicieActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".UvodniStranka"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppTheme">
             >
@@ -36,6 +41,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".VysledkyActivity"></activity>
     </application>
 
 </manifest>

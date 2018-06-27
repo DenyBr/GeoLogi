@@ -82,28 +82,30 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
         new CheckFTPFileSizeAndDateTask(ctx, new AsyncResultFTPCheckSizeAndDate() {
             @Override
-            public void onResult(String res) {
-                processDateAndSize(res);
+            public void onResult(long lSize, long lTimestamp) {
+                processDateAndSize(lSize, lTimestamp);
             }
         }).execute(sFilename);
 
         Log.d(TAG, "LEAVE: syncFileNow " + sFilename);
     }
 
-    private void processDateAndSize(String res) {
+    private void processDateAndSize(long lSize, long lTimestamp) {
         //tato metoda bude zavolana potom, co se zjisti vlastnosti vzdaleneho souboru
         //ted zjistime velikost a datum verze na zarizeni
-        Log.d(TAG, "ENTER: processDateAndSize. RemoteFile: " + res);
+        Log.d(TAG, "ENTER: processDateAndSize. RemoteFile: size: " + lSize + "timestamp: " + lTimestamp);
 
         File localFile = new File (ctx.getFilesDir().getAbsolutePath() + "/" + sFilename);
 
-        Log.d(TAG, "processDateAndSize. Local file: " + localFile.length()+ (localFile.lastModified()/100000));
+        Log.d(TAG, "processDateAndSize. Local file: size: " + localFile.length()+ "timestamp:" + (localFile.lastModified()/100000));
 
-        if (!res.equals(""+localFile.length()+ new TimeStamp(localFile.lastModified()).toString())) {
-            if (res.equals("")) {
-                //verze na netu neexistuje, takze nahrajem aktualni
-                upload();
-            } else {
+        //the version on the net does not exist => upload local file
+        if (0==lSize) {
+            upload();
+        }
+        else {
+            //version on the net has different size or is newer than local file => need to check the content
+            if ((lSize != localFile.length()) || (localFile.lastModified()/100000<lTimestamp)) {
                 new DownloadFTPFileTask(ctx, new AsyncResultFTPDownload() {
                     @Override
                     public void onResult(boolean res) {
@@ -112,6 +114,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
                 }).execute(sFilename, sFilename+"tmp");
             }
         }
+
 
         Log.d(TAG, "LEAVE: processDateAndSize: ");
     }
@@ -155,17 +158,19 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         readFile(sFilename+"tmp", remoteList);
         int iPocetRemotePred = remoteList.size();
 
-        Log.d(TAG, "Lokalni pocet= " + localList.size() + " ftp pocet= " +remoteList.size());
+        Log.d(TAG, "Local count = " + localList.size() + " ftp count = " +remoteList.size());
 
         //merge the remote list into the local one
         mergeRemoteList(remoteList);
 
-        Log.d(TAG, "Pocet po spojeni " + localList.size() + " ftp pocet= " +remoteList.size());
+        Log.d(TAG, "Count after merge " + localList.size());
+
+        //always write local version even in case of no change to update the timestamp
+        writeFile();
 
         if (iPocetLocalPred != localList.size()) {
             //pribyla nejaka indicie  =>
             //zapiseme soubor
-            writeFile();
 
             /*
                 TODO a jeste musime zavolat callback, ktery aktualizuje to, co je potreba - napr. obrazovku a prekresli napr. seznam indicii, pokud je zrovna otevreny

@@ -8,6 +8,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String> {
     Context ctx = null;
@@ -33,7 +35,17 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
-        callback.onResult(result);
+        long lSize=0;
+        long lTimestamp=0;
+
+        List<String> items = Arrays.asList(result.split("[\\\\s,]+"));
+
+        if (2 == items.size()) {
+            lSize = Long.parseLong (items.get(0));
+            lTimestamp = Long.parseLong (items.get(1));
+        }
+
+        callback.onResult(lSize, lTimestamp);
     }
 
     private String check (String sFilename) throws IOException {

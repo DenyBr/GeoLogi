@@ -23,16 +23,6 @@ public class IndicieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /* Commented out, since the screen is big eough after removing the action bar
-        if ((this.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
-           setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else
-        {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }*/
-
         setContentView(R.layout.activity_indicie);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
