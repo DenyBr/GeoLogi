@@ -15,11 +15,13 @@ import java.util.ArrayList;
  */
 
 public class Indicie implements Serializable, OverWriter<Indicie> {
+    private String sGroup;
     private ArrayList<String> sTexty;
     private Timestamp time;
 
-    public Indicie(ArrayList<String> sTexty) {
-        this.setsTexty(sTexty);
+    public Indicie(String sGroup, ArrayList<String> sTexty) {
+        setsGroup(sGroup);
+        setsTexty(sTexty);
     }
 
     //porovnani
@@ -63,11 +65,11 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
 
     @Override
     public boolean bEquals (Indicie to) {
-        return sTexty.get(0).equals(to.sTexty.get(0));
+        return to.getsGroup().equals(sGroup) && sTexty.get(0).equals(to.sTexty.get(0));
     }
 
     public boolean bOverWrite(Indicie by) {
-        if ( sTexty.get(0).equals(by.sTexty.get(0)) &&
+        if ( by.getsGroup().equals(sGroup) && sTexty.get(0).equals(by.sTexty.get(0)) &&
             time.after(by.time)) return true;
 
         return false;
@@ -79,4 +81,11 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
         time = by.time;
     }
 
+    public String getsGroup() {
+        return sGroup;
+    }
+
+    public void setsGroup(String sGroup) {
+        this.sGroup = sGroup;
+    }
 }

@@ -6,6 +6,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import org.osmdroid.api.IGeoPoint;
@@ -43,10 +45,9 @@ class GeoBody {
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
     //navstivene body se synchronizuji na ftp server
     public static SyncFiles<GeoBod> sfBodyNavsvivene;
+    public static Handler.Callback callback = null;
 
-    private Context context = null;
-    private Criteria criteria = null;
-    private String bestProvider = null;
+    private Context ctx = null;
     private Location location = null;
     private LocationManager locationManager = null;
 
@@ -57,11 +58,11 @@ class GeoBody {
         aMapa_nove = new ArrayList<IGeoPoint>();
         aMapa_navstivene = new ArrayList<IGeoPoint>();
 
-        for (int i = 0; i < GeoBody.getInstance(context).aBody.size(); i++) {
-            GeoBod actBod = GeoBody.getInstance(context).aBody.get(i);
+        for (int i = 0; i < GeoBody.getInstance(ctx).aBody.size(); i++) {
+            GeoBod actBod = GeoBody.getInstance(ctx).aBody.get(i);
 
             if (actBod.getbViditelny()) {
-                if (!GeoBody.getInstance(context).bylNavstivenej(actBod))
+                if (!GeoBody.getInstance(ctx).bylNavstivenej(actBod))
                     aMapa_nove.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
                 else
                     aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
@@ -85,7 +86,7 @@ class GeoBody {
 
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         } catch (SecurityException e) {
-            Okynka.zobrazOkynko(context, "" + e.getMessage());
+            Okynka.zobrazOkynko(ctx, "" + e.getMessage());
         } catch (Exception e) {
             //Okynka.zobrazOkynko(context, "" + e.getMessage());
         }
@@ -93,12 +94,16 @@ class GeoBody {
     }
 
     private GeoBody(Context ctx) {
-        context = ctx;
+        this.ctx = ctx;
 
-        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "bodynavstivene.bin", 600000);
-        registrujGPS(ctx, 1000, 10);
+        init();
     }
 
+    public void init() {
+        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 600000, callback);
+        registrujGPS(ctx, 1000, 10);
+    }
+    
 
     public boolean bylNavstivenej(GeoBod b) {
         for (int i = 0; i < sfBodyNavsvivene.localList.size(); i++) {
@@ -193,6 +198,9 @@ class GeoBody {
         return iMin;
     }
 
+    public static void setCallback(Handler.Callback callback) {
+        GeoBody.callback = callback;
+    }
 
     // Define a listener that responds to location updates
     LocationListener locationListener = new LocationListener() {

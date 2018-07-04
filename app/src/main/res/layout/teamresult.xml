@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <TextView
+        android:id="@+id/TeamName"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="Id"/>
+    <TextView
+        android:id="@+id/Hints"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:text="Počet indicií"/>
+    <TextView
+        android:id="@+id/Points"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="Počet navštívených bodů"/>
+</LinearLayout>

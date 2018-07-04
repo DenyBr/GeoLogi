@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -47,7 +48,7 @@ import java.util.List;
 
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "MAIN";
     //ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
     ArrayList<Zprava> zpravyKomplet = new ArrayList<Zprava>();
@@ -81,17 +82,25 @@ public class MainActivity extends AppCompatActivity {
     private void Init () {
         Log.d(TAG, "ENTER: Init");
 
-        //Okynka.zobrazOkynko(this, "init");
+        //Save currently selected gam and user to detect change later
         sVybrano = Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
 
+        //reload all parameters
         Nastaveni.getInstance(this).reload(this);
 
+        //reload stored messages
         read(this);
 
+        //register callback which will be called in case of update of Hints
+        //instantiate Hints singleton and read stored Hints
+        IndicieSeznam.setCallback(this);
         IndicieSeznam.getInstance(this).read(this);
 
-        GeoBody.getInstance(this);
+        //the same for visited points
+        GeoBody.setCallback(this);
+        GeoBody.getInstance(this).init();
 
+        //check and update messages
         zkontrolujZpravy(true);
 
         Log.d(TAG, "LEAVE: Init");
@@ -347,15 +356,21 @@ public class MainActivity extends AppCompatActivity {
                     iPocetIndicii = columns.getJSONObject(12).getInt("v"); }
                 catch (Exception e) {}
 
+                String sIndicieZeSkupiny = "";
+
+                try {
+                    sIndicieZeSkupiny = columns.getJSONObject(13).getString("v"); }
+                catch (Exception e) {}
+
                 String sPovinneIndicie = "";
 
                 try {
-                    sPovinneIndicie = columns.getJSONObject(13).getString("v"); }
+                    sPovinneIndicie = columns.getJSONObject(14).getString("v"); }
                 catch (Exception e) {}
 
                 String sNezobrazovatPokudMajiIndicii = "";
                 try {
-                    sNezobrazovatPokudMajiIndicii = columns.getJSONObject(14).getString("v"); }
+                    sNezobrazovatPokudMajiIndicii = columns.getJSONObject(15).getString("v"); }
                 catch (Exception e) {}
 
                 Zprava zprava = new Zprava(iId,
@@ -371,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
                         fZobrazitNaLat,
                         fZobrazitNaLong,
                         iPocetIndicii,
+                        sIndicieZeSkupiny,
                         sPovinneIndicie,
                         sNezobrazovatPokudMajiIndicii
                 );
@@ -411,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //vraci true, pokud maji dost indicii, nebo ru spravnou indicii
+    //vraci true, pokud maji tu spravnou indicii
     private boolean zkontrolujJestliMajiIndicie (Zprava z) {
         List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\s,]+"));
 
@@ -556,7 +572,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Zprava: " + z.getiId() +
                                     "  Oddil? " + ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu())) +
                                     "  Cas? " + (zkontrolujCas(z)) +
-                                    "  Pocet indicii? " + (IndicieSeznam.getInstance(this).sfIndicie.localList.size() >= z.getiPocetIndicii()) +
+                                    "  Pocet indicii? " + (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) +
                                     "  Spravne indicie? " + zkontrolujJestliMajiIndicie(z) +
                                     "  Nezobrazovaci indicie? " + ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))) +
                                     "  Lokace? " + zkontrolujLokaci(z));
@@ -564,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
                     //zkotrnolujeme, ze se ma zprava zobrazit
                     if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
                             && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
-                            && (IndicieSeznam.getInstance(this).sfIndicie.localList.size() >= z.getiPocetIndicii()) //maji dost indiciii
+                            && (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) //maji dost indiciii
                             && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
                             && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
                     {
@@ -754,5 +770,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         bPaused = true;
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        zkontrolujZpravy(false);
+
+        return true;
     }
 }

@@ -3,6 +3,8 @@ package com.deny.GeoLogi;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Message;
 
 /*
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -37,16 +39,16 @@ public class IndicieSeznam {
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
     //public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
     private static Context ctx = null;
+    private static Handler.Callback callback = null;
 
     public static SyncFiles<Indicie> sfIndicie;
 
     public static IndicieSeznam getInstance(Context context)  {
+        ctx = context;
+
         if (ourInstance == null) {
             ourInstance = new IndicieSeznam(context);
         }
-
-        ctx = context;
-
         return ourInstance;
     }
 
@@ -54,6 +56,10 @@ public class IndicieSeznam {
         //vim, ze tohle muze vratit null, ale z logiky programu bych se tomu mel vyhnout
 
         return ourInstance;
+    }
+
+    public static void setCallback(Handler.Callback callback) {
+        IndicieSeznam.callback = callback;
     }
 
 
@@ -76,6 +82,8 @@ public class IndicieSeznam {
         catch(Exception e) {
             //Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
         }
+
+        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000, callback);
     }
 
     public void write (Context context) {
@@ -125,7 +133,14 @@ public class IndicieSeznam {
                 JSONArray columns = row.getJSONArray("c");
 
                 ArrayList<String> aInd = new ArrayList<String>();
-                for (int iSloupec=0; iSloupec<5; iSloupec++) {
+
+                String sGroup = "";
+                try {
+                    sGroup = columns.getJSONObject(0).getString("v");
+                } catch (Exception e) {
+                }
+
+                for (int iSloupec=1; iSloupec<6; iSloupec++) {
                     String sText = "";
                     try {
                         sText = columns.getJSONObject(iSloupec).getString("v");
@@ -134,7 +149,7 @@ public class IndicieSeznam {
                     }
                 }
 
-                IndicieSeznam.getInstance().aIndicieVsechny.add(new Indicie(aInd));
+                IndicieSeznam.getInstance().aIndicieVsechny.add(new Indicie(sGroup, aInd));
             }
 
             IndicieSeznam.getInstance().write(ctx);
@@ -142,6 +157,18 @@ public class IndicieSeznam {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static int indiciiZeSkupiny(String sGroup) {
+        int iRes=0;
+
+        for (int i = 0; i< sfIndicie.localList.size(); i++) {
+            if (sfIndicie.localList.get(i).getsGroup().equals(sGroup)) {
+                iRes++;
+            }
+        }
+
+        return iRes;
     }
 
     public static boolean uzMajiIndicii(String uzMaji) {
@@ -156,8 +183,6 @@ public class IndicieSeznam {
     private IndicieSeznam(Context context) {
         ctx = context;
         read(context);
+   }
 
-        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000);
-
-    }
 }

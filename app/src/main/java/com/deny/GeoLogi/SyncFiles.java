@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import org.apache.commons.net.ntp.TimeStamp;
@@ -33,14 +34,16 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     private String sFilename;
     private Timer timer;
     private Context ctx;
+    private Handler.Callback callback;
 
     public ArrayList<T> localList;
 
 
-    public SyncFiles(Context ctx, String sFileName, int iPerioda){
+    public SyncFiles(Context ctx, String sFileName, int iPerioda, Handler.Callback callback){
         Log.d(TAG, "ENTER: SyncFiles: "+sFilename);
         setsFilename(sFileName);
         setCtx(ctx);
+        setCallback(callback);
 
         localList = new ArrayList<>();
 
@@ -93,7 +96,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     private void processDateAndSize(long lSize, long lTimestamp) {
         //tato metoda bude zavolana potom, co se zjisti vlastnosti vzdaleneho souboru
         //ted zjistime velikost a datum verze na zarizeni
-        Log.d(TAG, "ENTER: processDateAndSize. RemoteFile: size: " + lSize + "timestamp: " + lTimestamp);
+        Log.d(TAG, "ENTER: processDateAndSize. " + sFilename+ " RemoteFile: size: " + lSize + "timestamp: " + lTimestamp);
 
         File localFile = new File (ctx.getFilesDir().getAbsolutePath() + "/" + sFilename);
 
@@ -170,12 +173,12 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
         if (iPocetLocalPred != localList.size()) {
             //pribyla nejaka indicie  =>
-            //zapiseme soubor
-
             /*
                 TODO a jeste musime zavolat callback, ktery aktualizuje to, co je potreba - napr. obrazovku a prekresli napr. seznam indicii, pokud je zrovna otevreny
                 TODO resp hlavni stranku a pripadne zobrazi nove zpravy, ktere se zobrazi po ziskani indicii ...
             */
+            callback.handleMessage(null);
+
         }
 
         if (iPocetRemotePred != localList.size()) {
@@ -241,5 +244,9 @@ public class SyncFiles<T extends OverWriter&Serializable> {
                 Log.d(TAG, "ERROR: "+"writeFile " + ex.getMessage());
         }
         Log.d(TAG, "LEAVE: writeFile");
+    }
+
+    public void setCallback(Handler.Callback callback) {
+        this.callback = callback;
     }
 }

@@ -71,7 +71,7 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
                     String size = (new Long(ftpFile[0].getSize())).toString();
                     Long timestamp =  ftpFile[0].getTimestamp().getTimeInMillis()/100000;
 
-                    sResult=size+timestamp;
+                    sResult=size+","+timestamp;
                 }
                 con.logout();
                 con.disconnect();

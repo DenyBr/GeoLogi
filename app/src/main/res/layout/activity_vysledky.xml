@@ -12,18 +12,46 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TableRow android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/restblrowH"
+        >
+        <TextView
+            android:id="@+id/TeamNameH"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Id"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
+        <TextView
+            android:id="@+id/HintsH"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:text="Indicií"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
+        <TextView
+            android:id="@+id/PointsH"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Navštívených bodů"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
+        />
+    </TableRow>
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <ListView
-            android:layout_below="@+id/tblrow"
-            android:id="@+id/oddilyview"
-
-            android:layout_span="10"
+            android:layout_below="@+id/restblrow"
+            android:id="@+id/resutsview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+        </ListView>
     </TableRow>
 </TableLayout>
 </RelativeLayout>

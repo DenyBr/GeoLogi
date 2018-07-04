@@ -20,6 +20,7 @@ public class Zprava implements Serializable {
     private double fZobrazitNaLat;
     private double fZobrazitNaLong;
     private int iPocetIndicii;
+    private String sIndicieZeSkupiny;
     private String sPovinneIndicie;
     private String sNezobrazovatPokudMajiIndicii;
     private boolean bRead;
@@ -40,24 +41,26 @@ public class Zprava implements Serializable {
                    double fZobrazitNaLat,
                    double fZobrazitNaLong,
                    int iPocetIndicii,
+                   String sIndicieZeSkupiny,
                    String sPovinneIndicie,
                    String sNezobrazovatPokudMajiIndicii)
     {
-        this.setiId(iId);
-        this.setiOddil(iOddil);
-        this.setsPredmet(sPredmet);
-        this.setsZprava(sZprava);
-        this.setsLink(sLink);
-        this.setsZobrazitPoCase(sZobrazitPoCase);
-        this.setiPoZpraveCislo(iPoZpraveCislo);
-        this.setfCilovyBodLat(fCilovyBodLat);
-        this.setfCilovyBodLong(fCilovyBodLong);
-        this.setsCilovyBodPopis(sCilovyBodPopis);
-        this.setfZobrazitNaLat(fZobrazitNaLat);
-        this.setfZobrazitNaLong(fZobrazitNaLong);
-        this.setiPocetIndicii(iPocetIndicii);
-        this.setsPovinneIndicie(sPovinneIndicie);
-        this.setsNezobrazovatPokudMajiIndicii(sNezobrazovatPokudMajiIndicii);
+        setiId(iId);
+        setiOddil(iOddil);
+        setsPredmet(sPredmet);
+        setsZprava(sZprava);
+        setsLink(sLink);
+        setsZobrazitPoCase(sZobrazitPoCase);
+        setiPoZpraveCislo(iPoZpraveCislo);
+        setfCilovyBodLat(fCilovyBodLat);
+        setfCilovyBodLong(fCilovyBodLong);
+        setsCilovyBodPopis(sCilovyBodPopis);
+        setfZobrazitNaLat(fZobrazitNaLat);
+        setfZobrazitNaLong(fZobrazitNaLong);
+        setiPocetIndicii(iPocetIndicii);
+        setsIndicieZeSkupiny(sIndicieZeSkupiny);
+        setsPovinneIndicie(sPovinneIndicie);
+        setsNezobrazovatPokudMajiIndicii(sNezobrazovatPokudMajiIndicii);
     }
 
     public int getiId( ) { return this.iId;}
@@ -76,6 +79,7 @@ public class Zprava implements Serializable {
     public boolean getbRead () {return this.bRead;}
     public boolean getbZobrazeno () {return this.bZobrazeno;}
     public String getsNezobrazovatPokudMajiIndicii( ) { return this.sNezobrazovatPokudMajiIndicii;}
+    public String getsIndicieZeSkupiny() {return sIndicieZeSkupiny; }
 
     public void setiId( int iId) {  this.iId=iId;}
     public void setiOddil( int iOddil) {  this.iOddil=iOddil;}
@@ -93,7 +97,7 @@ public class Zprava implements Serializable {
     public void setsNezobrazovatPokudMajiIndicii( String sNezobrazovatPokudMajiIndicii) {  this.sNezobrazovatPokudMajiIndicii=sNezobrazovatPokudMajiIndicii;}
     public void setbRead (boolean bRead) {this.bRead = bRead;}
     public void setbZobrazeno (boolean bZobrazeno) {this.bZobrazeno = bZobrazeno;}
-
+    public void setsIndicieZeSkupiny(String sIndicieZeSkupiny) {this.sIndicieZeSkupiny = sIndicieZeSkupiny; }
 
     private void readObject(
             ObjectInputStream aInputStream

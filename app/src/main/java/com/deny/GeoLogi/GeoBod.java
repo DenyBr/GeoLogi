@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import static java.lang.Math.abs;
+
 /**
  * Created by bruzlzde on 27.2.2018.
  *
@@ -49,6 +51,8 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
         return Popis;
     }
 
+    public Timestamp getTime() {return time;
+    }
     public void setPopis(String popis) {
         Popis = popis;
     }
@@ -65,6 +69,7 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
         this.time = time;
     }
 
+
     private void readObject(
             ObjectInputStream aInputStream
     ) throws ClassNotFoundException, IOException {
@@ -79,19 +84,22 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
         aOutputStream.defaultWriteObject();
     }
 
-
     @Override
-    public boolean bOverWrite(GeoBod member) {
-        return false;
+    public boolean bOverWrite(GeoBod by) {
+        return (((abs(by.getdLat() - getdLat()) < 0.00001)
+                    && (abs(by.getdLong() - getdLong()) < 0.00001)) &&
+                (by.getTime().before(time) || (getPopis().equals("")&&!by.getPopis().equals(""))));
     }
 
     @Override
-    public void overwrite(GeoBod member) {
-
+    public void overwrite(GeoBod by) {
+        if (by.getbViditelny()) setbViditelny(true);
+        if (!by.getPopis().equals("")) setPopis(by.getPopis());
+        if (by.getTime().before(time)) setTime(by.getTime());
     }
 
     @Override
-    public boolean bEquals(GeoBod member) {
-        return false;
+    public boolean bEquals(GeoBod to) {
+        return ((abs(to.getdLat() - getdLat()) < 0.00001) && (abs(to.getdLong() - getdLong()) < 0.00001));
     }
 }

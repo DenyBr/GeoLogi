@@ -66,6 +66,7 @@ public class UvodniStranka extends AppCompatActivity {
     private View mControlsView;
     Intent intentSettings = null;
     Intent intentMain = null;
+    Intent intentResults = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +108,7 @@ public class UvodniStranka extends AppCompatActivity {
 
         intentSettings = new Intent(this, Settings.class);
         intentMain = new Intent(this, MainActivity.class);
-
+        intentResults = new Intent(this, VysledkyActivity.class);
     }
 
 
@@ -143,6 +144,7 @@ public class UvodniStranka extends AppCompatActivity {
     private void pristupy() {
         Button btnVyber = (Button) findViewById(R.id.btnVyberHry);
         Button btnPokracovat = (Button) findViewById(R.id.btnPokracovat);
+        Button btnResults = (Button) findViewById(R.id.btnVysledky);
         TextView tvTextik= (TextView) findViewById(R.id.tvVybranaHra);
 
 
@@ -152,10 +154,12 @@ public class UvodniStranka extends AppCompatActivity {
 
         if (Nastaveni.getInstance(this).getsHra().equals("")){
             btnPokracovat.setEnabled(false);
+            btnResults.setEnabled(false);
             tvTextik.setText("");
          }
          else {
             btnPokracovat.setEnabled(true);
+            btnResults.setEnabled(true);
             tvTextik.setText("Vybraná hra: "+Nastaveni.getInstance(this).getsHra());
 
             if (!Nastaveni.getInstance(this).getProperty("Uzivatel","").equals("")) {
@@ -175,7 +179,7 @@ public class UvodniStranka extends AppCompatActivity {
     }
 
     public void vysledkyClickHandler(View view) {
-        //TODO
+        startActivityForResult(intentResults, 3);
     }
 
     @Override
@@ -192,8 +196,4 @@ public class UvodniStranka extends AppCompatActivity {
         // created, to briefly hint to the user that UI controls
         // are available.
     }
-
-
-
-
 }
