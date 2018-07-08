@@ -1,30 +1,17 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Context.LOCATION_SERVICE;
 import static java.lang.Math.abs;
 
 /**
@@ -35,6 +22,8 @@ import static java.lang.Math.abs;
  */
 
 class GeoBody {
+    private final String TAG = "GeoBody";
+
     private static GeoBody ourInstance = null;
     //seznam cilovych bodu - to jsou body, ktere budou zobrazeny na mape
     //a bodu na kterych bude zobrazena zprava -
@@ -48,13 +37,13 @@ class GeoBody {
     public static Handler.Callback callback = null;
 
     private Context ctx = null;
-    private Location location = null;
-    private LocationManager locationManager = null;
 
     List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
     List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();
 
     public void aktualizujMapu() {
+        Log.d(TAG, "ENTER: AktualizujMapu");
+
         aMapa_nove = new ArrayList<IGeoPoint>();
         aMapa_navstivene = new ArrayList<IGeoPoint>();
 
@@ -68,6 +57,7 @@ class GeoBody {
                     aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
             }
         }
+        Log.d(TAG, "LEAVE: AktualizujMapu");
 
     }
 
@@ -77,22 +67,6 @@ class GeoBody {
         return ourInstance;
     }
 
-    private void registrujGPS (Context ctx, int iTimeout, int iDistance) {
-        locationManager = (LocationManager) ctx.getSystemService(LOCATION_SERVICE);
-        try {
-            // Register the listener with the Location Manager to receive location updates
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, iTimeout, iDistance, locationListener);
-
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        } catch (SecurityException e) {
-            Okynka.zobrazOkynko(ctx, "" + e.getMessage());
-        } catch (Exception e) {
-            //Okynka.zobrazOkynko(context, "" + e.getMessage());
-        }
-
-    }
-
     private GeoBody(Context ctx) {
         this.ctx = ctx;
 
@@ -100,8 +74,8 @@ class GeoBody {
     }
 
     public void init() {
-        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 600000, callback);
-        registrujGPS(ctx, 1000, 10);
+        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 60000, callback);
+        Global.init(ctx, 1000, 10);
     }
     
 
@@ -139,44 +113,36 @@ class GeoBody {
         int iAct;
 
         try {
-            try
-            {
-                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-            catch (SecurityException e) {
-                //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
-            }
+            //Projdi cilove body a eventuelne oznac navstivenej
+            for (int i = 0; i < aBody.size(); i++) {
+            try {
+                GeoBod bodAct = aBody.get(i);
 
-            if (null != location) {
-                //Projdi cilove body a eventuelne oznac navstivenej
-                for (int i = 0; i < aBody.size(); i++) {
-                try {
-                    GeoBod bodAct = aBody.get(i);
+                if (!bylNavstivenej(bodAct)) {
+                    Location locAct = new Location("");
+                    locAct.setLatitude(bodAct.getdLat());
+                    locAct.setLongitude(bodAct.getdLong());
 
-                    if (!bylNavstivenej(bodAct)) {
-                        Location locAct = new Location("");
-                        locAct.setLatitude(bodAct.getdLat());
-                        locAct.setLongitude(bodAct.getdLong());
+                    iAct = (int) Global.distanceTo(locAct);
 
-                        iAct = (int) location.distanceTo(locAct);
-
-                        if (iAct < iMin) {
-                            iMin = iAct;
-                        }
-
-                        if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
-                            //pridame bod mezi navstivene
-                            sfBodyNavsvivene.localList.add(bodAct);
-
-                            //a ulozime
-                            sfBodyNavsvivene.syncFileNow();
-
-                            aktualizujMapu();
-                        }
+                    if (iAct < iMin) {
+                        iMin = iAct;
                     }
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
+
+                    if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
+                        //pridame bod mezi navstivene
+                        bodAct.setTime(new Timestamp(Global.getTime()));
+                        sfBodyNavsvivene.localList.add(bodAct);
+
+                        //a ulozime a sesynchronizujeme
+                        sfBodyNavsvivene.writeFile();
+                        sfBodyNavsvivene.syncFileNow();
+
+                        aktualizujMapu();
+                    }
                 }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
         }
 
@@ -193,7 +159,7 @@ class GeoBody {
         else if (iMin < 50) {iTimeout = 3000; iDistance=2;}
         else if (iMin < 100) {iTimeout = 10000; iDistance=20;}
 
-        registrujGPS(ctx, iTimeout, iDistance);
+        Global.init(ctx, iTimeout, iDistance);
 
         return iMin;
     }
@@ -202,19 +168,5 @@ class GeoBody {
         GeoBody.callback = callback;
     }
 
-    // Define a listener that responds to location updates
-    LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-
-        public void onProviderEnabled(String provider) {
-        }
-
-        public void onProviderDisabled(String provider) {
-        }
-    };
 
 }

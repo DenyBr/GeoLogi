@@ -165,6 +165,7 @@ public class UvodniStranka extends AppCompatActivity {
             if (!Nastaveni.getInstance(this).getProperty("Uzivatel","").equals("")) {
                 tvTextik.setText(tvTextik.getText()+"                   Uživatel: "+Nastaveni.getInstance(this).getProperty("Uzivatel",""));
             }
+
         }
     }
 

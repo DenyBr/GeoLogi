@@ -14,7 +14,7 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
 
     <TableRow android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/restblrowH"
+        android:id="@+id/restblrow"
         >
         <TextView
             android:id="@+id/TeamNameH"

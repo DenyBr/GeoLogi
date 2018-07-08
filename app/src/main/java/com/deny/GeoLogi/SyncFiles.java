@@ -38,7 +38,6 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
     public ArrayList<T> localList;
 
-
     public SyncFiles(Context ctx, String sFileName, int iPerioda, Handler.Callback callback){
         Log.d(TAG, "ENTER: SyncFiles: "+sFilename);
         setsFilename(sFileName);
@@ -74,7 +73,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     }
 
     public void setsFilename(String sFilename) {
-        this.sFilename = sFilename;
+        this.sFilename = Global.simPrexix() + sFilename;
     }
 
     //metoda iniciuje zesynchronizovani souboru
@@ -172,12 +171,8 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         writeFile();
 
         if (iPocetLocalPred != localList.size()) {
-            //pribyla nejaka indicie  =>
-            /*
-                TODO a jeste musime zavolat callback, ktery aktualizuje to, co je potreba - napr. obrazovku a prekresli napr. seznam indicii, pokud je zrovna otevreny
-                TODO resp hlavni stranku a pripadne zobrazi nove zpravy, ktere se zobrazi po ziskani indicii ...
-            */
-            callback.handleMessage(null);
+            //new item added => callback to update must be called if registered
+            if (null!=callback) callback.handleMessage(null);
 
         }
 

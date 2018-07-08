@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         //se zaktualizuje seznam zpra a odesla aktualni stav indicii a navstivenych bodu
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Timestamp now = new Timestamp(Global.getTime());
 
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -519,14 +519,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             if (z.getiPoZpraveCislo()==0) {
                 Timestamp t = Timestamp.valueOf(z.getsZobrazitPoCase());
 
-                return ((new Timestamp(System.currentTimeMillis())).after(t));
+                return ((new Timestamp(Global.getTime())).after(t));
             }
             else
             {
                 Time t = Time.valueOf(z.getsZobrazitPoCase());
                 Time t0 = Time.valueOf("0:00:00");
 
-                Timestamp now = new Timestamp(System.currentTimeMillis());
+                Timestamp now = new Timestamp(Global.getTime());
                 Zprava z_po = zpravaPodleId(z.getiPoZpraveCislo());
 
                 if (z_po == null) return false;
@@ -645,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                             Okynka.zobrazOkynko(arg0.getContext(), zpravyZobraz.get(position).getsZprava());
                             zpravyZobraz.get(position).setbRead(true);
                             if (null == zpravyZobraz.get(position).getTsCasZobrazeni())
-                                zpravyZobraz.get(position).setTsCasZobrazeni(new Timestamp(System.currentTimeMillis()));
+                                zpravyZobraz.get(position).setTsCasZobrazeni(new Timestamp(Global.getTime()));
 
                             zkontrolujZpravy(true);
                             resize();
@@ -717,23 +717,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     public void testClickHandler(View view) {
 
-        //read(this);
-        try {
-            InputStream inputStream = this.openFileInput(Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.bin");
 
-            ObjectInputStream in = new ObjectInputStream(inputStream);
 
-            int iPocet = (int) in.readInt();
-            //Okynka.zobrazOkynko(this, "Ctu z " + Nastaveni.getInstance(this).getsIdHry() + Nastaveni.getInstance(this).getiIDOddilu() + "zpravy.bin" + "Pocet: " + iPocet);
-            //Log.d("")
 
-            in.close();
-            inputStream.close();
-        }
-        catch(Exception e) {
-           // Okynka.zobrazOkynko(this, e.getMessage());
-        }
-  }
+    }
 
 
     @Override

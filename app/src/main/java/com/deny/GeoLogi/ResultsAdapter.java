@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 
 public class ResultsAdapter extends ArrayAdapter<Result> {
-
     Context context;
     private ArrayList<Result> results;
 
@@ -30,22 +29,23 @@ public class ResultsAdapter extends ArrayAdapter<Result> {
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.teamresult, null);
         }
+
         Result o = results.get(position);
         if (o != null) {
             TextView teamName = (TextView) v.findViewById(R.id.TeamName);
 
             teamName.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            teamName.setText(String.valueOf(o.getsId()));
+            teamName.setText(o.getsId());
 
             TextView hints = (TextView) v.findViewById(R.id.Hints);
 
             hints.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            hints.setText(String.valueOf(o.getsHints()));
+            hints.setText(o.getsHints());
 
             TextView points = (TextView) v.findViewById(R.id.Points);
 
             points.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            points.setText(String.valueOf(o.getsPoints()));
+            points.setText(o.getsPoints());
         }
         return v;
     }

@@ -88,4 +88,6 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
     public void setsGroup(String sGroup) {
         this.sGroup = sGroup;
     }
+
+    public Timestamp getTime() { return time; }
 }

@@ -65,9 +65,9 @@ public class IndicieActivity extends AppCompatActivity {
                     if (IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i).jeToOno(etIndH.getText().toString())) {
                         IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
                         //set timestamp\
-                        Long tsLong = System.currentTimeMillis()/1000;
+                        Long tsLong = Global.getTime()/1000;
 
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.get(IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.size()-1).setTime(new Timestamp(System.currentTimeMillis()));
+                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.get(IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.size()-1).setTime(new Timestamp(Global.getTime()));
 
                         IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.writeFile();
 

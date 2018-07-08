@@ -32,14 +32,14 @@ public class Uzivatele {
 
     public void reload(String wID, Runnable callback) {
         if (wID != null) {
+            r_callback = callback;
+
             new DownloadWebpageTask(new AsyncResultJSON() {
                 @Override
                 public void onResult(JSONObject object) {
                     processJson(object);
                 }
             }).execute("https://docs.google.com/spreadsheets/d/" + wID + "/gviz/tq?sheet=Uzivatele");
-
-            r_callback = callback;
         }
     }
 
@@ -70,18 +70,16 @@ public class Uzivatele {
                 } catch (Exception e) {
                 }
 
-                String sRoot = "";
                 boolean bRoot = false;
                 try {
-                    sRoot = columns.getJSONObject(3).getString("v");
-                    bRoot = (sRoot.toLowerCase().equals("Ano"));
+                    bRoot = columns.getJSONObject(3).getBoolean("v");
                 } catch (Exception e) {
                 }
 
                 Uzivatel o = new Uzivatel(iId, sOddil, sHeslo, bRoot);
                 aOddily.add(o);
 
-                }
+            }
 
             if (r_callback!=null) r_callback.run();
 
