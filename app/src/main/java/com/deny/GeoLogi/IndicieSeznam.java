@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -185,4 +186,30 @@ public class IndicieSeznam {
         read(context);
    }
 
+   public boolean addHint(String sInd) {
+       for (int i = 0; i < aIndicieVsechny.size(); i++) {
+           if (aIndicieVsechny.get(i).jeToOno(sInd)) {
+               sfIndicie.localList.add(aIndicieVsechny.get(i));
+               sfIndicie.localList.get(IndicieSeznam.sfIndicie.localList.size()-1).setTime(new Timestamp(Global.getTime()));
+
+               sfIndicie.writeFile();
+
+               sfIndicie.syncFileNow();
+
+               return true;
+           }
+       }
+       return false;
+   }
+
+    public String simAddOneOfGroup(String sGroup) {
+        for (int i=0; i<aIndicieVsechny.size(); i++) {
+            Indicie indicie = aIndicieVsechny.get(i);
+            if (!uzMajiIndicii(indicie.getsTexty().get(0)) && indicie.getsGroup().equals(sGroup)) {
+                addHint(indicie.getsTexty().get(0));
+                return indicie.getsTexty().get(0);
+            }
+        }
+        return "";
+    }
 }

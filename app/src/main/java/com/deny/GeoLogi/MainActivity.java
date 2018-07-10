@@ -561,13 +561,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         synchronized (lock) {
             try {
-                Log.d(TAG, "su tady " + zpravyKomplet.size());
-
                 GeoBody.getInstance(this).aBody = new ArrayList<GeoBod>();
 
                 for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
                     Zprava z = zpravyKomplet.get(i);
-                    Log.d(TAG, "su tady " + i);
 
                     Log.d(TAG, "Zprava: " + z.getiId() +
                                     "  Oddil? " + ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu())) +
@@ -716,7 +713,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     }
 
     public void testClickHandler(View view) {
-
+        //Simulator.next();
 
 
 
@@ -761,6 +758,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     @Override
     public boolean handleMessage(Message msg) {
+        /*
+            Handler.callback interface implementation
+            it's used by FileSynchroniser to ensure update after the update
+         */
         zkontrolujZpravy(false);
 
         return true;

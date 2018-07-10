@@ -61,26 +61,11 @@ public class IndicieActivity extends AppCompatActivity {
             if (IndicieSeznam.getInstance(IndicieActivity.this).uzMajiIndicii(etIndH.getText().toString())) {
                 Okynka.zobrazOkynko(this, "Tuto indicii už máte");
             } else {
-                for (int i = 0; i < IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.size(); i++) {
-                    if (IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i).jeToOno(etIndH.getText().toString())) {
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.add(IndicieSeznam.getInstance(IndicieActivity.this).aIndicieVsechny.get(i));
-                        //set timestamp\
-                        Long tsLong = Global.getTime()/1000;
+                if (IndicieSeznam.getInstance(this).addHint(etIndH.getText().toString())) {
+                    prekresli();
+                    setResult(RESULT_OK);
 
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.get(IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.localList.size()-1).setTime(new Timestamp(Global.getTime()));
-
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.writeFile();
-
-                        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.syncFileNow();
-
-                        prekresli();
-
-                        setResult(RESULT_OK);
-
-                        return;
-                    }
-                }
-                Okynka.zobrazOkynko(this, "Neplatná indicie");
+                } else Okynka.zobrazOkynko(this, "Neplatná indicie");
             }
         }
     }

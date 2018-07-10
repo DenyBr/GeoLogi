@@ -67,6 +67,14 @@ public class Global {
         ctx = context;
     }
 
+    public static void setdLat(double dLat) {
+        Global.dLat = dLat;
+    }
+
+    public static void setdLong(double dLong) {
+        Global.dLong = dLong;
+    }
+
     public static double getLat () {
         if (bSimulationMode) {
             return dLat;
@@ -121,8 +129,8 @@ public class Global {
         if (bSimulationMode) {
             Location locSim = new Location("");
 
-            locSim.setLatitude(dLat);
-            locSim.setLongitude(dLong);
+            locSim.setLatitude(getLat());
+            locSim.setLongitude(getLong());
 
             return locSim.distanceTo(location);
         } else
@@ -143,6 +151,10 @@ public class Global {
     public static String simPrexix() {
         if (isbSimulationMode()) {return "s";}
         else return "";
+    }
+
+    public static void setlTime(long lTime) {
+        Global.lTime = lTime;
     }
 
     // Define a listener that responds to location updates
