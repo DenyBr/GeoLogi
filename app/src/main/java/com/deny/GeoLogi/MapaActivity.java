@@ -64,6 +64,7 @@ public class MapaActivity extends Activity {
 
         List<IGeoPoint> nove = GeoBody.getInstance(this).aMapa_nove;
         List<IGeoPoint> navstivene = GeoBody.getInstance(this).aMapa_navstivene;
+        List<IGeoPoint> tajne = GeoBody.getInstance(this).aMapa_tajne;
 
 
         if (nove.size()>0) {
@@ -74,6 +75,7 @@ public class MapaActivity extends Activity {
 
         SimplePointTheme pt_nove = new SimplePointTheme(nove, true);
         SimplePointTheme pt_navstivene = new SimplePointTheme(navstivene, true);
+        SimplePointTheme pt_tajne = new SimplePointTheme(tajne, true);
 
         Paint textStyleNove = new Paint();
         textStyleNove.setStyle(Paint.Style.FILL);
@@ -84,7 +86,7 @@ public class MapaActivity extends Activity {
 
         SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
                 .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
-                .setRadius(7).setIsClickable(true).setCellSize(15).setTextStyle(textStyleNove);
+                .setRadius(7).setIsClickable(false).setCellSize(15).setTextStyle(textStyleNove);
 
         final SimpleFastPointOverlay sfpo = new SimpleFastPointOverlay(pt_nove, opt);
 
@@ -101,11 +103,30 @@ public class MapaActivity extends Activity {
 
         SimpleFastPointOverlayOptions optNavstivene = SimpleFastPointOverlayOptions.getDefaultStyle().setPointStyle(ps_navstivene)
                 .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
-                .setRadius(7).setIsClickable(true).setCellSize(15).setTextStyle(textStyleNavstivene);
+                .setRadius(7).setIsClickable(false).setCellSize(15).setTextStyle(textStyleNavstivene);
 
         final SimpleFastPointOverlay sfpoNavstivene = new SimpleFastPointOverlay(pt_navstivene, optNavstivene);
 
         map.getOverlays().add(sfpoNavstivene);
+
+        if (Global.isbSimulationMode()) {
+            Paint textStyleTajne = new Paint();
+            textStyleTajne.setStyle(Paint.Style.FILL);
+            textStyleTajne.setColor(Color.parseColor("#ffff0000"));
+            textStyleTajne.setTextAlign(Paint.Align.CENTER);
+            textStyleTajne.setTextSize(36);
+
+            Paint psTajne = new Paint();
+            ps_navstivene.setColor(textStyleTajne.getColor());
+
+            SimpleFastPointOverlayOptions optTajne = SimpleFastPointOverlayOptions.getDefaultStyle().setPointStyle(psTajne)
+                    .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
+                    .setRadius(7).setIsClickable(false).setCellSize(15).setTextStyle(textStyleTajne);
+
+            final SimpleFastPointOverlay sfptajne = new SimpleFastPointOverlay(pt_tajne, optTajne);
+
+            map.getOverlays().add(sfptajne);
+        }
 
         setResult(RESULT_OK);
     }

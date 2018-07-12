@@ -23,6 +23,8 @@ import android.widget.TextView;
 
 import com.deny.GeoLogi.R;
 
+import java.sql.Timestamp;
+
 //import com.deny.taborofka_zpravy.R;
 
 public class UvodniStranka extends AppCompatActivity {
@@ -31,6 +33,10 @@ public class UvodniStranka extends AppCompatActivity {
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
+    private final String TAG = "Uvodni";
+
+    private long tsClick=0;
+    private int iNumfClicks;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -75,6 +81,9 @@ public class UvodniStranka extends AppCompatActivity {
 
         setContentView(R.layout.activity_uvodni_stranka);
         Log.d("Uvodni", "Spusteno");
+
+        TableRow tr = (TableRow) findViewById(R.id.sim);
+        tr.setVisibility(Global.isbSimulationMode() ? View.VISIBLE : View.INVISIBLE);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -196,5 +205,29 @@ public class UvodniStranka extends AppCompatActivity {
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
+    }
+
+    public void toggleSimulationMode(View view) {
+        if (Nastaveni.getInstance(this).getisRoot()) {
+
+            long now = System.currentTimeMillis();
+
+            if (now - tsClick > 5000) {
+                tsClick = now;
+                iNumfClicks = 1;
+                Log.d(TAG, "Sim "+iNumfClicks);
+            } else {
+                iNumfClicks++;
+                Log.d(TAG, "Sim "+iNumfClicks);
+
+                if (iNumfClicks > 7) {
+                    Global.setbSimulationMode(!Global.isbSimulationMode());
+
+                    TableRow tr = (TableRow) findViewById(R.id.sim);
+                    tr.setVisibility(Global.isbSimulationMode() ? View.VISIBLE : View.INVISIBLE);
+                    iNumfClicks=0;
+                }
+            }
+        }
     }
 }

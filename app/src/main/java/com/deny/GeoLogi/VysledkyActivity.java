@@ -114,7 +114,7 @@ public class VysledkyActivity extends AppCompatActivity {
             Log.d(TAG, "ENTER: updateOnFileDownload: "+u.getsNazev());
 
             if (!u.isbRoot()) {
-                results.add(new Result(u.getsNazev(), ""+u.getiId(), getNumberFromFile(Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"indicieziskane.binres"), getNumberFromFile(Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"bodynavstivene.binres")));
+                results.add(new Result(u.getsNazev(), ""+u.getiId(), getNumberFromFile(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"indicieziskane.binres"), getNumberFromFile(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"bodynavstivene.binres")));
             }
         }
 
@@ -123,7 +123,7 @@ public class VysledkyActivity extends AppCompatActivity {
 
         listview.setAdapter(adapter);
 
-        if (Nastaveni.getInstance(this).getisRoot()) {
+        if (Nastaveni.getInstance(this).getisRoot() || Global.isbSimulationMode()) {
             listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {

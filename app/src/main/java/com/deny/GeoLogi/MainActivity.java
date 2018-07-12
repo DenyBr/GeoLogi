@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Log.d(TAG, "ENTER: Init");
 
         //Save currently selected gam and user to detect change later
-        sVybrano = Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
+        sVybrano = Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
 
         //reload all parameters
         Nastaveni.getInstance(this).reload(this);
@@ -130,12 +130,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         zpravyKomplet = new ArrayList<Zprava>();
 
         try {
-            InputStream inputStream = context.openFileInput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin");
+            InputStream inputStream = context.openFileInput(Global.simPrexix()+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
 
             int iPocet = (int) in.readInt();
-            Log.d(TAG, "Ctu z " + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + "Pocet: " + iPocet);
+            Log.d(TAG, "Ctu z " + Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + "Pocet: " + iPocet);
 
             for (int i=0; i<iPocet; i++) {
                 Zprava z = (Zprava) in.readObject();
@@ -158,12 +158,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private void write (Context context) {
         Log.d(TAG, "ENTER: write");
         try {
-            FileOutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin", Context.MODE_PRIVATE);
+            FileOutputStream fileOut = context.openFileOutput(Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeInt(zpravyKomplet.size());
 
-            Log.d(TAG , "zapisuju do "+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + " pocet: " + zpravyKomplet.size());
+            Log.d(TAG , "zapisuju do "+ Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + " pocet: " + zpravyKomplet.size());
 
             for (int i=0; i<zpravyKomplet.size(); i++) {
                 out.writeObject(zpravyKomplet.get(i));
@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     private void casovyupdate () {
         int iTimeout = 30000;
-        boolean bZmenaHry = !sVybrano.equals(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu());
+        boolean bZmenaHry = !sVybrano.equals(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu());
 
         if (!bZmenaHry) {
             if (!Nastaveni.getInstance(this).getsHra().equals("")) {
@@ -713,10 +713,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     }
 
     public void testClickHandler(View view) {
-        //Simulator.next();
-
-
-
+        Log.d(TAG, "Simulace - next step");
+        Simulator.next(this, zpravyZobraz, zpravyKomplet);
     }
 
 
@@ -744,7 +742,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         resize();
 
         Button btnT = (Button) findViewById(R.id.btnTest);
-        btnT.setVisibility ((Nastaveni.getInstance(this).getisRoot()?View.VISIBLE:View.INVISIBLE));
+        btnT.setVisibility (Global.isbSimulationMode()?View.VISIBLE:View.INVISIBLE);
 
         casovyupdate();
     }

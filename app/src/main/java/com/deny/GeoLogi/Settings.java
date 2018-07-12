@@ -34,7 +34,7 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
+   }
 
 
     private void processJson(JSONObject object) {
@@ -150,6 +150,8 @@ public class Settings extends AppCompatActivity {
 
     public void buttonClickHandler(View view) {
         TextView tvHeslo = (EditText) findViewById(R.id.etHesloH);
+        tvHeslo.setEnabled(!Global.isbSimulationMode());
+
 
         //pNastaveni.setProperty("Uzivatel", tvOddil.getText().toString());
         Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
@@ -157,11 +159,8 @@ public class Settings extends AppCompatActivity {
 
         //Okynka.zobrazOkynko(Settings.this, "x"+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
 
-        if (!(Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString())))
+        if (Global.isbSimulationMode() || (Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString())))
         {
-            Okynka.zobrazOkynko(this, "Neplatné heslo");
-
-        } else {
             pNastaveni.setProperty("Heslo", tvHeslo.getText().toString());
             pNastaveni.setProperty("ID", ""+ Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
             pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
@@ -186,8 +185,11 @@ public class Settings extends AppCompatActivity {
 
             this.finish();
         }
-
-    }
+        else
+        {
+            Okynka.zobrazOkynko(this, "Neplatné heslo");
+        }
+     }
 
 
     class VyberHry implements AdapterView.OnItemSelectedListener {
@@ -236,6 +238,7 @@ public class Settings extends AppCompatActivity {
 
         EditText tvHeslo = (EditText) findViewById(R.id.etHesloH);
         tvHeslo.setText(pNastaveni.getProperty("Heslo", ""));
+        tvHeslo.setEnabled(!Global.isbSimulationMode());
 
         //zjisti jestli jsme na internetu a pokud ano, tak stahni seznam her
         //jinak zakaz vyber hry

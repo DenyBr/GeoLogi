@@ -40,21 +40,26 @@ class GeoBody {
 
     List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
     List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();
+    List<IGeoPoint> aMapa_tajne = new ArrayList<IGeoPoint>();
 
     public void aktualizujMapu() {
         Log.d(TAG, "ENTER: AktualizujMapu");
 
         aMapa_nove = new ArrayList<IGeoPoint>();
         aMapa_navstivene = new ArrayList<IGeoPoint>();
+        aMapa_tajne = new ArrayList<IGeoPoint>();
 
         for (int i = 0; i < GeoBody.getInstance(ctx).aBody.size(); i++) {
             GeoBod actBod = GeoBody.getInstance(ctx).aBody.get(i);
 
-            if (actBod.getbViditelny()) {
-                if (!GeoBody.getInstance(ctx).bylNavstivenej(actBod))
+            if (!GeoBody.getInstance(ctx).bylNavstivenej(actBod)) {
+                if (actBod.getbViditelny())
                     aMapa_nove.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
                 else
-                    aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
+                    aMapa_tajne.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
+            }
+            else {
+                aMapa_navstivene.add(new LabelledGeoPoint(actBod.getdLat(), actBod.getdLong(), actBod.getPopis()));
             }
         }
         Log.d(TAG, "LEAVE: AktualizujMapu");

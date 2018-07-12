@@ -16,6 +16,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TableRow
+            android:id="@+id/sim"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="150dp"
+            >
+            <TextView
+                android:text="Simulace"
+                android:textColor="#ff0000"
+            />
+        </TableRow>
+
+        <TableRow
             android:id="@+id/tblobraze"
             android:layout_width="match_parent"
             android:layout_height="150dp"
@@ -30,6 +42,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_span="4"
                 android:enabled="true"
+                android:onClick="toggleSimulationMode"
                 android:src="@drawable/uvodni" />
         </TableRow>
 
