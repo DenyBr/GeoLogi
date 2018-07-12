@@ -232,6 +232,7 @@ public class Settings extends AppCompatActivity {
 
         Spinner spHra = (Spinner) findViewById(R.id.spinHry);
         spHra.setOnItemSelectedListener(new VyberHry());
+        spHra.setEnabled(!Global.isbSimulationMode());
 
         Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
         spOddil.setOnItemSelectedListener(new VyberOddilu());
