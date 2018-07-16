@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.deny.GeoLogi.R;
 
 import java.sql.Timestamp;
+import java.util.Random;
 
 //import com.deny.taborofka_zpravy.R;
 
@@ -117,6 +118,7 @@ public class UvodniStranka extends AppCompatActivity {
 
         intentSettings = new Intent(this, Settings.class);
         intentMain = new Intent(this, MainActivity.class);
+        intentMain.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intentResults = new Intent(this, VysledkyActivity.class);
     }
 
@@ -185,7 +187,10 @@ public class UvodniStranka extends AppCompatActivity {
 
     public void pokracujClickHandler(View view) {
         // Do something in response to button
+        intentMain.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivityForResult(intentMain, 2);
+
+
     }
 
     public void vysledkyClickHandler(View view) {

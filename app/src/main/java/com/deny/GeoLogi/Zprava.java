@@ -1,5 +1,7 @@
 package com.deny.GeoLogi;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,6 +9,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class Zprava implements Serializable {
+    private final String TAG = "Zprava";
+
     private int iId;
     private int iOddil;
     private String sPredmet;
@@ -95,8 +99,12 @@ public class Zprava implements Serializable {
     public void setiPocetIndicii( int iPocetIndicii) {  this.iPocetIndicii=iPocetIndicii;}
     public void setsPovinneIndicie( String sPovinneIndicie) {  this.sPovinneIndicie=sPovinneIndicie;}
     public void setsNezobrazovatPokudMajiIndicii( String sNezobrazovatPokudMajiIndicii) {  this.sNezobrazovatPokudMajiIndicii=sNezobrazovatPokudMajiIndicii;}
-    public void setbRead (boolean bRead) {this.bRead = bRead;}
-    public void setbZobrazeno (boolean bZobrazeno) {this.bZobrazeno = bZobrazeno;}
+    public void setbRead (boolean bRead) {
+        Log.d ("TAG", "Message " + getsPredmet() + " Read: "+bRead);
+        this.bRead = bRead;}
+    public void setbZobrazeno (boolean bZobrazeno) {
+        Log.d ("TAG", "Message " + getsPredmet() + " Zobrazeno: "+bZobrazeno);
+        this.bZobrazeno = bZobrazeno;}
     public void setsIndicieZeSkupiny(String sIndicieZeSkupiny) {this.sIndicieZeSkupiny = sIndicieZeSkupiny; }
 
     private void readObject(

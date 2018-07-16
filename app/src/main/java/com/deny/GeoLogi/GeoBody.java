@@ -33,7 +33,7 @@ class GeoBody {
     //seznam navstivenych bodu - to jsou body, kam uz dosli
     //pokud jsou zobrazene, tak budou sede - ale mohou byt tajne
     //navstivene body se synchronizuji na ftp server
-    public static SyncFiles<GeoBod> sfBodyNavsvivene;
+    public static SyncFiles<GeoBod> sfBodyNavsvivene = null;
     public static Handler.Callback callback = null;
 
     private Context ctx = null;
@@ -79,6 +79,7 @@ class GeoBody {
     }
 
     public void init() {
+        if (null!=sfBodyNavsvivene) sfBodyNavsvivene.finalize();
         sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 60000, callback);
         Global.init(ctx, 1000, 10);
     }

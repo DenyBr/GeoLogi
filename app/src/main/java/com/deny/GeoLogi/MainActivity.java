@@ -38,6 +38,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 
 
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     int iSirka=0;
     final Object lock = new Object();
     String sVybrano;
+    final Handler updateHandler = new Handler();
+    private final int iRnd = (new Random()).nextInt();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +79,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         super.onCreate(savedInstanceState);
 
+        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
         v = (Vibrator)getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+
         Log.d(TAG, "LEAVE: OnCreate");
     }
 
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Log.d(TAG, "ENTER: Init");
 
         //Save currently selected gam and user to detect change later
-        sVybrano = Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
+        sVybrano = Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu();
 
         //reload all parameters
         Nastaveni.getInstance(this).reload(this);
@@ -121,60 +128,62 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                 }
             }
         }, 1);
-
     }
 
     private void read (Context context) {
         Log.d(TAG, "ENTER: read");
 
-        zpravyKomplet = new ArrayList<Zprava>();
+        synchronized (lock) {
 
-        try {
-            InputStream inputStream = context.openFileInput(Global.simPrexix()+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin");
+            zpravyKomplet = new ArrayList<Zprava>();
 
-            ObjectInputStream in = new ObjectInputStream(inputStream);
+            try {
+                InputStream inputStream = context.openFileInput(Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "zpravy.bin");
 
-            int iPocet = (int) in.readInt();
-            Log.d(TAG, "Ctu z " + Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + "Pocet: " + iPocet);
+                ObjectInputStream in = new ObjectInputStream(inputStream);
 
-            for (int i=0; i<iPocet; i++) {
-                Zprava z = (Zprava) in.readObject();
-                zpravyKomplet.add(z);
+                int iPocet = (int) in.readInt();
+                Log.d(TAG, "Ctu z " + Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "zpravy.bin" + "Pocet: " + iPocet);
+
+                for (int i = 0; i < iPocet; i++) {
+                    Zprava z = (Zprava) in.readObject();
+                    zpravyKomplet.add(z);
+                }
+                in.close();
+                inputStream.close();
+            } catch (FileNotFoundException e) {
+                //ignoruj
+            } catch (Exception e) {
+                Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
             }
-            in.close();
-            inputStream.close();
         }
-        catch (FileNotFoundException e) {
-            //ignoruj
-        }
-        catch(Exception e) {
-            Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
-        }
-
         Log.d(TAG, "LEAVE: read");
     }
 
 
     private void write (Context context) {
         Log.d(TAG, "ENTER: write");
-        try {
-            FileOutputStream fileOut = context.openFileOutput(Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin", Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-            out.writeInt(zpravyKomplet.size());
+        synchronized (lock) {
+            try {
+                FileOutputStream fileOut = context.openFileOutput(Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "zpravy.bin", Context.MODE_PRIVATE);
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-            Log.d(TAG , "zapisuju do "+ Global.simPrexix()+Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"zpravy.bin" + " pocet: " + zpravyKomplet.size());
+                out.writeInt(zpravyKomplet.size());
 
-            for (int i=0; i<zpravyKomplet.size(); i++) {
-                out.writeObject(zpravyKomplet.get(i));
+                Log.d(TAG, "zapisuju do " + Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "zpravy.bin" + " pocet: " + zpravyKomplet.size());
+
+                for (int i = 0; i < zpravyKomplet.size(); i++) {
+                    out.writeObject(zpravyKomplet.get(i));
+                }
+                out.flush();
+                out.close();
+
+                fileOut.flush();
+                fileOut.close();
+            } catch (IOException ex) {
+                Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
             }
-            out.flush();
-            out.close();
-
-            fileOut.flush();
-            fileOut.close();
-        } catch (IOException ex) {
-            Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
         }
         Log.d(TAG, "LEAVE: write");
     }
@@ -242,25 +251,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Init();
     }
 
-    public void zapisNavstivenyTest (String fileName) {
-        try {
-            OutputStream fileOut = openFileOutput(fileName, Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            GeoBod g1 = new GeoBod(49.1975289,16.6508889, "", true);
-            //GeoBod g2 = new GeoBod(49.302,	16.784, "");
-
-            out.writeInt(1);
-            out.writeObject(g1);
-            ///out.writeObject(g2);
-
-            out.close();
-            fileOut.flush();
-            fileOut.close();
-        } catch (IOException ex) {
-            Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
-        }
-    }
-
 
     private void clearfile (String fileName) {
         try {
@@ -283,115 +273,131 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         try {
             JSONArray rows = object.getJSONArray("rows");
 
-            for (int r = 0; r < rows.length(); ++r) {
-                JSONObject row = rows.getJSONObject(r);
-                JSONArray columns = row.getJSONArray("c");
-                System.out.print(rows.length());
+            synchronized (lock) {
+                for (int r = 0; r < rows.length(); ++r) {
+                    JSONObject row = rows.getJSONObject(r);
+                    JSONArray columns = row.getJSONArray("c");
+                    System.out.print(rows.length());
 
-                int iId = 0;
-                try {
-                    iId = columns.getJSONObject(0).getInt("v"); }
-                catch (Exception e) {}
+                    int iId = 0;
+                    try {
+                        iId = columns.getJSONObject(0).getInt("v");
+                    } catch (Exception e) {
+                    }
 
-                int iOddil = 0;
-                try {
-                    iOddil = columns.getJSONObject(1).getInt("v"); }
-                catch (Exception e) {}
+                    int iOddil = 0;
+                    try {
+                        iOddil = columns.getJSONObject(1).getInt("v");
+                    } catch (Exception e) {
+                    }
 
-                String sPredmet = "";
-                try {
-                    sPredmet = columns.getJSONObject(2).getString("v"); }
-                catch (Exception e) {}
+                    String sPredmet = "";
+                    try {
+                        sPredmet = columns.getJSONObject(2).getString("v");
+                    } catch (Exception e) {
+                    }
 
-                String sZprava = "";
-                try {
-                    sZprava = columns.getJSONObject(3).getString("v"); }
-                catch (Exception e) {}
+                    String sZprava = "";
+                    try {
+                        sZprava = columns.getJSONObject(3).getString("v");
+                    } catch (Exception e) {
+                    }
 
-                String sLink = "";
-                try {
-                    sLink = columns.getJSONObject(4).getString("v"); }
-                catch (Exception e) {}
+                    String sLink = "";
+                    try {
+                        sLink = columns.getJSONObject(4).getString("v");
+                    } catch (Exception e) {
+                    }
 
-                String sZobrazitPoCase = "";
-                try {
-                    sZobrazitPoCase = columns.getJSONObject(5).getString("v");}
-                catch (Exception e) {}
+                    String sZobrazitPoCase = "";
+                    try {
+                        sZobrazitPoCase = columns.getJSONObject(5).getString("v");
+                    } catch (Exception e) {
+                    }
 
-                int iPoZpraveCislo = 0;
-                try {
-                    iPoZpraveCislo = columns.getJSONObject(6).getInt("v"); }
-                catch (Exception e) {}
+                    int iPoZpraveCislo = 0;
+                    try {
+                        iPoZpraveCislo = columns.getJSONObject(6).getInt("v");
+                    } catch (Exception e) {
+                    }
 
-                double fCilovyBodLat = 0;
-                try {
-                    fCilovyBodLat = columns.getJSONObject(7).getDouble("v");
+                    double fCilovyBodLat = 0;
+                    try {
+                        fCilovyBodLat = columns.getJSONObject(7).getDouble("v");
+                    } catch (Exception e) {
+                    }
+
+                    double fCilovyBodLong = 0;
+                    try {
+                        fCilovyBodLong = columns.getJSONObject(8).getDouble("v");
+                    } catch (Exception e) {
+                    }
+
+                    String sCilovyBodPopis = "";
+                    try {
+                        sCilovyBodPopis = columns.getJSONObject(9).getString("v");
+                    } catch (Exception e) {
+                    }
+
+
+                    double fZobrazitNaLat = 0;
+                    try {
+                        fZobrazitNaLat = columns.getJSONObject(10).getDouble("v");
+                    } catch (Exception e) {
+                    }
+
+                    double fZobrazitNaLong = 0;
+                    try {
+                        fZobrazitNaLong = columns.getJSONObject(11).getDouble("v");
+                    } catch (Exception e) {
+                    }
+
+                    int iPocetIndicii = 0;
+                    try {
+                        iPocetIndicii = columns.getJSONObject(12).getInt("v");
+                    } catch (Exception e) {
+                    }
+
+                    String sIndicieZeSkupiny = "";
+
+                    try {
+                        sIndicieZeSkupiny = columns.getJSONObject(13).getString("v");
+                    } catch (Exception e) {
+                    }
+
+                    String sPovinneIndicie = "";
+
+                    try {
+                        sPovinneIndicie = columns.getJSONObject(14).getString("v");
+                    } catch (Exception e) {
+                    }
+
+                    String sNezobrazovatPokudMajiIndicii = "";
+                    try {
+                        sNezobrazovatPokudMajiIndicii = columns.getJSONObject(15).getString("v");
+                    } catch (Exception e) {
+                    }
+
+                    Zprava zprava = new Zprava(iId,
+                            iOddil,
+                            sPredmet,
+                            sZprava,
+                            sLink,
+                            sZobrazitPoCase,
+                            iPoZpraveCislo,
+                            fCilovyBodLat,
+                            fCilovyBodLong,
+                            sCilovyBodPopis,
+                            fZobrazitNaLat,
+                            fZobrazitNaLong,
+                            iPocetIndicii,
+                            sIndicieZeSkupiny,
+                            sPovinneIndicie,
+                            sNezobrazovatPokudMajiIndicii
+                    );
+
+                    pridejNeboPrepis(zprava);
                 }
-                catch (Exception e) {}
-
-                double fCilovyBodLong = 0;
-                try {
-                    fCilovyBodLong = columns.getJSONObject(8).getDouble("v");
-                }
-                catch (Exception e) {}
-
-                String sCilovyBodPopis = "";
-                try {
-                    sCilovyBodPopis = columns.getJSONObject(9).getString("v"); }
-                catch (Exception e) {}
-
-
-                double fZobrazitNaLat = 0;
-                try {
-                    fZobrazitNaLat = columns.getJSONObject(10).getDouble("v"); }
-                catch (Exception e) {}
-
-                double fZobrazitNaLong = 0;
-                try {
-                    fZobrazitNaLong = columns.getJSONObject(11).getDouble("v"); }
-                catch (Exception e) {}
-
-                int iPocetIndicii = 0;
-                try {
-                    iPocetIndicii = columns.getJSONObject(12).getInt("v"); }
-                catch (Exception e) {}
-
-                String sIndicieZeSkupiny = "";
-
-                try {
-                    sIndicieZeSkupiny = columns.getJSONObject(13).getString("v"); }
-                catch (Exception e) {}
-
-                String sPovinneIndicie = "";
-
-                try {
-                    sPovinneIndicie = columns.getJSONObject(14).getString("v"); }
-                catch (Exception e) {}
-
-                String sNezobrazovatPokudMajiIndicii = "";
-                try {
-                    sNezobrazovatPokudMajiIndicii = columns.getJSONObject(15).getString("v"); }
-                catch (Exception e) {}
-
-                Zprava zprava = new Zprava(iId,
-                        iOddil,
-                        sPredmet,
-                        sZprava,
-                        sLink,
-                        sZobrazitPoCase,
-                        iPoZpraveCislo,
-                        fCilovyBodLat,
-                        fCilovyBodLong,
-                        sCilovyBodPopis,
-                        fZobrazitNaLat,
-                        fZobrazitNaLong,
-                        iPocetIndicii,
-                        sIndicieZeSkupiny,
-                        sPovinneIndicie,
-                        sNezobrazovatPokudMajiIndicii
-                );
-
-                pridejNeboPrepis(zprava);
             }
 
             zkontrolujZpravy(false);
@@ -408,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         if (null == z_zapsana) {
             zpravyKomplet.add(z);
+            Log.d(TAG, "New message");
         } else {
             z_zapsana.setiOddil(z.getiOddil());
             z_zapsana.setsPredmet(z.getsPredmet());
@@ -423,8 +430,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             z_zapsana.setiPocetIndicii(z.getiPocetIndicii());
             z_zapsana.setsPovinneIndicie(z.getsPovinneIndicie());
             z_zapsana.setsNezobrazovatPokudMajiIndicii(z.getsNezobrazovatPokudMajiIndicii());
+            Log.d(TAG, "Message overwritten");
         }
-
     }
 
     //vraci true, pokud maji tu spravnou indicii
@@ -440,10 +447,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     private void serverUpdate (boolean bProvedHned) {
         //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
-        //se zaktualizuje seznam zpra a odesla aktualni stav indicii a navstivenych bodu
+        //se zaktualizuje seznam zprav
+        Log.d(TAG, "serverUpdate");
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        Timestamp now = new Timestamp(Global.getTime());
+        Timestamp now = new Timestamp(System.currentTimeMillis());
 
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -452,13 +460,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                     bConnectionLost = false;
                     tsLastUpdate = now;
 
-                    Log.d("Main", "Stahuju aktualni seznam zprav a indicii");
+                    Log.d(TAG, "Stahuju aktualni seznam zprav a indicii");
                     downloadJson();
                     IndicieSeznam.getInstance(this).nactizwebu(this);
-
-                    //Log.d("Main", "Odesilam data na server");
-                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"indicieziskanec.bin");
-                    //uploadFile(Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu()+"bodynavstivenec.bin");
                 }
             } else {
                 bConnectionLost = true;
@@ -467,13 +471,15 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         catch (Exception e) {
             bConnectionLost = true;
         }
-        tsLastUpdate = now;
+        //tsLastUpdate = now;
     }
 
 
     private void casovyupdate () {
         int iTimeout = 30000;
-        boolean bZmenaHry = !sVybrano.equals(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu());
+        boolean bZmenaHry = !sVybrano.equals(Global.simPrexix()+ Nastaveni.getInstance(this).getsIdHry()+Nastaveni.getInstance(this).getiIDOddilu());
+        Log.d(TAG, "ENTER:Casovy update ");
+
 
         if (!bZmenaHry) {
             if (!Nastaveni.getInstance(this).getsHra().equals("")) {
@@ -491,18 +497,19 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             iPocetAkt++;
         }
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!Thread.currentThread().isInterrupted()) {
-                    casovyupdate();
-                }
-            }
-        }, iTimeout);
+        Log.d(TAG, "LEAVE:Casovy update. "+ iRnd +" akt: "+iPocetAkt+ " Next run in "+iTimeout);
+        updateHandler.postDelayed(updateRunabble, iTimeout);
     }
 
-    private boolean zkontrolujLokaci (Zprava z) {
+    private Runnable updateRunabble = new Runnable() {
+        @Override
+        public void run() {
+            casovyupdate();
+        }
+    };
+
+
+private boolean zkontrolujLokaci (Zprava z) {
         if ((z.getfZobrazitNaLat()==0) || (z.getfZobrazitNaLong())==0) return true;
 
         GeoBod b = new GeoBod(z.getfZobrazitNaLat(), z.getfZobrazitNaLong(), "", false);
@@ -575,11 +582,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                                     "  Lokace? " + zkontrolujLokaci(z));
 
                     //zkotrnolujeme, ze se ma zprava zobrazit
-                    if (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
+                    if (z.getbZobrazeno() // uz byla nekdy videt
+                         ||
+
+                            (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(this).getiIDOddilu()))  //zprava je pro dany oddil
                             && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
                             && (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) //maji dost indiciii
                             && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
-                            && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
+                            && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(this).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
                     {
                         if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
                         {
@@ -655,16 +665,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
                     //pokud jsme na hlavni obrazovce, tak ukaz okynko, jinak pouze zapipej
                     //tim se predejde tomu, ze se zobrazuje nekolik okynek s informaci, ze maji novou zpravu
-                    if (!bPaused) Okynka.zobrazOkynko(this, "Máte novou zprávu");
+                    if (!bPaused) {
+                        Okynka.zobrazOkynko(this, "Máte novou zprávu");
 
-                    try {
-                        //zkus prehrat zvuk
-                        notificationRingtone.play();
-                        v.vibrate(500);
+                        try {
+                            //zkus prehrat zvuk
+                            notificationRingtone.play();
+                            v.vibrate(500);
 
-                        //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
-                    } catch (Exception e) {
-                        // nedelej nic
+                            //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
+                        } catch (Exception e) {
+                            // nedelej nic
+                        }
                     }
                 }
 
@@ -714,12 +726,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     public void testClickHandler(View view) {
         Log.d(TAG, "Simulace - next step");
-        Simulator.next(this, zpravyZobraz, zpravyKomplet);
+
+        if (Global.isbSimulationMode()) {
+            Simulator.next(this, zpravyZobraz, zpravyKomplet);
+            zkontrolujZpravy(false);
+        }
     }
 
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume called");
+
+        updateHandler.removeCallbacks(updateRunabble);
+
         bPaused = false;
 
         super.onResume();
@@ -727,16 +747,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
 
         setContentView(R.layout.activity_main);
-        Log.d("Main", "Spusteno");
+        Log.d(TAG, "Spusteno");
 
         //chceme full screan kvuli malejm telefonum
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
-
-        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        notificationRingtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
-        Init();
 
         iSirka = this.getResources().getConfiguration().screenWidthDp;
         resize();
@@ -744,6 +760,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Button btnT = (Button) findViewById(R.id.btnTest);
         btnT.setVisibility (Global.isbSimulationMode()?View.VISIBLE:View.INVISIBLE);
 
+        Init();
         casovyupdate();
     }
 
@@ -751,8 +768,27 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     protected void onPause () {
         super.onPause();
 
+        Log.d(TAG, "onPause called");
         bPaused = true;
     }
+
+    @Override
+    protected void onStop () {
+        super.onStop();
+
+        Log.d(TAG, "onStop called");
+    }
+
+    @Override
+    protected void onDestroy () {
+        super.onDestroy();
+
+        finish();
+        updateHandler.removeCallbacks(updateRunabble);
+
+        Log.d(TAG, "onDestroy called");
+    }
+
 
     @Override
     public boolean handleMessage(Message msg) {
@@ -761,7 +797,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             it's used by FileSynchroniser to ensure update after the update
          */
         zkontrolujZpravy(false);
+        Log.d(TAG, "handleMessage called");
 
         return true;
     }
+
+    @Override
+    public void finalize () {
+        Log.d(TAG, "finalize called");
+    }
+
 }

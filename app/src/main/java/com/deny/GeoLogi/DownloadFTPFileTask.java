@@ -30,18 +30,18 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
         } catch (Exception e) {
             //nedelej nic
         }
-        return "";
+        return "-1";
     }
 
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
         //
-        boolean bResult = (new Boolean(result)).booleanValue();
-        callback.onResult(bResult);
+        int iResult = (new Integer(result)).intValue();
+        callback.onResult(iResult);
     }
 
-    private String downloadFile(String sFilenameServer, String sFileNameLocal) throws IOException {
+    private String downloadFile(String sFilenameServer, String sFileNameLocal) {
         boolean result = false;
 
         try
@@ -67,6 +67,9 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
                 out.close();
                 con.logout();
                 con.disconnect();
+
+                if (result) return "1";
+                            return "0";
             }
         }
         catch (Exception e)
@@ -74,6 +77,6 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
 
-        return ""+result;
+        return "-1";
     }
 }

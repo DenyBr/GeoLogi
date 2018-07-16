@@ -42,7 +42,7 @@ public class IndicieSeznam {
     private static Context ctx = null;
     private static Handler.Callback callback = null;
 
-    public static SyncFiles<Indicie> sfIndicie;
+    public static SyncFiles<Indicie> sfIndicie = null;
 
     public static IndicieSeznam getInstance(Context context)  {
         ctx = context;
@@ -84,6 +84,7 @@ public class IndicieSeznam {
             //Okynka.zobrazOkynko(this, "Chyba: " + e.getMessage());
         }
 
+        if (null!=sfIndicie) sfIndicie.finalize();
         sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000, callback);
     }
 

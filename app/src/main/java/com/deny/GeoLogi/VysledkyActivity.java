@@ -67,14 +67,14 @@ public class VysledkyActivity extends AppCompatActivity {
 
                new DownloadFTPFileTask(VysledkyActivity.this, new AsyncResultFTPDownload() {
                    @Override
-                   public void onResult(boolean res) {
-                       updateOnFileDownload(res);
+                   public void onResult(int iRes) {
+                       updateOnFileDownload(iRes);
                    }
                }).execute(sFileNamePoints, sFileNamePoints + "res");
                new DownloadFTPFileTask(VysledkyActivity.this, new AsyncResultFTPDownload() {
                    @Override
-                   public void onResult(boolean res) {
-                       updateOnFileDownload(res);
+                   public void onResult(int iRes) {
+                       updateOnFileDownload(iRes);
                    }
                }).execute(sFileNameHints, sFileNameHints + "res");
            }
@@ -105,33 +105,35 @@ public class VysledkyActivity extends AppCompatActivity {
        return "?";
    }
 
-    private void updateOnFileDownload(boolean res) {
-        Log.d(TAG, "ENTER: updateOnFileDownload");
-        results = new ArrayList<>();
+    private void updateOnFileDownload(int iRes) {
+        Log.d(TAG, "ENTER: updateOnFileDownload " + iRes);
 
-        for (int i=0; i<Uzivatele.getInstance().aOddily.size(); i++) {
-            Uzivatel u = Uzivatele.getInstance().aOddily.get(i);
-            Log.d(TAG, "ENTER: updateOnFileDownload: "+u.getsNazev());
+        if (iRes == 1) {
+            results = new ArrayList<>();
 
-            if (!u.isbRoot()) {
-                results.add(new Result(u.getsNazev(), ""+u.getiId(), getNumberFromFile(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"indicieziskane.binres"), getNumberFromFile(Global.simPrexix()+Nastaveni.getInstance(this).getsIdHry()+u.getiId()+"bodynavstivene.binres")));
+            for (int i = 0; i < Uzivatele.getInstance().aOddily.size(); i++) {
+                Uzivatel u = Uzivatele.getInstance().aOddily.get(i);
+                Log.d(TAG, "ENTER: updateOnFileDownload: " + u.getsNazev());
+
+                if (!u.isbRoot()) {
+                    results.add(new Result(u.getsNazev(), "" + u.getiId(), getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "indicieziskane.binres"), getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "bodynavstivene.binres")));
+                }
+            }
+
+            listview = (ListView) findViewById(R.id.resutsview);
+            final ResultsAdapter adapter = new ResultsAdapter(this, R.layout.teamresult, results);
+
+            listview.setAdapter(adapter);
+
+            if (Nastaveni.getInstance(this).getisRoot() || Global.isbSimulationMode()) {
+                listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                        showTeamResults(results.get(position));
+                    }
+                });
             }
         }
-
-        listview = (ListView) findViewById(R.id.resutsview);
-        final ResultsAdapter adapter = new ResultsAdapter(this, R.layout.teamresult, results);
-
-        listview.setAdapter(adapter);
-
-        if (Nastaveni.getInstance(this).getisRoot() || Global.isbSimulationMode()) {
-            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                    showTeamResults(results.get(position));
-                }
-            });
-        }
-
 
         Log.d(TAG, "LEAVE: updateOnFileDownload");
 

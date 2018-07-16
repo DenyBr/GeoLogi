@@ -24,7 +24,7 @@ public class Simulator {
             StringBuffer s = new StringBuffer("Zprava, ktera by mela byt zobrazena: ");
 
             s.append(z.getsPredmet());
-            s.append("\n");
+            s.append("\n\n");
             s.append(checkHints(ctx, z));
             s.append("\n");
             s.append(checkTime(ctx, z, zpravyKomplet));
@@ -98,7 +98,7 @@ public class Simulator {
     private static String checkHints (Context ctx, Zprava z) {
         Log.d(TAG, "ENTER: checkHints");
 
-        StringBuffer sRes = new StringBuffer("Přidané indicie: ");
+        StringBuffer sRes = new StringBuffer("");
 
         if (!z.getsPovinneIndicie().equals("")) {
             List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\s,]+"));
@@ -132,7 +132,8 @@ public class Simulator {
         }
 
         Log.d(TAG, "LEAVE: checkHints");
-        return sRes.toString();
+        if (sRes.toString().equals("")) return "";
+                                  else return "Přidané indicie: "+sRes.toString();
     }
 
     private static String checkTime (Context ctx , Zprava z, ArrayList<Zprava> zpravyKomplet) {

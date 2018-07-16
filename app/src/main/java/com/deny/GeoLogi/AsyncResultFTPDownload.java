@@ -8,5 +8,9 @@ package com.deny.GeoLogi;
  */
 interface AsyncResultFTPDownload
 {
-    void onResult(boolean bResult);
+    //returns
+    // 1 ... success
+    // 0 ... file not found
+    // -1 ... failure => most probably connection failure
+    void onResult(int iResult);
 }

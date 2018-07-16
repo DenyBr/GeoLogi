@@ -31,6 +31,7 @@ import java.util.TimerTask;
 public class SyncFiles<T extends OverWriter&Serializable> {
     private final String TAG = "SyncFiles";
 
+    private boolean bFinished = false;
     private String sFilename;
     private Timer timer;
     private Context ctx;
@@ -39,26 +40,31 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     public ArrayList<T> localList;
 
     public SyncFiles(Context ctx, String sFileName, int iPerioda, Handler.Callback callback){
-        Log.d(TAG, "ENTER: SyncFiles: "+sFilename);
-        setsFilename(sFileName);
-        setCtx(ctx);
-        setCallback(callback);
+        if (!bFinished) {
 
-        localList = new ArrayList<>();
+            Log.d(TAG, "ENTER: SyncFiles: " + sFilename);
 
-        readFile();
 
-        timer = new Timer();
-        timer.schedule(
+            setsFilename(sFileName);
+            setCtx(ctx);
+            setCallback(callback);
+
+            localList = new ArrayList<>();
+
+            readFile();
+
+            timer = new Timer();
+            timer.schedule(
                     new TimerTask() {
 
-                    @Override
-                    public void run() {
-                        syncFileNow();
-                    }
-                }, 1, iPerioda);
+                        @Override
+                        public void run() {
+                            syncFileNow();
+                        }
+                    }, 1, iPerioda);
 
-        Log.d(TAG, "LEAVE: SyncFiles: "+sFilename);
+            Log.d(TAG, "LEAVE: SyncFiles: " + sFilename);
+        }
     }
 
      public String getsFilename() {
@@ -80,16 +86,18 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     //vola se jednak pravidelne tak jak je nastaveno
     //a muze se volat "rucne" - napriklad kduyz uzivatel zada novou indicii
     public void syncFileNow() {
-        Log.d(TAG, "ENTER: syncFileNow " + sFilename);
+        if (!bFinished) {
+            Log.d(TAG, "ENTER: syncFileNow " + sFilename);
 
-        new CheckFTPFileSizeAndDateTask(ctx, new AsyncResultFTPCheckSizeAndDate() {
-            @Override
-            public void onResult(long lSize, long lTimestamp) {
-                processDateAndSize(lSize, lTimestamp);
-            }
-        }).execute(sFilename);
+            new CheckFTPFileSizeAndDateTask(ctx, new AsyncResultFTPCheckSizeAndDate() {
+                @Override
+                public void onResult(long lSize, long lTimestamp) {
+                    processDateAndSize(lSize, lTimestamp);
+                }
+            }).execute(sFilename);
 
-        Log.d(TAG, "LEAVE: syncFileNow " + sFilename);
+            Log.d(TAG, "LEAVE: syncFileNow " + sFilename);
+        }
     }
 
     private void processDateAndSize(long lSize, long lTimestamp) {
@@ -110,8 +118,8 @@ public class SyncFiles<T extends OverWriter&Serializable> {
             if ((lSize != localFile.length()) || (localFile.lastModified()/100000<lTimestamp)) {
                 new DownloadFTPFileTask(ctx, new AsyncResultFTPDownload() {
                     @Override
-                    public void onResult(boolean res) {
-                        processDownload(res);
+                    public void onResult(int iRes) {
+                        processDownload(iRes);
                     }
                 }).execute(sFilename, sFilename+"tmp");
             }
@@ -151,34 +159,36 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         }
     }
 
-    private void processDownload(boolean res) {
+    private void processDownload(int res) {
         int iPocetLocalPred = localList.size();
         Log.d(TAG, "ENTER: processDownload: " + res);
 
-        ArrayList<T> remoteList = new ArrayList<>();
+        if (res != -1 ) {
+            ArrayList<T> remoteList = new ArrayList<>();
 
-        readFile(sFilename+"tmp", remoteList);
-        int iPocetRemotePred = remoteList.size();
+            readFile(sFilename + "tmp", remoteList);
+            int iPocetRemotePred = remoteList.size();
 
-        Log.d(TAG, "Local count = " + localList.size() + " ftp count = " +remoteList.size());
+            Log.d(TAG, "Local count = " + localList.size() + " ftp count = " + remoteList.size());
 
-        //merge the remote list into the local one
-        mergeRemoteList(remoteList);
+            //merge the remote list into the local one
+            mergeRemoteList(remoteList);
 
-        Log.d(TAG, "Count after merge " + localList.size());
+            Log.d(TAG, "Count after merge " + localList.size());
 
-        //always write local version even in case of no change to update the timestamp
-        writeFile();
+            //always write local version even in case of no change to update the timestamp
+            writeFile();
 
-        if (iPocetLocalPred != localList.size()) {
-            //new item added => callback to update must be called if registered
-            if (null!=callback) callback.handleMessage(null);
+            if (iPocetLocalPred != localList.size()) {
+                //new item added => callback to update must be called if registered
+                if (null != callback) callback.handleMessage(null);
 
-        }
+            }
 
-        if (iPocetRemotePred != localList.size()) {
-            //lokalne mame nejaky indicie navic, takze musime uploadovat
-            upload();
+            if (iPocetRemotePred != localList.size()) {
+                //lokalne mame nejaky indicie navic, takze musime uploadovat
+                upload();
+            }
         }
 
         Log.d(TAG, "LEAVE: processDownload");
@@ -244,4 +254,9 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     public void setCallback(Handler.Callback callback) {
         this.callback = callback;
     }
+
+    public void finalize () {
+        bFinished=true;
+    }
+
 }

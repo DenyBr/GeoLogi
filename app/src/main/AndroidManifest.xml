@@ -17,22 +17,28 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance"
+            />
         <activity
             android:name=".Settings"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance"
+            />
         <activity
             android:name=".Nastenka"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance"
+            />
         <activity
             android:name=".MapaActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance"
+            />
         <activity
             android:name=".IndicieActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleInstance"
+            />
         <activity
             android:name=".UvodniStranka"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme">
             >
             <intent-filter>
