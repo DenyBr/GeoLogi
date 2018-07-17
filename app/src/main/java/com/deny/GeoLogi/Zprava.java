@@ -1,5 +1,6 @@
 package com.deny.GeoLogi;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import java.io.IOException;
@@ -30,24 +31,25 @@ public class Zprava implements Serializable {
     private boolean bRead;
     private boolean bZobrazeno;
     private Timestamp tsCasZobrazeni;
+    private int iBarva;
 
-
-    public Zprava( int iId,
-                   int iOddil,
-                   String sPredmet,
-                   String sZprava,
-                   String sLink,
-                   String sZobrazitPoCase,
-                   int iPoZpraveCislo,
-                   double fCilovyBodLat,
-                   double fCilovyBodLong,
-                   String sCilovyBodPopis,
-                   double fZobrazitNaLat,
-                   double fZobrazitNaLong,
-                   int iPocetIndicii,
-                   String sIndicieZeSkupiny,
-                   String sPovinneIndicie,
-                   String sNezobrazovatPokudMajiIndicii)
+    public Zprava(int iId,
+                  int iOddil,
+                  String sPredmet,
+                  String sZprava,
+                  String sLink,
+                  String sZobrazitPoCase,
+                  int iPoZpraveCislo,
+                  double fCilovyBodLat,
+                  double fCilovyBodLong,
+                  String sCilovyBodPopis,
+                  double fZobrazitNaLat,
+                  double fZobrazitNaLong,
+                  int iPocetIndicii,
+                  String sIndicieZeSkupiny,
+                  String sPovinneIndicie,
+                  String sNezobrazovatPokudMajiIndicii,
+                  int iBarva)
     {
         setiId(iId);
         setiOddil(iOddil);
@@ -65,6 +67,7 @@ public class Zprava implements Serializable {
         setsIndicieZeSkupiny(sIndicieZeSkupiny);
         setsPovinneIndicie(sPovinneIndicie);
         setsNezobrazovatPokudMajiIndicii(sNezobrazovatPokudMajiIndicii);
+        setiBarva(iBarva);
     }
 
     public int getiId( ) { return this.iId;}
@@ -84,6 +87,8 @@ public class Zprava implements Serializable {
     public boolean getbZobrazeno () {return this.bZobrazeno;}
     public String getsNezobrazovatPokudMajiIndicii( ) { return this.sNezobrazovatPokudMajiIndicii;}
     public String getsIndicieZeSkupiny() {return sIndicieZeSkupiny; }
+    public int getiBarva() { return iBarva; }
+
 
     public void setiId( int iId) {  this.iId=iId;}
     public void setiOddil( int iOddil) {  this.iOddil=iOddil;}
@@ -106,6 +111,7 @@ public class Zprava implements Serializable {
         Log.d ("TAG", "Message " + getsPredmet() + " Zobrazeno: "+bZobrazeno);
         this.bZobrazeno = bZobrazeno;}
     public void setsIndicieZeSkupiny(String sIndicieZeSkupiny) {this.sIndicieZeSkupiny = sIndicieZeSkupiny; }
+    public void setiBarva(int iBarva) { this.iBarva = iBarva; Log.d ("TAG", "Barva " + iBarva);}
 
     private void readObject(
             ObjectInputStream aInputStream

@@ -85,7 +85,6 @@
 
             <Button
                 android:id="@+id/btnTest" android:enabled="true"
-                android:visibility="visible"
                 android:onClick="testClickHandler"
                 android:layout_width="15pt"
                 android:layout_height="wrap_content"

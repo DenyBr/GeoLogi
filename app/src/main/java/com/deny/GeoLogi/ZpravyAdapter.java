@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -39,7 +40,8 @@ public class ZpravyAdapter extends ArrayAdapter<Zprava> {
             else {predmet.setTypeface(null, Typeface.NORMAL);}
 
             predmet.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            predmet.setText(String.valueOf(o.getsPredmet() /*+ " " + o.getTsCasZobrazeni().toString()*/));
+            predmet.setTextColor( 0xFF000000 + o.getiBarva());
+            predmet.setText(String.valueOf(o.getsPredmet()));
           }
         return v;
     }

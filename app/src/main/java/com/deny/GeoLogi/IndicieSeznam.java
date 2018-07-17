@@ -40,7 +40,7 @@ public class IndicieSeznam {
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
     //public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
     private static Context ctx = null;
-    private static Handler.Callback callback = null;
+    private static Handler.Callback updateCallback = null;
 
     public static SyncFiles<Indicie> sfIndicie = null;
 
@@ -60,7 +60,7 @@ public class IndicieSeznam {
     }
 
     public static void setCallback(Handler.Callback callback) {
-        IndicieSeznam.callback = callback;
+        IndicieSeznam.updateCallback = callback;
     }
 
 
@@ -85,7 +85,7 @@ public class IndicieSeznam {
         }
 
         if (null!=sfIndicie) sfIndicie.finalize();
-        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000, callback);
+        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000, updateCallback);
     }
 
     public void write (Context context) {

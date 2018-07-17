@@ -83,9 +83,6 @@ public class UvodniStranka extends AppCompatActivity {
         setContentView(R.layout.activity_uvodni_stranka);
         Log.d("Uvodni", "Spusteno");
 
-        TableRow tr = (TableRow) findViewById(R.id.sim);
-        tr.setVisibility(Global.isbSimulationMode() ? View.VISIBLE : View.INVISIBLE);
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //to remove the action bar (title bar)
@@ -163,6 +160,9 @@ public class UvodniStranka extends AppCompatActivity {
         btnVyber.setEnabled(true);
         Nastaveni.getInstance(this).reload(this);
 
+        TableRow tr = (TableRow) findViewById(R.id.sim);
+        tr.setVisibility(Global.isbSimulationMode() ? View.VISIBLE : View.INVISIBLE);
+
         if (Nastaveni.getInstance(this).getsHra().equals("")){
             btnPokracovat.setEnabled(false);
             btnResults.setEnabled(false);
@@ -226,7 +226,8 @@ public class UvodniStranka extends AppCompatActivity {
                 Log.d(TAG, "Sim "+iNumfClicks);
 
                 if (iNumfClicks > 7) {
-                    Global.setbSimulationMode(!Global.isbSimulationMode());
+                    Global.togglebSimulationMode();
+                    Nastaveni.getInstance().store(this);
 
                     TableRow tr = (TableRow) findViewById(R.id.sim);
                     tr.setVisibility(Global.isbSimulationMode() ? View.VISIBLE : View.INVISIBLE);

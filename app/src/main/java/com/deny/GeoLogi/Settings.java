@@ -170,6 +170,7 @@ public class Settings extends AppCompatActivity {
             pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
             pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());
             pNastaveni.setProperty("Root", ""+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbRoot());
+            pNastaveni.setProperty("Simulation", ""+Global.isbSimulationMode());
 
             try {
                 OutputStream outputStream = openFileOutput("config.properties", Context.MODE_PRIVATE);

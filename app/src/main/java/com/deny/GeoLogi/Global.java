@@ -7,6 +7,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.OutputStream;
+
 import static android.content.Context.LOCATION_SERVICE;
 
 public class Global {
@@ -14,7 +16,6 @@ public class Global {
     private static long lTime = System.currentTimeMillis();
     private static double dLat = 0;
     private static double dLong = 0;
-    private static boolean bSimulationMode = false;
     private static Context ctx = null;
     private static Location location = null;
     private static LocationManager locationManager = null;
@@ -55,11 +56,16 @@ public class Global {
     }
 
     public static boolean isbSimulationMode() {
-        return bSimulationMode;
+        return Nastaveni.getInstance().getisSimulation();
     }
 
-    public static void setbSimulationMode(boolean bSimulationMode) {
-        Global.bSimulationMode = bSimulationMode;
+    public static void togglebSimulationMode() {
+        Log.d(TAG, "Prepni simulaci: Stav pred : " + isbSimulationMode());
+
+        Nastaveni.getInstance(ctx).setProperty("Simulation", ""+!(isbSimulationMode()));
+
+
+        Log.d(TAG, "Prepni simulaci: Stav po : " + isbSimulationMode());
     }
 
 
@@ -76,7 +82,7 @@ public class Global {
     }
 
     public static double getLat () {
-        if (bSimulationMode) {
+        if (isbSimulationMode()) {
             return dLat;
         }
         else
@@ -95,7 +101,7 @@ public class Global {
         }
     }
     public static double getLong () {
-        if (bSimulationMode) {
+        if (isbSimulationMode()) {
             return dLong;
         }
         else
@@ -115,7 +121,7 @@ public class Global {
     }
 
     public static long getTime () {
-        if (bSimulationMode) {
+        if (isbSimulationMode()) {
             return lTime;
         }
         else
@@ -126,7 +132,7 @@ public class Global {
 
 
     public static float distanceTo(Location location) {
-        if (bSimulationMode) {
+        if (isbSimulationMode()) {
             Location locSim = new Location("");
 
             locSim.setLatitude(getLat());
