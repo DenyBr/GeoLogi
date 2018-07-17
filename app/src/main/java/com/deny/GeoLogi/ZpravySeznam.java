@@ -7,12 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ZpravySeznam {
+public class ZpravySeznam implements Handler.Callback {
     private final static String TAG = "MessageList";
     final int iTimeoutUpdate = 1200000;
     String sVybrano;
@@ -47,6 +44,7 @@ public class ZpravySeznam {
     Timestamp tsLastUpdate = null;
     boolean bConnectionLost = false;
     final Handler updateHandler = new Handler();
+    Handler.Callback guiUpdate =null;
 
     public static ZpravySeznam getInstance(Context context) {
         if (null==ourInstance) {
@@ -68,9 +66,16 @@ public class ZpravySeznam {
         v = (Vibrator)context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
     }
 
+    public void registerGuiCallback(Handler.Callback callback) {
+        guiUpdate = callback;
+    }
+
+
     public void read (Context context) {
         Log.d(TAG, "ENTER: read");
         this.context = context;
+
+        updateHandler.removeCallbacks(updateRunabble);
 
         synchronized (lock) {
             //Save currently selected gam and user to detect change later
@@ -98,6 +103,23 @@ public class ZpravySeznam {
                 Okynka.zobrazOkynko(context, "Chyba: " + e.getMessage());
             }
         }
+
+
+        //register callback which will be called in case of update of Hints
+        //instantiate Hints singleton and read stored Hints
+        IndicieSeznam.setCallback(this);
+        IndicieSeznam.getInstance(context).read(context);
+
+        //the same for visited points
+        GeoBody.setCallback(this);
+        GeoBody.getInstance(context).init();
+
+        //check and update messages
+        ZpravySeznam.getInstance(context).zkontrolujZpravy(true);
+        tsLastUpdate = null;
+
+        casovyupdate();
+
         Log.d(TAG, "LEAVE: read");
     }
 
@@ -410,6 +432,9 @@ public class ZpravySeznam {
                 if (bPrekreslit) {
                     zpravyZobraz = zpravy;
 
+                    if (null!=guiUpdate) {
+                        guiUpdate.handleMessage(null);
+                    }
                 }
 
                 if (bNova) {
@@ -446,7 +471,6 @@ public class ZpravySeznam {
             }
         }
         Log.d(TAG, "LEAVE: zkontrolujZpravy: celkem zprav: "+ zpravyKomplet.size()+" viditelnych zprav: " + zpravy.size());
-
     }
 
 
@@ -478,7 +502,7 @@ public class ZpravySeznam {
     public void serverUpdate (boolean bProvedHned) {
         //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
         //se zaktualizuje seznam zprav
-        Log.d(TAG, "serverUpdate");
+        Log.d(TAG, "serverUpdate" + (null==tsLastUpdate?"0":tsLastUpdate.toString()));
 
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -538,6 +562,11 @@ public class ZpravySeznam {
         }
     };
 
+    @Override
+    public boolean handleMessage(Message message) {
+        zkontrolujZpravy(false);
+        return true;
+    }
 
     private boolean zkontrolujLokaci (Zprava z) {
         if ((z.getfZobrazitNaLat()==0) || (z.getfZobrazitNaLong())==0) return true;
@@ -580,9 +609,6 @@ public class ZpravySeznam {
             return false;
         }
     }
-
-
-
 }
 
 

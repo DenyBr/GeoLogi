@@ -54,21 +54,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private static final String TAG = "MAIN";
     Location location;
     ListView listview;
-    boolean bPaused = false;
-
-    //jak casto se bude stahovat a updatovat server
-    //jednou za 20 minut staci
     int iSirka=0;
-    final Handler updateHandler = new Handler();
-    private final int iRnd = (new Random()).nextInt();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "ENTER: OnCreate");
 
         super.onCreate(savedInstanceState);
-
 
         setContentView(R.layout.activity_main);
 
@@ -94,24 +86,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private void Init () {
         Log.d(TAG, "ENTER: Init");
 
-
         //reload all parameters
         Nastaveni.getInstance(this).reload(this);
 
         //reload stored messages
+        ZpravySeznam.getInstance(this).registerGuiCallback(this);
         ZpravySeznam.getInstance(this).read(this);
-
-        //register callback which will be called in case of update of Hints
-        //instantiate Hints singleton and read stored Hints
-        IndicieSeznam.setCallback(this);
-        IndicieSeznam.getInstance(this).read(this);
-
-        //the same for visited points
-        GeoBody.setCallback(this);
-        GeoBody.getInstance(this).init();
-
-        //check and update messages
-        ZpravySeznam.getInstance(this).zkontrolujZpravy(true);
 
         Log.d(TAG, "LEAVE: Init");
     }
@@ -209,8 +189,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         Log.d(TAG, "onResume called");
 
-        bPaused = false;
-
         pristupy();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
@@ -227,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         resize();
 
         Init();
-        ZpravySeznam.getInstance(this).casovyupdate();
     }
 
     @Override
@@ -235,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         super.onPause();
 
         Log.d(TAG, "onPause called");
-        bPaused = true;
     }
 
     @Override
@@ -257,16 +233,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     @Override
     public boolean handleMessage(Message msg) {
-        /*
-            Handler.callback interface implementation
-            it's used by FileSynchroniser and list of messages to ensure update after the update
-         */
-        ZpravySeznam.getInstance(this).zkontrolujZpravy(false);
-
         updateView();
-
-        Log.d(TAG, "handleMessage called");
-
         return true;
     }
 
@@ -275,7 +242,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Log.d(TAG, "finalize called");
     }
 
+
+
     private void updateView () {
+        Log.d(TAG, "ENTER: updateView");
+
         int iMin = 100000;
 
         listview = (ListView) findViewById(R.id.listview);
@@ -325,5 +296,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                 resize();
             }
         });
+
+        Log.d(TAG, "LEAVE: updateView");
     }
 }
