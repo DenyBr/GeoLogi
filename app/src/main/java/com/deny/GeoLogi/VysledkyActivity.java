@@ -11,11 +11,8 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class VysledkyActivity extends AppCompatActivity {

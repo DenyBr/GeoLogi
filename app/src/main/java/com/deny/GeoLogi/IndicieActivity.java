@@ -11,9 +11,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
-import java.sql.Timestamp;
-
-
 public class IndicieActivity extends AppCompatActivity {
     private final String TAG = "IndicieActivity";
     private ListView listview;
@@ -25,6 +22,11 @@ public class IndicieActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_indicie);
 
+        IndicieSeznam.getInstance(IndicieActivity.this).read(IndicieActivity.this);
+        IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.readFile();
+
+        handler.postDelayed(update, 10);
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //to remove the action bar (title bar)
@@ -35,14 +37,7 @@ public class IndicieActivity extends AppCompatActivity {
     private Runnable update = new Runnable() {
         @Override
         public void run() {
-            IndicieSeznam.getInstance(IndicieActivity.this).read(IndicieActivity.this);
-            IndicieSeznam.getInstance(IndicieActivity.this).sfIndicie.readFile();
-
             prekresli();
-
-            IndicieSeznam.getInstance(IndicieActivity.this).nactizwebu(IndicieActivity.this);
-
-            handler.postDelayed(this, 60000);
         }
     };
 
@@ -81,9 +76,9 @@ public class IndicieActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
 
-        super.onPause();
+        super.onStop();
 
         finish();
     }

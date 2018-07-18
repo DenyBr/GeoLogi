@@ -29,7 +29,6 @@ import java.util.List;
 
 public class ZpravySeznam implements Handler.Callback {
     private final static String TAG = "MessageList";
-    final int iTimeoutUpdate = 1200000;
     String sVybrano;
 
     private static ZpravySeznam ourInstance = null;
@@ -161,108 +160,114 @@ public class ZpravySeznam implements Handler.Callback {
                     JSONArray columns = row.getJSONArray("c");
                     System.out.print(rows.length());
 
+                    boolean bPublic = false;
+                    try {
+                        bPublic = columns.getJSONObject(0).getBoolean("v");
+                    } catch (Exception e) {
+                    }
+
                     int iId = 0;
                     try {
-                        iId = columns.getJSONObject(0).getInt("v");
+                        iId = columns.getJSONObject(1).getInt("v");
                     } catch (Exception e) {
                     }
 
                     int iOddil = 0;
                     try {
-                        iOddil = columns.getJSONObject(1).getInt("v");
+                        iOddil = columns.getJSONObject(2).getInt("v");
                     } catch (Exception e) {
                     }
 
                     String sPredmet = "";
                     try {
-                        sPredmet = columns.getJSONObject(2).getString("v");
+                        sPredmet = columns.getJSONObject(3).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sZprava = "";
                     try {
-                        sZprava = columns.getJSONObject(3).getString("v");
+                        sZprava = columns.getJSONObject(4).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sLink = "";
                     try {
-                        sLink = columns.getJSONObject(4).getString("v");
+                        sLink = columns.getJSONObject(5).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sZobrazitPoCase = "";
                     try {
-                        sZobrazitPoCase = columns.getJSONObject(5).getString("v");
+                        sZobrazitPoCase = columns.getJSONObject(6).getString("v");
                     } catch (Exception e) {
                     }
 
                     int iPoZpraveCislo = 0;
                     try {
-                        iPoZpraveCislo = columns.getJSONObject(6).getInt("v");
+                        iPoZpraveCislo = columns.getJSONObject(7).getInt("v");
                     } catch (Exception e) {
                     }
 
                     double fCilovyBodLat = 0;
                     try {
-                        fCilovyBodLat = columns.getJSONObject(7).getDouble("v");
+                        fCilovyBodLat = columns.getJSONObject(8).getDouble("v");
                     } catch (Exception e) {
                     }
 
                     double fCilovyBodLong = 0;
                     try {
-                        fCilovyBodLong = columns.getJSONObject(8).getDouble("v");
+                        fCilovyBodLong = columns.getJSONObject(9).getDouble("v");
                     } catch (Exception e) {
                     }
 
                     String sCilovyBodPopis = "";
                     try {
-                        sCilovyBodPopis = columns.getJSONObject(9).getString("v");
+                        sCilovyBodPopis = columns.getJSONObject(10).getString("v");
                     } catch (Exception e) {
                     }
 
 
                     double fZobrazitNaLat = 0;
                     try {
-                        fZobrazitNaLat = columns.getJSONObject(10).getDouble("v");
+                        fZobrazitNaLat = columns.getJSONObject(11).getDouble("v");
                     } catch (Exception e) {
                     }
 
                     double fZobrazitNaLong = 0;
                     try {
-                        fZobrazitNaLong = columns.getJSONObject(11).getDouble("v");
+                        fZobrazitNaLong = columns.getJSONObject(12).getDouble("v");
                     } catch (Exception e) {
                     }
 
                     int iPocetIndicii = 0;
                     try {
-                        iPocetIndicii = columns.getJSONObject(12).getInt("v");
+                        iPocetIndicii = columns.getJSONObject(13).getInt("v");
                     } catch (Exception e) {
                     }
 
                     String sIndicieZeSkupiny = "";
 
                     try {
-                        sIndicieZeSkupiny = columns.getJSONObject(13).getString("v");
+                        sIndicieZeSkupiny = columns.getJSONObject(14).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sPovinneIndicie = "";
 
                     try {
-                        sPovinneIndicie = columns.getJSONObject(14).getString("v");
+                        sPovinneIndicie = columns.getJSONObject(15).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sNezobrazovatPokudMajiIndicii = "";
                     try {
-                        sNezobrazovatPokudMajiIndicii = columns.getJSONObject(15).getString("v");
+                        sNezobrazovatPokudMajiIndicii = columns.getJSONObject(16).getString("v");
                     } catch (Exception e) {
                     }
 
                     String sColor = "";
                     try {
-                        sColor = columns.getJSONObject(16).getString("v");
+                        sColor = columns.getJSONObject(17).getString("v");
                     } catch (Exception e) {
                     }
 
@@ -275,7 +280,8 @@ public class ZpravySeznam implements Handler.Callback {
                         }
                     }
 
-                    Zprava zprava = new Zprava(iId,
+                    Zprava zprava = new Zprava(bPublic,
+                            iId,
                             iOddil,
                             sPredmet,
                             sZprava,
@@ -314,6 +320,7 @@ public class ZpravySeznam implements Handler.Callback {
             zpravyKomplet.add(z);
             Log.d(TAG, "New message");
         } else {
+            z_zapsana.setbPublic(z.getbPublic());
             z_zapsana.setiOddil(z.getiOddil());
             z_zapsana.setsPredmet(z.getsPredmet());
             z_zapsana.setsZprava(z.getsZprava());
@@ -368,6 +375,7 @@ public class ZpravySeznam implements Handler.Callback {
                     Zprava z = zpravyKomplet.get(i);
 
                     Log.d(TAG, "Zprava: " + z.getiId() +
+                            "  Public? " + z.getbPublic() +
                             "  Oddil? " + ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(context).getiIDOddilu())) +
                             "  Cas? " + (zkontrolujCas(z)) +
                             "  Pocet indicii? " + (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) +
@@ -378,8 +386,8 @@ public class ZpravySeznam implements Handler.Callback {
                     //zkotrnolujeme, ze se ma zprava zobrazit
                     if (z.getbZobrazeno() // uz byla nekdy videt
                             ||
-
-                            (((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(context).getiIDOddilu()))  //zprava je pro dany oddil
+                            (       ((z.getbPublic()) || (Global.isbSimulationMode())) //zprava je verejna nebo jsme v simulacnim rezimu
+                                    && ((z.getiOddil() == 0) || (z.getiOddil() == Nastaveni.getInstance(context).getiIDOddilu()))  //zprava je pro dany oddil
                                     && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
                                     && (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) //maji dost indiciii
                                     && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
@@ -500,7 +508,7 @@ public class ZpravySeznam implements Handler.Callback {
     }
 
     public void serverUpdate (boolean bProvedHned) {
-        //Kazdych 20 minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
+        //Kazdych X minut - nebo okamzite, pokud jsme ziskali spojeni po ztrate
         //se zaktualizuje seznam zprav
         Log.d(TAG, "serverUpdate" + (null==tsLastUpdate?"0":tsLastUpdate.toString()));
 
@@ -510,13 +518,20 @@ public class ZpravySeznam implements Handler.Callback {
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                if ((bProvedHned) || (tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + iTimeoutUpdate))) {
+                if ((bProvedHned) || (tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + Global.iUpdateInterval))) {
                     bConnectionLost = false;
                     tsLastUpdate = now;
 
                     Log.d(TAG, "Stahuju aktualni seznam zprav a indicii");
                     downloadJson();
-                    IndicieSeznam.getInstance(context).nactizwebu(context);
+
+                    if (bProvedHned) {
+                        //if the user initiates immediate action, synchronise also hints and geopoints
+                        //otherwise there are separated timer handlers
+                        IndicieSeznam.getInstance(context).syncFileNow(context);
+                        IndicieSeznam.sfIndicie.syncFileNow();
+                        GeoBody.sfBodyNavsvivene.syncFileNow();
+                    }
                 }
             } else {
                 bConnectionLost = true;

@@ -7,9 +7,7 @@ import android.util.Log;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
     Context ctx = null;
@@ -37,7 +35,7 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         //
-        int iResult = (new Integer(result)).intValue();
+        int iResult = Integer.valueOf(result);
         callback.onResult(iResult);
     }
 

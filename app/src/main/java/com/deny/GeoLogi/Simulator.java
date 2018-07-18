@@ -107,10 +107,13 @@ public class Simulator {
                 String hint = items.get(i);
                 if (!IndicieSeznam.getInstance().uzMajiIndicii(hint)) {
                     if (IndicieSeznam.getInstance().addHint(hint)) {
-                        sRes.append(hint+" ");
+                        sRes.append(hint);
+                        sRes.append(" ");
                     }
                     else {
-                        sRes.append(" Povinna indicie "+hint+" neexistuje! ");
+                        sRes.append(" Povinna indicie ");
+                        sRes.append(hint);
+                        sRes.append(" neexistuje! ");
                     }
                 }
             }
@@ -123,9 +126,11 @@ public class Simulator {
                 String s=IndicieSeznam.getInstance(ctx).simAddOneOfGroup(z.getsIndicieZeSkupiny());
 
                 if (!s.equals("")) {
-                    sRes.append(s+" ");
+                    sRes.append(s);
+                    sRes.append(" ");
                  } else {
-                    sRes.append("Neexistuje dostatek indicii ze skupiny "+z.getsIndicieZeSkupiny());
+                    sRes.append("Neexistuje dostatek indicii ze skupiny ");
+                    sRes.append(z.getsIndicieZeSkupiny());
                     break;
                 }
             }

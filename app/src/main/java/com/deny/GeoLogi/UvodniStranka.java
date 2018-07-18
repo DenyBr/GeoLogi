@@ -5,28 +5,18 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.deny.GeoLogi.R;
-
-import java.sql.Timestamp;
-import java.util.Random;
-
-//import com.deny.taborofka_zpravy.R;
 
 public class UvodniStranka extends AppCompatActivity {
     /**

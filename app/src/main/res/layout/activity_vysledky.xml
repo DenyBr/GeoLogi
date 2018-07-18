@@ -40,7 +40,6 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
             android:text="Navštívených bodů"
             android:textStyle="bold"
             android:textAlignment="center"/>
-        />
     </TableRow>
     <TableRow
         android:layout_width="match_parent"

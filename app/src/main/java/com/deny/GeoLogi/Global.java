@@ -13,6 +13,9 @@ import static android.content.Context.LOCATION_SERVICE;
 
 public class Global {
     private final static String TAG = "Global";
+
+    public final static int iUpdateInterval = 600000; //miliseconds
+
     private static long lTime = System.currentTimeMillis();
     private static double dLat = 0;
     private static double dLong = 0;

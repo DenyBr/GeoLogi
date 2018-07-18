@@ -95,7 +95,8 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
         String line = null;
         try {
             while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+                sb.append(line);
+                sb.append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

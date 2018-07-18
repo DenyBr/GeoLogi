@@ -1,6 +1,5 @@
 package com.deny.GeoLogi;
 
-import android.graphics.Color;
 import android.util.Log;
 
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.sql.Timestamp;
 public class Zprava implements Serializable {
     private final String TAG = "Zprava";
 
+    private boolean bPublic;
     private int iId;
     private int iOddil;
     private String sPredmet;
@@ -33,7 +33,8 @@ public class Zprava implements Serializable {
     private Timestamp tsCasZobrazeni;
     private int iBarva;
 
-    public Zprava(int iId,
+    public Zprava(boolean bPublic,
+                  int iId,
                   int iOddil,
                   String sPredmet,
                   String sZprava,
@@ -51,6 +52,7 @@ public class Zprava implements Serializable {
                   String sNezobrazovatPokudMajiIndicii,
                   int iBarva)
     {
+        setbPublic(bPublic);
         setiId(iId);
         setiOddil(iOddil);
         setsPredmet(sPredmet);
@@ -70,6 +72,7 @@ public class Zprava implements Serializable {
         setiBarva(iBarva);
     }
 
+    public boolean getbPublic() {return bPublic;}
     public int getiId( ) { return this.iId;}
     public int getiOddil( ) { return this.iOddil;}
     public String getsPredmet( ) { return this.sPredmet;}
@@ -90,6 +93,7 @@ public class Zprava implements Serializable {
     public int getiBarva() { return iBarva; }
 
 
+    public void setbPublic (boolean bPublic) {this.bPublic = bPublic;}
     public void setiId( int iId) {  this.iId=iId;}
     public void setiOddil( int iOddil) {  this.iOddil=iOddil;}
     public void setsPredmet( String sPredmet) {  this.sPredmet=sPredmet;}

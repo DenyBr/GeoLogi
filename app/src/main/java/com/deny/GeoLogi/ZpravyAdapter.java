@@ -1,7 +1,6 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;

@@ -43,6 +43,7 @@
                 android:layout_span="4"
                 android:enabled="true"
                 android:onClick="toggleSimulationMode"
+                android:contentDescription="Banner"
                 android:src="@drawable/uvodni" />
         </TableRow>
 
@@ -52,7 +53,7 @@
         android:layout_height="150dp"
         android:gravity="center_horizontal"
         android:minHeight="30dp">
-        >
+
 
         <TextView
             android:id="@+id/tvVybranaHra"

@@ -15,11 +15,13 @@ import java.util.ArrayList;
  */
 
 public class Indicie implements Serializable, OverWriter<Indicie> {
+    private int iPlatnaPo;
     private String sGroup;
     private ArrayList<String> sTexty;
     private Timestamp time;
 
-    public Indicie(String sGroup, ArrayList<String> sTexty) {
+    public Indicie(int iPlatnaPo, String sGroup, ArrayList<String> sTexty) {
+        setiPlatnaPo(iPlatnaPo);
         setsGroup(sGroup);
         setsTexty(sTexty);
     }
@@ -90,4 +92,12 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
     }
 
     public Timestamp getTime() { return time; }
+
+    public int getiPlatnaPo() {
+        return iPlatnaPo;
+    }
+
+    public void setiPlatnaPo(int iPlatnaPo) {
+        this.iPlatnaPo = iPlatnaPo;
+    }
 }

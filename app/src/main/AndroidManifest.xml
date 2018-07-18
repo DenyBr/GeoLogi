@@ -40,7 +40,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme">
-            >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

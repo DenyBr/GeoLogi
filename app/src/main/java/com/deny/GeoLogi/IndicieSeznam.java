@@ -4,20 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
-import android.os.Message;
-
-/*
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.DataStoreFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.DriveScopes;
-*/
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,9 +24,10 @@ import java.util.ArrayList;
 public class IndicieSeznam {
     private static IndicieSeznam ourInstance = null;
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
-    //public static ArrayList<Indicie> aIndicieZiskane = new ArrayList<Indicie>();
+
     private static Context ctx = null;
     private static Handler.Callback updateCallback = null;
+    private static Handler updateHandler = new Handler();
 
     public static SyncFiles<Indicie> sfIndicie = null;
 
@@ -63,9 +50,20 @@ public class IndicieSeznam {
         IndicieSeznam.updateCallback = callback;
     }
 
+    private Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            syncFileNow(IndicieSeznam.ctx);
+
+            updateHandler.postDelayed(updateRunnable, 10);
+        }
+    };
+
 
     public void read (Context context) {
         try {
+            updateHandler.removeCallbacks(updateRunnable);
+
             aIndicieVsechny = new ArrayList<Indicie>();
             InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.bin");
 
@@ -85,8 +83,14 @@ public class IndicieSeznam {
         }
 
         if (null!=sfIndicie) sfIndicie.finalize();
-        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", 60000, updateCallback);
+        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", Global.iUpdateInterval, updateCallback);
+
+        updateHandler.postDelayed(updateRunnable, 10);
+
     }
+
+
+
 
     public void write (Context context) {
         try {
@@ -105,7 +109,7 @@ public class IndicieSeznam {
         }
     }
 
-    public void nactizwebu(Context context) {
+    public void syncFileNow(Context context) {
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -136,13 +140,20 @@ public class IndicieSeznam {
 
                 ArrayList<String> aInd = new ArrayList<String>();
 
-                String sGroup = "";
+
+                int iPlatnaPo = 0;
                 try {
-                    sGroup = columns.getJSONObject(0).getString("v");
+                    iPlatnaPo = columns.getJSONObject(0).getInt("v");
                 } catch (Exception e) {
                 }
 
-                for (int iSloupec=1; iSloupec<6; iSloupec++) {
+                String sGroup = "";
+                try {
+                    sGroup = columns.getJSONObject(1).getString("v");
+                } catch (Exception e) {
+                }
+
+                for (int iSloupec=2; iSloupec<7; iSloupec++) {
                     String sText = "";
                     try {
                         sText = columns.getJSONObject(iSloupec).getString("v");
@@ -151,7 +162,7 @@ public class IndicieSeznam {
                     }
                 }
 
-                IndicieSeznam.getInstance().aIndicieVsechny.add(new Indicie(sGroup, aInd));
+                IndicieSeznam.getInstance().aIndicieVsechny.add(new Indicie(iPlatnaPo, sGroup, aInd));
             }
 
             IndicieSeznam.getInstance().write(ctx);
@@ -189,9 +200,11 @@ public class IndicieSeznam {
 
    public boolean addHint(String sInd) {
        for (int i = 0; i < aIndicieVsechny.size(); i++) {
-           if (aIndicieVsechny.get(i).jeToOno(sInd)) {
-               sfIndicie.localList.add(aIndicieVsechny.get(i));
-               sfIndicie.localList.get(IndicieSeznam.sfIndicie.localList.size()-1).setTime(new Timestamp(Global.getTime()));
+           Indicie indicie = aIndicieVsechny.get(i);
+           if (indicie.jeToOno(sInd)
+                   &&(indicie.getiPlatnaPo()==0 || ZpravySeznam.getInstance(ctx).zpravaPodleId(indicie.getiPlatnaPo()).getbZobrazeno())) {
+               indicie.setTime(new Timestamp(Global.getTime()));
+               sfIndicie.localList.add(indicie);
 
                sfIndicie.writeFile();
 
