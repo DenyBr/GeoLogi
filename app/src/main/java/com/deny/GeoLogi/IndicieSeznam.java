@@ -144,12 +144,11 @@ public class IndicieSeznam {
             JSONArray rows = object.getJSONArray("rows");
             IndicieSeznam.getInstance().aIndicieVsechny = new ArrayList<Indicie>();
 
-            for (int r = 1; r < rows.length(); ++r) {
+            for (int r = 0; r < rows.length(); ++r) {
                 JSONObject row = rows.getJSONObject(r);
                 JSONArray columns = row.getJSONArray("c");
 
                 ArrayList<String> aInd = new ArrayList<String>();
-
 
                 int iPlatnaPo = 0;
                 try {
@@ -168,10 +167,13 @@ public class IndicieSeznam {
                     try {
                         sText = columns.getJSONObject(iSloupec).getString("v");
                         aInd.add(sText);
+
+                        Log.d (TAG, "Indicie raw " + iSloupec +" " + sText);
                     } catch (Exception e) {
                     }
                 }
 
+                Log.d(TAG, "Indicie " + aInd.get(0));
                 IndicieSeznam.getInstance().aIndicieVsechny.add(new Indicie(iPlatnaPo, sGroup, aInd));
             }
 
@@ -211,6 +213,9 @@ public class IndicieSeznam {
    public boolean addHint(String sInd) {
        for (int i = 0; i < aIndicieVsechny.size(); i++) {
            Indicie indicie = aIndicieVsechny.get(i);
+
+           Log.d(TAG, "addHint: " + indicie.getsTexty().get(0) + " " + indicie.jeToOno(sInd)+ " " + indicie.getiPlatnaPo());
+
            if (indicie.jeToOno(sInd)
                    &&(indicie.getiPlatnaPo()==0 || ZpravySeznam.getInstance(ctx).zpravaPodleId(indicie.getiPlatnaPo()).getbZobrazeno())) {
                indicie.setTime(new Timestamp(Global.getTime()));
