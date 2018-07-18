@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
  */
 
 public class IndicieSeznam {
+    private final static String TAG = "IndicieSeznam";
+
     private static IndicieSeznam ourInstance = null;
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
 
@@ -55,13 +58,15 @@ public class IndicieSeznam {
         public void run() {
             syncFileNow(IndicieSeznam.ctx);
 
-            updateHandler.postDelayed(updateRunnable, 10);
+            updateHandler.postDelayed(updateRunnable, Global.iUpdateInterval);
         }
     };
 
 
     public void read (Context context) {
         try {
+            Log.d(TAG, "ENTER: read");
+
             updateHandler.removeCallbacks(updateRunnable);
 
             aIndicieVsechny = new ArrayList<Indicie>();
@@ -87,12 +92,15 @@ public class IndicieSeznam {
 
         updateHandler.postDelayed(updateRunnable, 10);
 
+        Log.d(TAG, "LEAVE: read. Indicii celkem " + aIndicieVsechny.size());
     }
 
 
 
 
     public void write (Context context) {
+        Log.d(TAG, "ENTER: write");
+
         try {
             OutputStream fileOut = context.openFileOutput(Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.bin", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -105,6 +113,8 @@ public class IndicieSeznam {
 
             out.close();
             fileOut.close();
+
+            Log.d(TAG, "LEAVE: write " + aIndicieVsechny.size());
         } catch (IOException ex) {Okynka.zobrazOkynko(context, "Chyba: " + ex.getMessage());
         }
     }

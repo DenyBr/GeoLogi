@@ -114,6 +114,8 @@ class GeoBody {
 
 
     public int iVzdalenostNejblizsiho(Context ctx) {
+
+        Log.d(TAG, "ENTER: iVzdalenostNejblizsiho");
         //zjisti aktualni polohu
         int iMin = 100000;
         int iAct;
@@ -145,6 +147,7 @@ class GeoBody {
                         sfBodyNavsvivene.syncFileNow();
 
                         aktualizujMapu();
+                        ZpravySeznam.getInstance(ctx).zkontrolujZpravy(true);
                     }
                 }
             } catch (NullPointerException e) {
@@ -167,6 +170,7 @@ class GeoBody {
 
         Global.init(ctx, iTimeout, iDistance);
 
+        Log.d(TAG, "LEAVE: iVzdalenostNejblizsiho: "+iMin);
         return iMin;
     }
 
