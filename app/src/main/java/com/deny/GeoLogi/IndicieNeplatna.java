@@ -42,7 +42,7 @@ public class IndicieNeplatna implements Serializable, OverWriter<IndicieNeplatna
 
     @Override
     public boolean bEquals (IndicieNeplatna to) {
-        return to.getsIndicie().equals(to.sIndicie);
+        return to.getsIndicie().equals(sIndicie);
     }
 
     public boolean bOverWrite(IndicieNeplatna by) {

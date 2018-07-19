@@ -2,29 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <TextView
         android:id="@+id/TeamName"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="1"
-        android:text="Id"/>
+        android:layout_weight="2"
+        android:text="Uživatel"/>
     <TextView
         android:id="@+id/Hints"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="2"
-        android:text="Počet indicií"/>
+        android:layout_weight="1"
+        android:text="Indicií"/>
     <TextView
         android:id="@+id/HintsFailed"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="2"
-        android:text="Počet neplatných indicií"/>
+        android:layout_weight="1"
+        android:text="Neplatné indicie"/>
     <TextView
         android:id="@+id/Points"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:text="Počet navštívených bodů"/>
+        android:text="Navštívené body"/>
 </LinearLayout>
