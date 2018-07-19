@@ -43,23 +43,30 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         setContentView(R.layout.activity_main);
 
-        pristupy();
-
         Log.d(TAG, "LEAVE: OnCreate");
     }
 
 
     private void pristupy () {
-        Button btnT = (Button) findViewById(R.id.btnTest);
+        Button btnT = findViewById(R.id.btnTest);
 
         if (Global.isbSimulationMode()) {
-            Log.d(TAG, "Simulation mode");
-            btnT.setVisibility(btnT.VISIBLE);
+            btnT.setVisibility(View.VISIBLE);
+            btnT.setWidth(50);
+            btnT.setEnabled(true);
+            btnT.setText("T");
+            Log.d(TAG, "Simulation mode " + (btnT.getVisibility()==View.VISIBLE));
+
         }
         else {
-            Log.d(TAG, "Normal mode");
-            btnT.setVisibility(btnT.GONE);
+            btnT.setVisibility(View.GONE);
+            btnT.setWidth(0);
+            btnT.setText("");
+            btnT.setEnabled(false);
         }
+
+        Log.d(TAG, "Simulation mode " + (btnT.getVisibility()==View.VISIBLE));
+
     }
 
     private void Init () {
@@ -168,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         Log.d(TAG, "onResume called");
 
-        pristupy();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
 
@@ -181,7 +187,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         getSupportActionBar().hide();
 
         iSirka = this.getResources().getConfiguration().screenWidthDp;
-        resize();
+        //resize();
+
+        pristupy();
 
         Init();
     }
