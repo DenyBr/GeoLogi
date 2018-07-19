@@ -16,6 +16,12 @@
         android:layout_weight="2"
         android:text="Počet indicií"/>
     <TextView
+        android:id="@+id/HintsFailed"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
+        android:text="Počet neplatných indicií"/>
+    <TextView
         android:id="@+id/Points"
         android:layout_height="wrap_content"
         android:layout_width="0dp"

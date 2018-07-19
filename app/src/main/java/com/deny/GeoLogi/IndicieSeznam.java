@@ -33,6 +33,7 @@ public class IndicieSeznam {
     private static Handler updateHandler = new Handler();
 
     public static SyncFiles<Indicie> sfIndicie = null;
+    public static SyncFiles<IndicieNeplatna> sfIndicieNeplatne = null;
 
     public static IndicieSeznam getInstance(Context context)  {
         ctx = context;
@@ -89,6 +90,9 @@ public class IndicieSeznam {
 
         if (null!=sfIndicie) sfIndicie.finalize();
         sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", Global.iUpdateInterval, updateCallback);
+
+        if (null!=sfIndicieNeplatne) sfIndicieNeplatne.finalize();
+        sfIndicieNeplatne = new SyncFiles<IndicieNeplatna>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieneplatne.bin", Global.iUpdateInterval, null);
 
         updateHandler.postDelayed(updateRunnable, 10);
 
@@ -228,8 +232,21 @@ public class IndicieSeznam {
                return true;
            }
        }
+
+       addWrongHint(sInd);
+
        return false;
    }
+
+   private void addWrongHint(String sInd) {
+        for (int i=0; i<sfIndicieNeplatne.localList.size(); i++) {
+            if (sfIndicieNeplatne.localList.get(i).getsIndicie().equals(sInd)) return;
+        }
+
+        sfIndicieNeplatne.localList.add(new IndicieNeplatna(sInd));
+        sfIndicieNeplatne.writeFile();
+        sfIndicieNeplatne.syncFileNow();
+    }
 
     public String simAddOneOfGroup(String sGroup) {
         for (int i=0; i<aIndicieVsechny.size(); i++) {

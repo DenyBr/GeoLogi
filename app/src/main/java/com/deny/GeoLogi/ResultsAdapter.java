@@ -42,6 +42,12 @@ public class ResultsAdapter extends ArrayAdapter<Result> {
             hints.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
             hints.setText(o.getsHints());
 
+            TextView hintsFailed = (TextView) v.findViewById(R.id.HintsFailed);
+
+            hintsFailed.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
+            hintsFailed.setText(o.getsHintsFailed());
+
+
             TextView points = (TextView) v.findViewById(R.id.Points);
 
             points.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);

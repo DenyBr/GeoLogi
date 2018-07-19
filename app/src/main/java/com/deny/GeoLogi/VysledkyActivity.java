@@ -59,6 +59,7 @@ public class VysledkyActivity extends AppCompatActivity {
                //initiate download of files
                String sId = "" + Uzivatele.getInstance().aOddily.get(i).getiId();
                String sFileNameHints = Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + sId + "indicieziskane.bin";
+               String sFileNameHintsFailed = Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + sId + "indicieneplatne.bin";
                String sFileNamePoints = Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + sId + "bodynavstivene.bin";
                Log.d(TAG, "Downloading: " + sFileNameHints + " " + sFileNamePoints);
 
@@ -74,6 +75,12 @@ public class VysledkyActivity extends AppCompatActivity {
                        updateOnFileDownload(iRes);
                    }
                }).execute(sFileNameHints, sFileNameHints + "res");
+               new DownloadFTPFileTask(VysledkyActivity.this, new AsyncResultFTPDownload() {
+                   @Override
+                   public void onResult(int iRes) {
+                       updateOnFileDownload(iRes);
+                   }
+               }).execute(sFileNameHintsFailed, sFileNameHintsFailed + "res");
            }
 
        }
@@ -113,7 +120,10 @@ public class VysledkyActivity extends AppCompatActivity {
                 Log.d(TAG, "ENTER: updateOnFileDownload: " + u.getsNazev());
 
                 if (!u.isbRoot()) {
-                    results.add(new Result(u.getsNazev(), "" + u.getiId(), getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "indicieziskane.binres"), getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "bodynavstivene.binres")));
+                    results.add(new Result(u.getsNazev(), "" + u.getiId(),
+                            getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "indicieziskane.binres"),
+                            getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "indicieneplatne.binres"),
+                            getNumberFromFile(Global.simPrexix() + Nastaveni.getInstance(this).getsIdHry() + u.getiId() + "bodynavstivene.binres")));
                 }
             }
 
@@ -171,6 +181,38 @@ public class VysledkyActivity extends AppCompatActivity {
             return sRes.toString();
         }
 
+    private String hintsFailedToString(Result r) {
+        Log.d(TAG, "ENTER: hintsFailedToString");
+        String sFilename=Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + r.getsIdUzivatele() + "indicieneplatne.binres";
+        StringBuffer sRes = new StringBuffer("Neplatné indicie \n");
+
+        try {
+            InputStream inputStream =  this.openFileInput(sFilename);
+
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+
+            int iPocet = (int) in.readInt();
+
+            for (int i=0; i<iPocet; i++) {
+                IndicieNeplatna obj = (IndicieNeplatna) in.readObject();
+
+                sRes.append(obj.getTime().toString());
+                sRes.append(" ");
+                sRes.append(obj.getsIndicie());
+                sRes.append("\n");
+            }
+            in.close();
+        }
+        catch(Exception e) {
+            Log.d (TAG, "ERROR: readFile " + e.getMessage());
+        }
+
+        Log.d(TAG, "LEAVE: Ze souboru: "+sFilename+" nacteno: " + sRes);
+
+        return sRes.toString();
+    }
+
+
     private String pointToString(Result r) {
         Log.d(TAG, "ENTER: hintsToString");
         String sFilename=Global.simPrexix() +Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + r.getsIdUzivatele() + "bodynavstivene.binres";
@@ -213,6 +255,8 @@ public class VysledkyActivity extends AppCompatActivity {
         StringBuffer sRes = new StringBuffer();
 
         sRes.append(hintsToString(r));
+        sRes.append("\n");
+        sRes.append(hintsFailedToString(r));
         sRes.append("\n");
         sRes.append(pointToString(r));
 

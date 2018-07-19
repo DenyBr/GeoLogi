@@ -6,7 +6,9 @@ public class Result {
 
     private String sIdUzivatele;
     private String sHints;
+    private String sHintsFailed;
     private String sPoints;
+
 
     public String getsId() {
         return sId;
@@ -15,6 +17,8 @@ public class Result {
     public String getsHints() {
         return sHints;
     }
+
+    public String getsHintsFailed() { return sHintsFailed; }
 
     public String getsPoints() {
         return sPoints;
@@ -33,6 +37,8 @@ public class Result {
         this.sHints = sHints;
     }
 
+    public void setsHintsFailed(String sHintsFailed) { this.sHintsFailed = sHintsFailed; }
+
     public void setsPoints(String sPoints) {
         this.sPoints = sPoints;
     }
@@ -41,9 +47,11 @@ public class Result {
         this.sIdUzivatele = sIdUzivatele;
     }
 
-    Result(String sId, String sIdUzivatele, String sHints, String sPoints) {
+
+    Result(String sId, String sIdUzivatele, String sHints, String sHintsFailed, String sPoints) {
         setsId(sId);
         setsHints(sHints);
+        setsHintsFailed(sHintsFailed);
         setsPoints(sPoints);
         setsIdUzivatele(sIdUzivatele);
     }

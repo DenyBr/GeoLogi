@@ -25,6 +25,8 @@ import java.util.TimerTask;
 public class SyncFiles<T extends OverWriter&Serializable> {
     private final String TAG = "SyncFiles";
 
+    final Object lock = new Object();
+
     private boolean bFinished = false;
     private String sFilename;
     private Timer timer;
@@ -148,8 +150,10 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
 
     private void mergeRemoteList(ArrayList<T> remoteList) {
-        for (int i=0; i<remoteList.size(); i++) {
-            addOrRewrite(remoteList.get(i));
+        synchronized (lock) {
+            for (int i = 0; i < remoteList.size(); i++) {
+                addOrRewrite(remoteList.get(i));
+            }
         }
     }
 
@@ -193,54 +197,56 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         new UploadFTPFileTask(ctx).execute(sFilename);
     }
 
-        public void readFile () {
-            localList = new ArrayList<T>();
-            readFile(sFilename, localList);
+    public void readFile () {
+        localList = new ArrayList<T>();
+        readFile(sFilename, localList);
 
-            Log.d(TAG, "LEAVE: lokalni seznam - nacteno: " + localList.size());
-        }
+        Log.d(TAG, "LEAVE: lokalni seznam - nacteno: " + localList.size());
+    }
 
-
-        private void readFile (String sFilename, ArrayList<T> arrayList) {
+    private void readFile (String sFilename, ArrayList<T> arrayList) {
         Log.d(TAG, "ENTER: readFile: "+sFilename);
-        try {
-            InputStream inputStream =  ctx.openFileInput(sFilename);
 
-            ObjectInputStream in = new ObjectInputStream(inputStream);
+        synchronized (lock) {
+            try {
+                InputStream inputStream = ctx.openFileInput(sFilename);
 
-            int iPocet = (int) in.readInt();
+                ObjectInputStream in = new ObjectInputStream(inputStream);
 
-            for (int i=0; i<iPocet; i++) {
-                T obj = (T) in.readObject();
-                arrayList.add(obj);
+                int iPocet = (int) in.readInt();
+
+                for (int i = 0; i < iPocet; i++) {
+                    T obj = (T) in.readObject();
+                    arrayList.add(obj);
+                }
+                in.close();
+            } catch (Exception e) {
+                Log.d(TAG, "ERROR: readFile " + e.getMessage());
             }
-            in.close();
         }
-        catch(Exception e) {
-            Log.d (TAG, "ERROR: readFile " + e.getMessage());
-        }
-
         Log.d(TAG, "LEAVE: Ze souboru: "+sFilename+" nacteno: " + arrayList.size());
     }
 
     public void writeFile () {
         Log.d(TAG, "ENTER: writeFile: "+sFilename + " pocet zapisovanych " + localList.size());
-        try {
-            OutputStream fileOut = ctx.openFileOutput(sFilename, Context.MODE_PRIVATE);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-            out.writeInt(localList.size());
+        synchronized (lock) {
+            try {
+                OutputStream fileOut = ctx.openFileOutput(sFilename, Context.MODE_PRIVATE);
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-            for (int i=0; i<localList.size(); i++) {
-                out.writeObject((T) localList.get(i));
-            }
+                out.writeInt(localList.size());
 
-            out.close();
-            fileOut.close();
-        }
-            catch (IOException ex) {
+                for (int i = 0; i < localList.size(); i++) {
+                    out.writeObject((T) localList.get(i));
+                }
+
+                out.close();
+                fileOut.close();
+            } catch (IOException ex) {
                 Okynka.zobrazOkynko(ctx, "Chyba: " + ex.getMessage());
-                Log.d(TAG, "ERROR: "+"writeFile " + ex.getMessage());
+                Log.d(TAG, "ERROR: " + "writeFile " + ex.getMessage());
+            }
         }
         Log.d(TAG, "LEAVE: writeFile");
     }
