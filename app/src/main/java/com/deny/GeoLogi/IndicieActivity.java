@@ -76,10 +76,7 @@ public class IndicieActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-
-        super.onStop();
-
-        finish();
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 
 import com.deny.GeoLogi.R;
@@ -27,20 +28,19 @@ import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme;
 import java.util.List;
 
 public class MapaActivity extends Activity {
+    private final static String TAG = "MapaActivity";
+
     MapView map = null;
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
- }
+        setContentView( R.layout.activity_mapa);
+    }
 
 
     public void onResume(){
         super.onResume();
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-
-        setContentView( R.layout.activity_mapa);
 
         map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -131,15 +131,12 @@ public class MapaActivity extends Activity {
         setResult(RESULT_OK);
     }
 
+    @Override
+    protected void onDestroy () {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy called");
 
-    public void onPause(){
-        super.onPause();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().save(this, prefs);
-        //map.onPause();  //needed for compass, my location overlays, v6.0.0 and up\
-
-        finish();
+    //    finish();
     }
+
 }

@@ -68,7 +68,7 @@ public class UvodniStranka extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         setContentView(R.layout.activity_uvodni_stranka);
         Log.d("Uvodni", "Spusteno");
@@ -105,7 +105,6 @@ public class UvodniStranka extends AppCompatActivity {
 
         intentSettings = new Intent(this, Settings.class);
         intentMain = new Intent(this, MainActivity.class);
-        intentMain.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intentResults = new Intent(this, VysledkyActivity.class);
     }
 

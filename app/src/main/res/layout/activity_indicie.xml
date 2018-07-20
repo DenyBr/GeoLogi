@@ -19,20 +19,20 @@
 
             <TextView
                 android:id="@+id/tvIndN"
-                android:layout_width="100pt"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="100pt"
-                android:width="100pt"
+                android:minWidth="50pt"
+                android:width="50pt"
                 android:height="15pt"
                 android:text="Nová indicie: " />
 
             <EditText
                 android:id="@+id/etIndH" android:enabled="true"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:inputType="text"
                 android:layout_height="wrap_content"
-                android:minWidth="100pt"
-                android:width="100pt"
+                android:minWidth="50pt"
+                android:width="50pt"
                 android:hint=""
                 android:text="" />
             <Button

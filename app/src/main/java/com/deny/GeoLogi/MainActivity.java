@@ -31,7 +31,6 @@ import java.sql.Timestamp;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "MAIN";
-    Location location;
     ListView listview;
     int iSirka=0;
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Log.d(TAG, "ENTER: OnCreate");
 
         super.onCreate(savedInstanceState);
-
+       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
         setContentView(R.layout.activity_main);
 
         Log.d(TAG, "LEAVE: OnCreate");
@@ -82,25 +81,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         Log.d(TAG, "LEAVE: Init");
     }
 
-    private void resize () {
-        //auxiliary method to set width of the screen
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                TextView tvVyplne = (TextView) findViewById(R.id.tvVyplne);
-
-                if (iSirka>800) {
-                    tvVyplne.getLayoutParams().width=iSirka-600;
-                }
-            }
-        }, 1);
-    }
-
-
-
 
     public void syncClickHandler(View view) {
        ZpravySeznam.getInstance(this).serverUpdate(true);
@@ -127,9 +107,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //zkontrolujZpravy(false);
-
-        //resize();
     }
 
     public void clearClickHandler(View view) {
@@ -175,10 +152,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         Log.d(TAG, "onResume called");
 
-
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); // Zpravy jsou na sirku
-
-        setContentView(R.layout.activity_main);
         Log.d(TAG, "Spusteno");
 
         //chceme full screan kvuli malejm telefonum
@@ -187,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         getSupportActionBar().hide();
 
         iSirka = this.getResources().getConfiguration().screenWidthDp;
-        //resize();
 
         pristupy();
 
@@ -211,10 +183,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     @Override
     protected void onDestroy () {
         super.onDestroy();
+        Log.d(TAG, "onDestroy called");
 
         finish();
-
-        Log.d(TAG, "onDestroy called");
     }
 
 
@@ -274,16 +245,29 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 Zprava z = ZpravySeznam.getInstance(MainActivity.this).zpravyZobraz.get(position);
 
-                Okynka.zobrazOkynko(arg0.getContext(), z.getsZprava());
+                if (z.getsLink().equals("")) {
+                    Okynka.zobrazOkynko(arg0.getContext(), z.getsZprava());
+                }
+                else
+                {
+                    openWebWiew(z.getsLink());
+                }
                 z.setbRead(true);
                 if (null == z.getTsCasZobrazeni())
                     z.setTsCasZobrazeni(new Timestamp(Global.getTime()));
 
                 ZpravySeznam.getInstance(MainActivity.this).zkontrolujZpravy(true);
-                resize();
             }
         });
 
         Log.d(TAG, "LEAVE: updateView");
+    }
+
+    public void openWebWiew(String sPage) {
+        Intent intent = new Intent(this, Nastenka.class);
+
+        intent.putExtra("Page", sPage);
+
+        startActivityForResult(intent, 0);
     }
 }

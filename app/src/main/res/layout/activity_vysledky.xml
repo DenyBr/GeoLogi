@@ -29,7 +29,7 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="Indicií"
+            android:text="Indicie"
             android:textStyle="bold"
             android:textAlignment="center"/>
         <TextView
@@ -37,7 +37,7 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="Indicií"
+            android:text="Neplatné indicie"
             android:textStyle="bold"
             android:textAlignment="center"/>
         <TextView

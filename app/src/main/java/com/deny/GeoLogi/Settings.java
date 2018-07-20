@@ -263,6 +263,12 @@ public class Settings extends AppCompatActivity {
             Okynka.zobrazOkynko(this, "Nejste připojení k těm internetům. Nastavení není možné změnit");
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
 }
 
 

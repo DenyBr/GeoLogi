@@ -67,7 +67,7 @@ public class Nastaveni extends Properties {
     public boolean getisRoot() {return Boolean.parseBoolean(getProperty("Root", ""));}
 
     public boolean getisSimulation() {boolean res = Boolean.parseBoolean(getProperty("Simulation", ""));
-    Log.d(TAG, "Simulation = " + res); return res;}
+    return res;}
 
     public boolean getisVerejna() {return Boolean.parseBoolean(getProperty("Verejna", ""));}
 

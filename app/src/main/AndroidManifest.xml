@@ -14,9 +14,11 @@
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/ic_launcher"
         android:label="GeoLogi"
+        android:configChanges="orientation|screenSize"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"
             />
         <activity
@@ -25,10 +27,12 @@
             />
         <activity
             android:name=".Nastenka"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"
             />
         <activity
             android:name=".MapaActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"
             />
         <activity
@@ -47,7 +51,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".VysledkyActivity"></activity>
+        <activity android:name=".VysledkyActivity">
+            android:configChanges="orientation|keyboardHidden|screenSize"
+        </activity>
     </application>
 
 </manifest>

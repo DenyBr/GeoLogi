@@ -7,14 +7,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import java.io.OutputStream;
-
 import static android.content.Context.LOCATION_SERVICE;
 
 public class Global {
     private final static String TAG = "Global";
 
-    public final static int iUpdateInterval = 600000; //miliseconds
+    public final static int iUpdateInterval = 3000000; //miliseconds
 
     private static long lTime = System.currentTimeMillis();
     private static double dLat = 0;
@@ -44,18 +42,6 @@ public class Global {
         }
 
         Log.d(TAG, "LEAVE: RegistrujGPS");
-
-
-
-
-
-        try
-        {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        catch (SecurityException e) {
-            //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
-        }
     }
 
     public static boolean isbSimulationMode() {
@@ -93,10 +79,13 @@ public class Global {
             if (null != ctx) {
                 try
                 {
-                    return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+                    return location.getLongitude();
                 }
                 catch (SecurityException e) {
                     //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
+                }
+                catch (Exception e) {
+                    Log.d(TAG, "getLongtitude: " + e.getMessage());
                 }
             }
 
@@ -112,10 +101,13 @@ public class Global {
             if (null != ctx) {
                 try
                 {
-                    return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+                    return location.getLatitude();
                 }
                 catch (SecurityException e) {
                     //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
+                }
+                catch (Exception e) {
+                    Log.d(TAG, "getLatitude: " + e.getMessage());
                 }
             }
 
@@ -134,28 +126,30 @@ public class Global {
     }
 
 
-    public static float distanceTo(Location location) {
+    public static float distanceTo(Location locationDistant) {
         if (isbSimulationMode()) {
             Location locSim = new Location("");
 
             locSim.setLatitude(getLat());
             locSim.setLongitude(getLong());
 
-            return locSim.distanceTo(location);
+            return locSim.distanceTo(locationDistant);
         } else
         {
-            if (null != ctx) {
-                try
-                {
-                    return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).distanceTo(location);
-                }
-                catch (SecurityException e) {
-                    //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
-                }
+            try
+            {
+                Log.d(TAG, "Distance to: " + Global.location.distanceTo(locationDistant));
+                return Global.location.distanceTo(locationDistant);
             }
-
-            return 100000;
+            catch (SecurityException e) {
+                //nedelej nic, snad se uzivatel polepsi :-) ptame se po startu
+            }
+            catch (Exception e) {
+                Log.d(TAG, "DistanceTo: " + e.getMessage());
+            }
         }
+
+        return 100000;
     }
     public static String simPrexix() {
         if (isbSimulationMode()) {return "s";}
@@ -169,6 +163,9 @@ public class Global {
     // Define a listener that responds to location updates
     private static LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
+            Log.d(TAG, "Location update: " + location.toString());
+
+            Global.location = location;
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -180,6 +177,4 @@ public class Global {
         public void onProviderDisabled(String provider) {
         }
     };
-
-
 }

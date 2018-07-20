@@ -125,6 +125,7 @@ class GeoBody {
             for (int i = 0; i < aBody.size(); i++) {
             try {
                 GeoBod bodAct = aBody.get(i);
+                Log.d(TAG, "iVzdalenostNejblizsiho " + aBody.get(i).toString());
 
                 if (!bylNavstivenej(bodAct)) {
                     Location locAct = new Location("");
@@ -132,6 +133,7 @@ class GeoBody {
                     locAct.setLongitude(bodAct.getdLong());
 
                     iAct = (int) Global.distanceTo(locAct);
+                    Log.d(TAG, "iVzdalenost: " + iAct);
 
                     if (iAct < iMin) {
                         iMin = iAct;
