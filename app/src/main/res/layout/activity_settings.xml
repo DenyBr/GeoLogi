@@ -20,10 +20,9 @@
 
             <TextView
                 android:id="@+id/tvHra"
-                android:layout_width="30pt"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="30pt"
-                android:width="30pt"
                 android:height="15pt"
                 android:text="Hra" />
 
@@ -45,10 +44,9 @@
 
             <TextView
                 android:id="@+id/tvOddilN"
-                android:layout_width="30pt"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="30pt"
-                android:width="30pt"
                 android:height="15pt"
                 android:text="Oddíl" />
 
@@ -68,10 +66,9 @@
 
             <TextView
                 android:id="@+id/tvHeslolN"
-                android:layout_width="30pt"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="30pt"
-                android:width="30pt"
                 android:height="15pt"
                 android:text="Heslo" />
 
@@ -84,6 +81,28 @@
                 android:text="" />
 
         </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="15dp">
+
+            <TextView
+                android:id="@+id/tvUpdateN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="30pt"
+                android:height="15pt"
+                android:text="Interval aktualizace (s)" />
+
+            <EditText
+                android:id="@+id/etInterval" android:enabled="true"
+                android:layout_width="fill_parent"
+                android:inputType="number"
+                android:layout_height="wrap_content"
+                android:minWidth="100pt"
+                android:text="" />
+        </TableRow>
+
         <TableRow
             android:id="@+id/tblrow"
             android:layout_width="match_parent"
@@ -100,6 +119,7 @@
                 android:text="Uložit" />
 
         </TableRow>
+
     </TableLayout>
 
 </RelativeLayout>

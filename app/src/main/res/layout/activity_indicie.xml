@@ -21,8 +21,6 @@
                 android:id="@+id/tvIndN"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="50pt"
-                android:width="50pt"
                 android:height="15pt"
                 android:text="Nová indicie: " />
 
@@ -42,6 +40,9 @@
                 android:layout_height="wrap_content"
                 android:onClick="buttonClickHandler"
                 android:text="Uložit" />
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"/>
         </TableRow>
 
 
@@ -55,6 +56,7 @@
                 android:id="@+id/listview"
 
                 android:layout_span="10"
+                android:layout_weight="10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </TableRow>

@@ -152,45 +152,55 @@ public class Settings extends AppCompatActivity {
         TextView tvHeslo = (EditText) findViewById(R.id.etHesloH);
         tvHeslo.setEnabled(!Global.isbSimulationMode());
 
+        EditText etUpdate = (EditText) findViewById(R.id.etInterval);
 
-        //pNastaveni.setProperty("Uzivatel", tvOddil.getText().toString());
-        Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
-        Spinner spHra = (Spinner) findViewById(R.id.spinHry);
+        int iUpdate = 0;
+        try {
+            iUpdate = Integer.parseInt(etUpdate.getText().toString());
+        }
+        catch (Exception e) {
+            Okynka.zobrazOkynko(this, "Chybný formát čísla u intervalu aktualizace");
+        }
 
-        //Okynka.zobrazOkynko(Settings.this, "x"+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
+        if (iUpdate < 30) {
+            Okynka.zobrazOkynko(this, "Interval aktualizace nesmí být kratší než 30s");
+        } else {
+            //pNastaveni.setProperty("Uzivatel", tvOddil.getText().toString());
+            Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
+            Spinner spHra = (Spinner) findViewById(R.id.spinHry);
 
-        if (Global.isbSimulationMode() || (Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString())))
-        {
-            pNastaveni.setProperty("Heslo", tvHeslo.getText().toString());
-            pNastaveni.setProperty("ID", ""+ Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
-            pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
-            pNastaveni.setProperty("Hra", hry.get(spHra.getSelectedItemPosition()).getsHra());
-            pNastaveni.setProperty("IDHra", hry.get(spHra.getSelectedItemPosition()).getIdHra());
-            pNastaveni.setProperty("Verejna", ""+hry.get(spHra.getSelectedItemPosition()).isbVerejna());
-            pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
-            pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());
-            pNastaveni.setProperty("Root", ""+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbRoot());
-            pNastaveni.setProperty("Simulation", ""+Global.isbSimulationMode());
+            //Okynka.zobrazOkynko(Settings.this, "x"+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
 
-            try {
-                OutputStream outputStream = openFileOutput("config.properties", Context.MODE_PRIVATE);
-                pNastaveni.store(outputStream, "");
-                outputStream.flush();
-                outputStream.close();
+            if (Global.isbSimulationMode() || (Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo().equals(tvHeslo.getText().toString()))) {
+                pNastaveni.setProperty("Heslo", tvHeslo.getText().toString());
+                pNastaveni.setProperty("ID", "" + Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getiId());
+                pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
+                pNastaveni.setProperty("Hra", hry.get(spHra.getSelectedItemPosition()).getsHra());
+                pNastaveni.setProperty("IDHra", hry.get(spHra.getSelectedItemPosition()).getIdHra());
+                pNastaveni.setProperty("Verejna", "" + hry.get(spHra.getSelectedItemPosition()).isbVerejna());
+                pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
+                pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());
+                pNastaveni.setProperty("Root", "" + Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbRoot());
+                pNastaveni.setProperty("Simulation", "" + Global.isbSimulationMode());
 
-                pNastaveni.reload(this);
+                try {
+                    OutputStream outputStream = openFileOutput("config.properties", Context.MODE_PRIVATE);
+                    pNastaveni.store(outputStream, "");
+                    outputStream.flush();
+                    outputStream.close();
 
-                setResult(RESULT_OK);
-            } catch (Exception e) {
+                    pNastaveni.reload(this);
+
+                    setResult(RESULT_OK);
+                } catch (Exception e) {
+                }
+
+                this.finish();
+            } else {
+                Okynka.zobrazOkynko(this, "Neplatné heslo");
             }
-
-            this.finish();
         }
-        else
-        {
-            Okynka.zobrazOkynko(this, "Neplatné heslo");
-        }
-     }
+    }
 
 
     class VyberHry implements AdapterView.OnItemSelectedListener {
@@ -231,6 +241,9 @@ public class Settings extends AppCompatActivity {
         //to remove the action bar (title bar)
         getSupportActionBar().hide();
 
+        EditText etUpdate = (EditText) findViewById(R.id.etInterval);
+        etUpdate.setText(""+(pNastaveni.getiUpdate()/1000));
+
         Spinner spHra = (Spinner) findViewById(R.id.spinHry);
         spHra.setOnItemSelectedListener(new VyberHry());
         spHra.setEnabled(!Global.isbSimulationMode());
@@ -267,7 +280,6 @@ public class Settings extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        finish();
     }
 }
 

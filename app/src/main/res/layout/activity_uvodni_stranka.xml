@@ -24,7 +24,11 @@
             <TextView
                 android:text="Simulace"
                 android:textColor="#ff0000"
-            />
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_weight="5"/>
         </TableRow>
 
         <TableRow
@@ -36,11 +40,10 @@
 
             <ImageView
                 android:id="@+id/ivUvodni"
-                android:layout_width="350dp"
+                android:layout_width="10dp"
                 android:layout_height="150dp"
-                android:layout_below="@+id/tblbuttony"
                 android:layout_gravity="center_horizontal"
-                android:layout_span="4"
+                android:layout_weight="5"
                 android:enabled="true"
                 android:onClick="toggleSimulationMode"
                 android:contentDescription="Banner"
@@ -51,78 +54,74 @@
         android:id="@+id/tbltext"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
         android:minHeight="30dp">
-
 
         <TextView
             android:id="@+id/tvVybranaHra"
             android:text="Vybraná hra"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
             android:layout_gravity="center_horizontal"
-            android:layout_span="4"
-            android:layout_below="@+id/tblbuttony"
-        />
+            android:gravity="center"
+            android:layout_weight="5"
+            android:layout_span="5"/>
 
     </TableRow>
 
         <TableRow
             android:id="@+id/tblbuttony"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:minHeight="15dp">
-            <TextView
-                android:id="@+id/vypln1"
-                android:width="100dp"
-                />
 
-            <Button
+             <Button
                 android:id="@+id/btnVyberHry"
                 android:text="Výběr hry"
                 android:gravity="center"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="120dp"
-                android:width="120dp"
-                android:height="15dp"
+                android:layout_weight="1"
                 android:onClick="vyberClickHandler"
                 />
             <Button
                 android:id="@+id/btnPokracovat"
                 android:text="Hra"
-                android:layout_width="200dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="200dp"
-                android:width="200dp"
-                android:height="15dp"
                 android:gravity="center"
-                android:padding="15dp"
                 android:onClick="pokracujClickHandler"
+                android:layout_weight="1"
                 />
             <Button
                 android:id="@+id/btnVysledky"
                 android:enabled="false"
                 android:text="Výsledky"
                 android:gravity="center"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="120dp"
-                android:width="120dp"
-                android:height="15dp"
                 android:onClick="vysledkyClickHandler"
-                />
-            <TextView
-                android:id="@+id/vypln2"
-                android:width="100dp"
+                android:layout_weight="1"
                 />
         </TableRow>
-    </TableLayout>>
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
+        <TableRow
+            android:id="@+id/tblExit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:minHeight="15dp">
 
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-
+        <Button
+            android:id="@+id/btnKonec"
+            android:text="Ukončit aplikaci"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="konecClickHandler"
+            />
+        </TableRow>
+    </TableLayout>
     </LinearLayout>
 </FrameLayout>

@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     private void pristupy () {
         Button btnT = findViewById(R.id.btnTest);
+        Button btnT1 = findViewById(R.id.btnTest1);
+        Button btnT2 = findViewById(R.id.btnTest2);
 
         if (Global.isbSimulationMode()) {
             btnT.setVisibility(View.VISIBLE);
@@ -56,12 +58,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             btnT.setText("T");
             Log.d(TAG, "Simulation mode " + (btnT.getVisibility()==View.VISIBLE));
 
+            btnT1.setVisibility(View.VISIBLE);
+            btnT2.setVisibility(View.VISIBLE);
         }
         else {
             btnT.setVisibility(View.GONE);
             btnT.setWidth(0);
             btnT.setText("");
             btnT.setEnabled(false);
+
+            btnT1.setVisibility(View.GONE);
+            btnT2.setVisibility(View.GONE);
         }
 
         Log.d(TAG, "Simulation mode " + (btnT.getVisibility()==View.VISIBLE));
@@ -145,6 +152,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         }
     }
 
+    public void test1ClickHandler(View view) {
+        Log.d(TAG, "Simulace - synchronizace indicii od zacatku");
+
+        Simulator.simulujPridavaniIndicii(true);
+    }
+
+    public void test2ClickHandler(View view) {
+        Log.d(TAG, "Simulace - synchronizace indicii od konce");
+
+        Simulator.simulujPridavaniIndicii(false);
+    }
 
     @Override
     protected void onResume() {
@@ -164,11 +182,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         pristupy();
 
         Init();
+
+        Global.setbPaused(false);
     }
 
     @Override
     protected void onPause () {
         super.onPause();
+        Global.setbPaused(true);
 
         Log.d(TAG, "onPause called");
     }
@@ -216,12 +237,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
 
         if (hledanebody != null) {
-            hledanebody.setText("Cíle: " + GeoBody.getInstance(this).sfBodyNavsvivene.localList.size() + "/" + GeoBody.getInstance(this).aBody.size());
+            hledanebody.setText("Cíle: " + GeoBody.getInstance(this).sfBodyNavsvivene.iSize() + "/" + GeoBody.getInstance(this).aBody.size());
         }
 
         TextView indicie = (TextView) findViewById(R.id.indicii);
         if (indicie != null) {
-            indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfIndicie.localList.size() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
+            indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfIndicie.iSize() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
         }
 
         iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);

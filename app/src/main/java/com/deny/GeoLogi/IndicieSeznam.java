@@ -29,6 +29,7 @@ public class IndicieSeznam {
     public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
 
     private static Context ctx = null;
+
     private static Handler.Callback updateCallback = null;
     private static Handler updateHandler = new Handler();
 
@@ -59,7 +60,7 @@ public class IndicieSeznam {
         public void run() {
             syncFileNow(IndicieSeznam.ctx);
 
-            updateHandler.postDelayed(updateRunnable, Global.iUpdateInterval);
+            updateHandler.postDelayed(updateRunnable, Nastaveni.getInstance(ctx).getiUpdate());
         }
     };
 
@@ -89,18 +90,21 @@ public class IndicieSeznam {
         }
 
         if (null!=sfIndicie) sfIndicie.finalize();
-        sfIndicie = new SyncFiles<Indicie>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin", Global.iUpdateInterval, updateCallback);
+        sfIndicie = new SyncFiles<Indicie>(ctx,
+                Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin",
+                Nastaveni.getInstance(ctx).getiUpdate(),
+                updateCallback);
 
         if (null!=sfIndicieNeplatne) sfIndicieNeplatne.finalize();
-        sfIndicieNeplatne = new SyncFiles<IndicieNeplatna>(ctx, Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieneplatne.bin", Global.iUpdateInterval, null);
+        sfIndicieNeplatne = new SyncFiles<IndicieNeplatna>(ctx,
+                Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieneplatne.bin",
+                Nastaveni.getInstance(ctx).getiUpdate(),
+                null);
 
         updateHandler.postDelayed(updateRunnable, 10);
 
         Log.d(TAG, "LEAVE: read. Indicii celkem " + aIndicieVsechny.size());
     }
-
-
-
 
     public void write (Context context) {
         Log.d(TAG, "ENTER: write");
@@ -191,8 +195,8 @@ public class IndicieSeznam {
     public static int indiciiZeSkupiny(String sGroup) {
         int iRes=0;
 
-        for (int i = 0; i< sfIndicie.localList.size(); i++) {
-            if (sfIndicie.localList.get(i).getsGroup().equals(sGroup)) {
+        for (int i = 0; i< sfIndicie.iSize(); i++) {
+            if (sfIndicie.getLocalList().get(i).getsGroup().equals(sGroup) || (sGroup.equals(""))) {
                 iRes++;
             }
         }
@@ -201,8 +205,8 @@ public class IndicieSeznam {
     }
 
     public static boolean uzMajiIndicii(String uzMaji) {
-        for (int i = 0; i< sfIndicie.localList.size(); i++) {
-            if (sfIndicie.localList.get(i).jeToOno(uzMaji)) {
+        for (int i = 0; i< sfIndicie.iSize(); i++) {
+            if (sfIndicie.getLocalList().get(i).jeToOno(uzMaji)) {
                 return true;
             }
         }
@@ -222,11 +226,9 @@ public class IndicieSeznam {
 
            if (indicie.jeToOno(sInd)
                    &&(indicie.getiPlatnaPo()==0 || ZpravySeznam.getInstance(ctx).zpravaPodleId(indicie.getiPlatnaPo()).getbZobrazeno())) {
-               indicie.setTime(new Timestamp(Global.getTime()));
-               sfIndicie.localList.add(indicie);
+               sfIndicie.addOrRewrite(indicie);
 
                sfIndicie.writeFile();
-
                sfIndicie.syncFileNow();
 
                return true;
@@ -239,11 +241,7 @@ public class IndicieSeznam {
    }
 
    private void addWrongHint(String sInd) {
-        for (int i=0; i<sfIndicieNeplatne.localList.size(); i++) {
-            if (sfIndicieNeplatne.localList.get(i).getsIndicie().equals(sInd)) return;
-        }
-
-        sfIndicieNeplatne.localList.add(new IndicieNeplatna(sInd));
+        sfIndicieNeplatne.addOrRewrite(new IndicieNeplatna(sInd));
         sfIndicieNeplatne.writeFile();
         sfIndicieNeplatne.syncFileNow();
     }
@@ -251,7 +249,7 @@ public class IndicieSeznam {
     public String simAddOneOfGroup(String sGroup) {
         for (int i=0; i<aIndicieVsechny.size(); i++) {
             Indicie indicie = aIndicieVsechny.get(i);
-            if (!uzMajiIndicii(indicie.getsTexty().get(0)) && indicie.getsGroup().equals(sGroup)) {
+            if (!uzMajiIndicii(indicie.getsTexty().get(0)) && (sGroup.equals("") || indicie.getsGroup().equals(sGroup))) {
                 addHint(indicie.getsTexty().get(0));
                 return indicie.getsTexty().get(0);
             }

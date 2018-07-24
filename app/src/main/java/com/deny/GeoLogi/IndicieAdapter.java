@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.deny.GeoLogi.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
@@ -39,7 +40,7 @@ public class IndicieAdapter extends ArrayAdapter<Indicie> {
         if (o != null) {
             TextView predmet = (TextView) v.findViewById(R.id.textindicie);
             predmet.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            predmet.setText(String.valueOf(o.getsTexty().get(0)));
+            predmet.setText(new SimpleDateFormat("dd:MM HH:mm:ss").format(o.getTime()) + " " +String.valueOf(o.getsTexty().get(0)));
           }
         return v;
     }

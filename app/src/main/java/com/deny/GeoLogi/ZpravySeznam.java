@@ -1,14 +1,20 @@
 package com.deny.GeoLogi;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -26,6 +32,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 
 public class ZpravySeznam implements Handler.Callback {
     private final static String TAG = "MessageList";
@@ -364,6 +372,7 @@ public class ZpravySeznam implements Handler.Callback {
         ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
         bPrekreslit = bPrekreslit || (zpravyZobraz.size() == 0);
         boolean bNova = false;
+        String sNova = "";
 
         Log.d(TAG, "ENTER: zkontrolujZpravy: " + zpravyKomplet.size());
 
@@ -420,6 +429,7 @@ public class ZpravySeznam implements Handler.Callback {
                             if (!(z.getbZobrazeno())) {
                                 bPrekreslit = true;
                                 bNova = true;
+                                sNova = z.getsPredmet();
 
                                 z.setbZobrazeno(true);
                             }
@@ -459,8 +469,43 @@ public class ZpravySeznam implements Handler.Callback {
                         notificationRingtone.play();
                         v.vibrate(500);
 
-                        //sendNotification("Nová zpráva", "Nová zpráva", "Nová zpráva", true, true, 0);
-                    } catch (Exception e) {
+                        if (Global.isbPaused()) {
+                            Log.d(TAG, "Channel creation");
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                CharSequence name = "GeoLogi";
+                                String description = "Geologi Notification";
+                                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                                String CHANNEL_ID = "GL";
+                                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+                                channel.setDescription(description);
+                                // Register the channel with the system; you can't change the importance
+                                // or other notification behaviors after this
+                                NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+                                notificationManager.createNotificationChannel(channel);
+                            }
+
+                            Intent intent = new Intent(context, UvodniStranka.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+                            Log.d(TAG, "Notificaiton creation");
+                            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, "GL")
+                                    .setSmallIcon(R.drawable.ic_notification)
+                                    .setContentTitle("Nová zpráva")
+                                    .setContentText(sNova)
+                                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                    .setContentIntent(pendingIntent)
+                                    .setVisibility(VISIBILITY_PUBLIC)
+                                    .setAutoCancel(true);
+
+                            Log.d(TAG, "Notification managet creation");
+                            NotificationManager mNotificationManager =
+                                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                            Log.d(TAG, "Sending notification");
+                            mNotificationManager.notify(0, mBuilder.build());
+                        }
+                    } catch(Exception e){
                         // nedelej nic
                     }
                 }
@@ -518,7 +563,7 @@ public class ZpravySeznam implements Handler.Callback {
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                if ((bProvedHned) || (tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + Global.iUpdateInterval))) {
+                if ((bProvedHned) || (tsLastUpdate == null) || bConnectionLost || (now.getTime() > (tsLastUpdate.getTime() + Nastaveni.getInstance(context).getiUpdate()))) {
                     bConnectionLost = false;
                     tsLastUpdate = now;
 

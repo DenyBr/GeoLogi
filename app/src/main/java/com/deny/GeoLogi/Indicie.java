@@ -1,5 +1,7 @@
 package com.deny.GeoLogi;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,7 +20,8 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
     private int iPlatnaPo;
     private String sGroup;
     private ArrayList<String> sTexty;
-    private Timestamp time;
+    private Timestamp time = new Timestamp(System.currentTimeMillis());
+    private final static String TAG = "Indicie";
 
     public Indicie(int iPlatnaPo, String sGroup, ArrayList<String> sTexty) {
         setiPlatnaPo(iPlatnaPo);
@@ -67,12 +70,17 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
 
     @Override
     public boolean bEquals (Indicie to) {
-        return to.getsGroup().equals(sGroup) && sTexty.get(0).equals(to.sTexty.get(0));
+        return jeToOno(to.sTexty.get(0));
     }
 
     public boolean bOverWrite(Indicie by) {
-        if ( by.getsGroup().equals(sGroup) && sTexty.get(0).equals(by.sTexty.get(0)) &&
-            time.after(by.time)) return true;
+
+
+        if ( by.getsGroup().equals(sGroup) && jeToOno(by.sTexty.get(0)) &&
+            time.after(by.time)) {
+            Log.d(TAG, "Overwite : " + time.toString() + " by " + by.time.toString());
+            return true;
+        }
 
         return false;
     }
@@ -99,5 +107,10 @@ public class Indicie implements Serializable, OverWriter<Indicie> {
 
     public void setiPlatnaPo(int iPlatnaPo) {
         this.iPlatnaPo = iPlatnaPo;
+    }
+
+    @Override
+    public Indicie copy() {
+        return new Indicie(iPlatnaPo, sGroup, sTexty);
     }
 }

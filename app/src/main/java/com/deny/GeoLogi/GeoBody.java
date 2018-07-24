@@ -72,6 +72,12 @@ class GeoBody {
         return ourInstance;
     }
 
+    static GeoBody getInstance() throws Exception {
+        if (null == ourInstance) throw new Exception("Geobody jeste nebyly zkonstruovany");
+
+        return ourInstance;
+    }
+
     private GeoBody(Context ctx) {
         this.ctx = ctx;
 
@@ -86,11 +92,7 @@ class GeoBody {
     
 
     public boolean bylNavstivenej(GeoBod b) {
-        for (int i = 0; i < sfBodyNavsvivene.localList.size(); i++) {
-            if ((abs(b.getdLat() - sfBodyNavsvivene.localList.get(i).getdLat()) < 0.00001) && (abs(b.getdLong() - sfBodyNavsvivene.localList.get(i).getdLong()) < 0.00001))
-                return true;
-        }
-        return false;
+        return sfBodyNavsvivene.bItemInTheList(b);
     }
 
     public boolean jeHledanej(GeoBod b) {
@@ -141,8 +143,7 @@ class GeoBody {
 
                     if ((iAct < 20) && (!bylNavstivenej(bodAct))) {
                         //pridame bod mezi navstivene
-                        bodAct.setTime(new Timestamp(Global.getTime()));
-                        sfBodyNavsvivene.localList.add(bodAct);
+                        sfBodyNavsvivene.addOrRewrite(bodAct);
 
                         //a ulozime a sesynchronizujeme
                         sfBodyNavsvivene.writeFile();

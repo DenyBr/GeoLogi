@@ -19,9 +19,9 @@ import static java.lang.Math.abs;
 public class GeoBod implements Serializable, OverWriter<GeoBod> {
     private double dLat;
     private double dLong;
-    private String Popis;
+    private String sPopis;
     private boolean bViditelny;
-    private Timestamp time;
+    private Timestamp time = new Timestamp(System.currentTimeMillis());
 
     public GeoBod (double dLat, double dLong, String sPopis, boolean bViditelny) {
         setdLat(dLat);
@@ -48,13 +48,13 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
     }
 
     public String getPopis() {
-        return Popis;
+        return sPopis;
     }
 
     public Timestamp getTime() {return time;
     }
     public void setPopis(String popis) {
-        Popis = popis;
+        sPopis = popis;
     }
 
     public boolean getbViditelny() {
@@ -65,7 +65,7 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
         this.bViditelny = bViditelny;
     }
 
-    public void setTime(Timestamp time) {
+    private void setTime(Timestamp time) {
         this.time = time;
     }
 
@@ -101,5 +101,10 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
     @Override
     public boolean bEquals(GeoBod to) {
         return ((abs(to.getdLat() - getdLat()) < 0.00001) && (abs(to.getdLong() - getdLong()) < 0.00001));
+    }
+
+    @Override
+    public GeoBod copy() {
+        return new GeoBod(dLat, dLong,  sPopis, bViditelny);
     }
 }

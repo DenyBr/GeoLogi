@@ -12,7 +12,8 @@ import static android.content.Context.LOCATION_SERVICE;
 public class Global {
     private final static String TAG = "Global";
 
-    public final static int iUpdateInterval = 3000000; //miliseconds
+    //public final static int iUpdateInterval = 300000; //miliseconds
+   // public final static int iUpdateInterval = 30000; //miliseconds
 
     private static long lTime = System.currentTimeMillis();
     private static double dLat = 0;
@@ -20,6 +21,7 @@ public class Global {
     private static Context ctx = null;
     private static Location location = null;
     private static LocationManager locationManager = null;
+    private static boolean bPaused = true;
 
     private Global() {
         //
@@ -154,6 +156,14 @@ public class Global {
     public static String simPrexix() {
         if (isbSimulationMode()) {return "s";}
         else return "";
+    }
+
+    public static boolean isbPaused() {
+        return bPaused;
+    }
+
+    public static void setbPaused(boolean bPaused) {
+        Global.bPaused = bPaused;
     }
 
     public static void setlTime(long lTime) {

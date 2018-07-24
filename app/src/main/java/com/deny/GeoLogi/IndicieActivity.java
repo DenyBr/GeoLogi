@@ -69,9 +69,9 @@ public class IndicieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_indicie);
         listview = (ListView) findViewById(R.id.listview);
 
-        Log.d(TAG, "prekresli Pocet indicii: "+IndicieSeznam.getInstance(this).sfIndicie.localList.size());
+        Log.d(TAG, "prekresli Pocet indicii: "+IndicieSeznam.getInstance(this).sfIndicie.iSize ());
 
-        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfIndicie.localList);
+        final IndicieAdapter adapter = new IndicieAdapter(this, R.layout.indicie, IndicieSeznam.getInstance(this).sfIndicie.getLocalList());
         listview.setAdapter(adapter);
     }
 

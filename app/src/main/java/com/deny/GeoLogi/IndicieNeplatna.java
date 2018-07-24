@@ -62,4 +62,9 @@ public class IndicieNeplatna implements Serializable, OverWriter<IndicieNeplatna
     private void setsIndicie(String sIndicie) {
         this.sIndicie = sIndicie;
     }
+
+    @Override
+    public IndicieNeplatna copy() {
+        return new IndicieNeplatna(sIndicie);
+    }
 }

@@ -1,6 +1,7 @@
 package com.deny.GeoLogi;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import java.sql.Time;
@@ -8,9 +9,17 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+
 
 public class Simulator {
     private static final String TAG ="Simulator";
+    private static Random rGen=new Random();
+
+    static Handler handler = new Handler();
+
+    static int iAktSimInd;
+    static boolean bSmerPridavani;
 
     public static void next(Context ctx, ArrayList<Zprava> zpravyZobraz, ArrayList<Zprava> zpravyKomplet) {
         Log.d(TAG, "ENTER: next");
@@ -201,5 +210,52 @@ public class Simulator {
         }
         return "";
     }
+
+
+    static Runnable pridejJednu = new Runnable() {
+        @Override
+        public void run() {
+            IndicieSeznam.getInstance().addHint("Indicie testovaci"+iAktSimInd);
+            GeoBod b = new GeoBod(49.19 + iAktSimInd/10000, 16.65 + iAktSimInd/10000, "Test"+iAktSimInd, true);
+
+            try {
+                GeoBody.getInstance().sfBodyNavsvivene.addOrRewrite(b);
+            } catch (Exception e) {
+                Log.d(TAG, "Chyba simulovanych bodu" + e.getMessage());
+            }
+
+            if (bSmerPridavani) {
+                iAktSimInd++;
+            }
+            else {
+                iAktSimInd--;
+            }
+
+            int delay = rGen.nextInt(3000);
+
+            Log.d(TAG, "Adding "+iAktSimInd);
+            Log.d(TAG, "Adding "+b.toString());
+
+            if (iAktSimInd>0 && iAktSimInd<100) {
+                handler.postDelayed(pridejJednu,
+                        2000+delay);
+            }
+        }
+    };
+
+    static void simulujPridavaniIndicii(boolean bOdZacatku) {
+        bSmerPridavani = bOdZacatku;
+
+        if (bSmerPridavani == true) {
+            iAktSimInd = 0;
+        }
+        else {
+            iAktSimInd = 100;
+        }
+
+        handler.postDelayed(pridejJednu, 1000);
+    }
+
+
 
 }

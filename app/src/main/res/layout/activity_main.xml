@@ -6,6 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:keepScreenOn="true"
     tools:context="com.deny.GeoLogi.MainActivity">
 
     <TableLayout
@@ -86,11 +87,31 @@
             <Button
                 android:id="@+id/btnTest" android:enabled="true"
                 android:onClick="testClickHandler"
-                android:layout_width="15pt"
+                android:layout_width="50pt"
                 android:layout_height="wrap_content"
                 android:height="15pt"
-                android:text="T"
+                android:text="Sim"
                 />
+
+            <Button
+                android:id="@+id/btnTest1" android:enabled="true"
+                android:onClick="test1ClickHandler"
+                android:layout_width="30pt"
+                android:layout_height="wrap_content"
+                android:height="15pt"
+                android:text="T1"
+                />
+
+            <Button
+                android:id="@+id/btnTest2" android:enabled="true"
+                android:onClick="test2ClickHandler"
+                android:layout_width="30pt"
+                android:layout_height="wrap_content"
+                android:height="15pt"
+                android:text="T2"
+                />
+
+
             <TextView
                 android:id="@+id/tvVyplne"
                 android:layout_width="fill_parent"

@@ -25,7 +25,7 @@ import java.util.TimerTask;
 public class SyncFiles<T extends OverWriter&Serializable> {
     private final String TAG = "SyncFiles";
 
-    final Object lock = new Object();
+    public final Object lock = new Object();
 
     private boolean bFinished = false;
     private String sFilename;
@@ -33,7 +33,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     private Context ctx;
     private Handler.Callback callback;
 
-    public ArrayList<T> localList;
+    private ArrayList<T> localList;
 
     public SyncFiles(Context ctx, String sFileName, int iPerioda, Handler.Callback callback){
         if (!bFinished) {
@@ -63,12 +63,19 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         }
     }
 
-     public String getsFilename() {
+    public String getsFilename() {
         return sFilename;
     }
     public Context getCtx() {
         return ctx;
     }
+
+    public ArrayList<T> getLocalList() {
+        //warning - only use for read purposes
+        return localList;
+    }
+
+    public int iSize() {return localList.size();}
 
     public void setCtx(Context ctx) {
         this.ctx = ctx;
@@ -125,37 +132,48 @@ public class SyncFiles<T extends OverWriter&Serializable> {
         Log.d(TAG, "LEAVE: processDateAndSize: ");
     }
 
-    private void addOrRewrite (T remoteItem) {
+    public boolean bItemInTheList (T item) {
+        for (int i = 0; i < localList.size(); i++) {
+            if (localList.get(i).bEquals(item)  )
+                return true;
+        }
+        return false;
+    }
+
+
+    public void addOrRewrite (T newItem) {
         boolean bAdd = true;
 
-        //go through the list and check if the item is already there
-        for (int i=0; i<localList.size(); i++) {
-            if (remoteItem.bEquals((T) localList.get(i))) {
-                bAdd = false;
+        synchronized (lock) {
+            //go through the list and check if the item is already there
+            for (int i = 0; i < localList.size(); i++) {
+                if (newItem.bEquals((T) localList.get(i))) {
+                    bAdd = false;
 
-                //if yes, check if it should be rewritten
-                if (remoteItem.bOverWrite((T) localList.get(i))) {
-                    localList.get(i).overwrite(remoteItem);                }
+                    //if yes, check if it should be rewritten
+                    if (((T) localList.get(i)).bOverWrite(newItem)) {
+                        Log.d(TAG, "Overwriting");
+                        localList.get(i).overwrite(newItem);
+                    }
 
-                //the item was found, break the cycle
-                break;
+                    //the item was found, break the cycle
+                    break;
+                }
+            }
+
+            if (bAdd) {
+                T cp = (T) newItem.copy();
+                Log.d(TAG, "Adding");
+                localList.add(cp);
             }
         }
-
-        if (bAdd) {
-            localList.add(remoteItem);
-        }
     }
-
-
 
     private void mergeRemoteList(ArrayList<T> remoteList) {
-        synchronized (lock) {
-            for (int i = 0; i < remoteList.size(); i++) {
-                addOrRewrite(remoteList.get(i));
-            }
+        for (int i = 0; i < remoteList.size(); i++) {
+            addOrRewrite(remoteList.get(i));
         }
-    }
+}
 
     private void processDownload(int res) {
         int iPocetLocalPred = localList.size();

@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class VysledkyActivity extends AppCompatActivity {
@@ -165,7 +166,7 @@ public class VysledkyActivity extends AppCompatActivity {
                 for (int i=0; i<iPocet; i++) {
                     Indicie obj = (Indicie) in.readObject();
 
-                    sRes.append(obj.getTime().toString());
+                    sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
                     sRes.append(" ");
                     sRes.append(obj.getsTexty().get(0));
                     sRes.append("\n");
@@ -196,7 +197,7 @@ public class VysledkyActivity extends AppCompatActivity {
             for (int i=0; i<iPocet; i++) {
                 IndicieNeplatna obj = (IndicieNeplatna) in.readObject();
 
-                sRes.append(obj.getTime().toString());
+                sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
                 sRes.append(" ");
                 sRes.append(obj.getsIndicie());
                 sRes.append("\n");
@@ -228,7 +229,7 @@ public class VysledkyActivity extends AppCompatActivity {
             for (int i=0; i<iPocet; i++) {
                 GeoBod obj = (GeoBod) in.readObject();
 
-                sRes.append(obj.getTime().toString());
+                sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
                 sRes.append(" ");
                 sRes.append(obj.getdLat());
                 sRes.append(" ");

@@ -64,6 +64,8 @@ public class Nastaveni extends Properties {
 
     public int getiIDOddilu() {return Integer.parseInt(getProperty("ID", ""));}
 
+    public int getiUpdate() {return 1000*Integer.parseInt(getProperty("Update", "600"));}
+
     public boolean getisRoot() {return Boolean.parseBoolean(getProperty("Root", ""));}
 
     public boolean getisSimulation() {boolean res = Boolean.parseBoolean(getProperty("Simulation", ""));

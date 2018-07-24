@@ -110,6 +110,7 @@ public class UvodniStranka extends AppCompatActivity {
 
 
     private void resize() {
+        /*
         final Handler handler = new Handler();
 
         iSirka = this.getResources().getConfiguration().screenWidthDp;
@@ -133,7 +134,7 @@ public class UvodniStranka extends AppCompatActivity {
             }
             }
         }, 1);
-
+*/
 
     }
 
@@ -224,5 +225,11 @@ public class UvodniStranka extends AppCompatActivity {
                 }
             }
         }
+    }
+
+
+    public void konecClickHandler(View view) {
+        this.finishAffinity();
+        System.exit(0);
     }
 }

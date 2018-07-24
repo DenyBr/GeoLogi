@@ -135,8 +135,6 @@ public class MapaActivity extends Activity {
     protected void onDestroy () {
         super.onDestroy();
         Log.d(TAG, "onDestroy called");
-
-    //    finish();
     }
 
 }
