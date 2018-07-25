@@ -54,7 +54,6 @@ tools:context="com.deny.GeoLogi.VysledkyActivity">
         android:layout_height="match_parent">
 
         <ListView
-            android:layout_below="@+id/restblrow"
             android:id="@+id/resutsview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">

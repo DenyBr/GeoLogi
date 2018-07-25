@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +25,7 @@ public class IndicieSeznam {
     private final static String TAG = "IndicieSeznam";
 
     private static IndicieSeznam ourInstance = null;
-    public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<Indicie>();
+    public static ArrayList<Indicie> aIndicieVsechny = new ArrayList<>();
 
     private static Context ctx = null;
 
@@ -71,7 +70,7 @@ public class IndicieSeznam {
 
             updateHandler.removeCallbacks(updateRunnable);
 
-            aIndicieVsechny = new ArrayList<Indicie>();
+            aIndicieVsechny = new ArrayList<>();
             InputStream inputStream =  context.openFileInput( Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicievsechny.bin");
 
             ObjectInputStream in = new ObjectInputStream(inputStream);
@@ -90,14 +89,14 @@ public class IndicieSeznam {
         }
 
         if (null!=sfIndicie) sfIndicie.finalize();
-        sfIndicie = new SyncFiles<Indicie>(ctx,
-                Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieziskane.bin",
+        sfIndicie = new SyncFiles<>(ctx,
+                Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "indicieziskane.bin",
                 Nastaveni.getInstance(ctx).getiUpdate(),
                 updateCallback);
 
         if (null!=sfIndicieNeplatne) sfIndicieNeplatne.finalize();
-        sfIndicieNeplatne = new SyncFiles<IndicieNeplatna>(ctx,
-                Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu()+"indicieneplatne.bin",
+        sfIndicieNeplatne = new SyncFiles<>(ctx,
+                Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "indicieneplatne.bin",
                 Nastaveni.getInstance(ctx).getiUpdate(),
                 null);
 
@@ -150,13 +149,13 @@ public class IndicieSeznam {
 
         try {
             JSONArray rows = object.getJSONArray("rows");
-            IndicieSeznam.getInstance().aIndicieVsechny = new ArrayList<Indicie>();
+            IndicieSeznam.getInstance().aIndicieVsechny = new ArrayList<>();
 
             for (int r = 0; r < rows.length(); ++r) {
                 JSONObject row = rows.getJSONObject(r);
                 JSONArray columns = row.getJSONArray("c");
 
-                ArrayList<String> aInd = new ArrayList<String>();
+                ArrayList<String> aInd = new ArrayList<>();
 
                 int iPlatnaPo = 0;
                 try {

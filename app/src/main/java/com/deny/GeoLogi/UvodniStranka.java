@@ -3,9 +3,9 @@ package com.deny.GeoLogi;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -228,8 +228,11 @@ public class UvodniStranka extends AppCompatActivity {
     }
 
 
+
     public void konecClickHandler(View view) {
-        this.finishAffinity();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) this.finishAffinity();
+
         System.exit(0);
     }
 }

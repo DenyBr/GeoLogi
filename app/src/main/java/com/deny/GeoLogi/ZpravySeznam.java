@@ -41,8 +41,8 @@ public class ZpravySeznam implements Handler.Callback {
 
     private static ZpravySeznam ourInstance = null;
     private Context context = null;
-    ArrayList<Zprava> zpravyKomplet = new ArrayList<Zprava>();
-    ArrayList<Zprava> zpravyZobraz = new ArrayList<Zprava>();
+    ArrayList<Zprava> zpravyKomplet = new ArrayList<>();
+    ArrayList<Zprava> zpravyZobraz = new ArrayList<>();
     final Object lock = new Object();
     Uri notification;
     Ringtone notificationRingtone;
@@ -88,7 +88,7 @@ public class ZpravySeznam implements Handler.Callback {
             //Save currently selected gam and user to detect change later
             sVybrano = Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu();
 
-            zpravyKomplet = new ArrayList<Zprava>();
+            zpravyKomplet = new ArrayList<>();
 
             try {
                 InputStream inputStream = context.openFileInput(Global.simPrexix() + Nastaveni.getInstance(context).getsIdHry() + Nastaveni.getInstance(context).getiIDOddilu() + "zpravy.bin");
@@ -369,7 +369,7 @@ public class ZpravySeznam implements Handler.Callback {
 
 
     void zkontrolujZpravy (boolean bPrekreslit) {
-        ArrayList<Zprava> zpravy = new ArrayList<Zprava>();
+        ArrayList<Zprava> zpravy = new ArrayList<>();
         bPrekreslit = bPrekreslit || (zpravyZobraz.size() == 0);
         boolean bNova = false;
         String sNova = "";
@@ -378,7 +378,7 @@ public class ZpravySeznam implements Handler.Callback {
 
         synchronized (lock) {
             try {
-                GeoBody.getInstance(context).aBody = new ArrayList<GeoBod>();
+                GeoBody.getInstance(context).aBody = new ArrayList<>();
 
                 for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
                     Zprava z = zpravyKomplet.get(i);

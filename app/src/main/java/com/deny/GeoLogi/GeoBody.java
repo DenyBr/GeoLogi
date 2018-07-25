@@ -8,7 +8,6 @@ import android.util.Log;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.views.overlay.simplefastpoint.LabelledGeoPoint;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +37,16 @@ class GeoBody {
 
     private Context ctx = null;
 
-    List<IGeoPoint> aMapa_nove = new ArrayList<IGeoPoint>();
-    List<IGeoPoint> aMapa_navstivene = new ArrayList<IGeoPoint>();
-    List<IGeoPoint> aMapa_tajne = new ArrayList<IGeoPoint>();
+    List<IGeoPoint> aMapa_nove = new ArrayList<>();
+    List<IGeoPoint> aMapa_navstivene = new ArrayList<>();
+    List<IGeoPoint> aMapa_tajne = new ArrayList<>();
 
     public void aktualizujMapu() {
         Log.d(TAG, "ENTER: AktualizujMapu");
 
-        aMapa_nove = new ArrayList<IGeoPoint>();
-        aMapa_navstivene = new ArrayList<IGeoPoint>();
-        aMapa_tajne = new ArrayList<IGeoPoint>();
+        aMapa_nove = new ArrayList<>();
+        aMapa_navstivene = new ArrayList<>();
+        aMapa_tajne = new ArrayList<>();
 
         for (int i = 0; i < GeoBody.getInstance(ctx).aBody.size(); i++) {
             GeoBod actBod = GeoBody.getInstance(ctx).aBody.get(i);
@@ -86,7 +85,7 @@ class GeoBody {
 
     public void init() {
         if (null!=sfBodyNavsvivene) sfBodyNavsvivene.finalize();
-        sfBodyNavsvivene = new SyncFiles<GeoBod>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 60000, callback);
+        sfBodyNavsvivene = new SyncFiles<>(ctx, Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "bodynavstivene.bin", 60000, callback);
         Global.init(ctx, 1000, 10);
     }
     

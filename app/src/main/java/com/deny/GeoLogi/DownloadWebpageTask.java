@@ -19,6 +19,8 @@ import java.net.URL;
 
 public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
     AsyncResultJSON callback;
+    final static private String TAG = "DownloadWebPage";
+
 
     public DownloadWebpageTask(AsyncResultJSON callback) {
         this.callback = callback;
@@ -46,7 +48,7 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
                 JSONObject table = new JSONObject(jsonResponse);
                 callback.onResult(table);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.d (TAG, e.getMessage());
             }
         }
     }
@@ -57,8 +59,8 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setReadTimeout((int) Global.iConTimeout /* milliseconds */);
+            conn.setConnectTimeout((int) Global.iConTimeout /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
             // Starts the query
@@ -78,13 +80,15 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
             }
         }
         catch (Exception e) {
-            //nedelej nic
+            Log.d (TAG, e.getMessage());
         }
         finally {
             if (is != null) {
                 is.close();
             }
         }
+
+        Log.d (TAG, "Webpage download failed");
         return "";
     }
 
@@ -99,12 +103,12 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
                 sb.append("\n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d (TAG, e.getMessage());
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d (TAG, e.getMessage());
             }
         }
         return sb.toString();

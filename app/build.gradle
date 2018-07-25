@@ -7,34 +7,21 @@ android {
         applicationId 'com.deny.taborofka_zpravy'
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 17
-        versionName "1.17"
+        versionCode 18
+        versionName "1.18"
         vectorDrawables.useSupportLibrary = true
-//        multiDexEnabled true
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
         }
-
-    }
-    productFlavors {
     }
 }
 
-configurations {
-    all {
-        //  exclude module: 'httpclient'
-        //exclude module: 'commons-logging'
-    }
-}
 
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'org.osmdroid:osmdroid-android:5.6.5'
     implementation files('commons-net-3.6.jar')
-
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }

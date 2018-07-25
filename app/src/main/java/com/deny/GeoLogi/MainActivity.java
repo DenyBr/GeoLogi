@@ -2,8 +2,6 @@ package com.deny.GeoLogi;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -228,26 +226,26 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         int iMin = 100000;
 
-        listview = (ListView) findViewById(R.id.listview);
+        listview = findViewById(R.id.listview);
 
-        TextView nadpis = (TextView) findViewById(R.id.nadpisek);
+        TextView nadpis = findViewById(R.id.nadpisek);
         if (nadpis != null) {
             nadpis.setText(Nastaveni.getInstance(this).getsHra() + "\n" + Nastaveni.getInstance(this).getProperty("Uzivatel", "") /* + " "+iPocerzobr*/);
         }
-        TextView hledanebody = (TextView) findViewById(R.id.hledanebody);
+        TextView hledanebody = findViewById(R.id.hledanebody);
 
         if (hledanebody != null) {
             hledanebody.setText("Cíle: " + GeoBody.getInstance(this).sfBodyNavsvivene.iSize() + "/" + GeoBody.getInstance(this).aBody.size());
         }
 
-        TextView indicie = (TextView) findViewById(R.id.indicii);
+        TextView indicie = findViewById(R.id.indicii);
         if (indicie != null) {
             indicie.setText("Indicie: " + IndicieSeznam.getInstance(this).sfIndicie.iSize() + "/" + IndicieSeznam.getInstance(this).aIndicieVsechny.size());
         }
 
         iMin = GeoBody.getInstance(this).iVzdalenostNejblizsiho(this);
 
-        TextView vzd = (TextView) findViewById(R.id.vzdalenost);
+        TextView vzd = findViewById(R.id.vzdalenost);
         if (vzd != null) {
             if (iMin < 1000) {
                 vzd.setText("Vzdálenost: " + iMin + "m");

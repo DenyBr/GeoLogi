@@ -40,7 +40,7 @@ public class IndicieAdapter extends ArrayAdapter<Indicie> {
         if (o != null) {
             TextView predmet = (TextView) v.findViewById(R.id.textindicie);
             predmet.setTextSize(TypedValue.COMPLEX_UNIT_DIP,36);
-            predmet.setText(new SimpleDateFormat("dd:MM HH:mm:ss").format(o.getTime()) + " " +String.valueOf(o.getsTexty().get(0)));
+            predmet.setText(new SimpleDateFormat("dd.MM. HH:mm:ss").format(o.getTime()) + " " +String.valueOf(o.getsTexty().get(0)));
           }
         return v;
     }

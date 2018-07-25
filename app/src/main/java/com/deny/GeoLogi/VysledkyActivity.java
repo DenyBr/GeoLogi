@@ -13,6 +13,8 @@ import android.widget.ListView;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -154,7 +156,7 @@ public class VysledkyActivity extends AppCompatActivity {
     private String hintsToString(Result r) {
             Log.d(TAG, "ENTER: hintsToString");
             String sFilename=Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + r.getsIdUzivatele() + "indicieziskane.binres";
-            StringBuffer sRes = new StringBuffer("Indicie\n");
+            StringBuilder sRes = new StringBuilder("Indicie\n");
 
             try {
                 InputStream inputStream =  this.openFileInput(sFilename);
@@ -166,7 +168,7 @@ public class VysledkyActivity extends AppCompatActivity {
                 for (int i=0; i<iPocet; i++) {
                     Indicie obj = (Indicie) in.readObject();
 
-                    sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
+                    sRes.append(new SimpleDateFormat("dd.MM.yy HH:mm:ss").format(obj.getTime()));
                     sRes.append(" ");
                     sRes.append(obj.getsTexty().get(0));
                     sRes.append("\n");
@@ -185,7 +187,7 @@ public class VysledkyActivity extends AppCompatActivity {
     private String hintsFailedToString(Result r) {
         Log.d(TAG, "ENTER: hintsFailedToString");
         String sFilename=Global.simPrexix() + Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + r.getsIdUzivatele() + "indicieneplatne.binres";
-        StringBuffer sRes = new StringBuffer("Neplatné indicie \n");
+        StringBuilder sRes = new StringBuilder("Neplatné indicie \n");
 
         try {
             InputStream inputStream =  this.openFileInput(sFilename);
@@ -197,7 +199,7 @@ public class VysledkyActivity extends AppCompatActivity {
             for (int i=0; i<iPocet; i++) {
                 IndicieNeplatna obj = (IndicieNeplatna) in.readObject();
 
-                sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
+                sRes.append(new SimpleDateFormat("dd.MM.yy HH:mm:ss").format(obj.getTime()));
                 sRes.append(" ");
                 sRes.append(obj.getsIndicie());
                 sRes.append("\n");
@@ -217,7 +219,7 @@ public class VysledkyActivity extends AppCompatActivity {
     private String pointToString(Result r) {
         Log.d(TAG, "ENTER: hintsToString");
         String sFilename=Global.simPrexix() +Nastaveni.getInstance(VysledkyActivity.this).getsIdHry() + r.getsIdUzivatele() + "bodynavstivene.binres";
-        StringBuffer sRes = new StringBuffer("Navštívené body\n");
+        StringBuilder sRes = new StringBuilder("Navštívené body\n");
 
         try {
             InputStream inputStream =  this.openFileInput(sFilename);
@@ -228,16 +230,15 @@ public class VysledkyActivity extends AppCompatActivity {
 
             for (int i=0; i<iPocet; i++) {
                 GeoBod obj = (GeoBod) in.readObject();
+                NumberFormat formatter = new DecimalFormat("#0.0000");
 
-                sRes.append(new SimpleDateFormat("dd:MM:yy HH:mm:ss").format(obj.getTime()));
-                sRes.append(" ");
-                sRes.append(obj.getdLat());
-                sRes.append(" ");
-                sRes.append(obj.getdLong());
-                sRes.append(":");
-                sRes.append(obj.getdLat());
+                sRes.append(new SimpleDateFormat("dd.MM.yy HH:mm:ss").format(obj.getTime()));
                 sRes.append(" ");
                 sRes.append(obj.getPopis());
+                sRes.append("\n");
+                sRes.append(formatter.format(obj.getdLat()));
+                sRes.append(":");
+                sRes.append(formatter.format(obj.getdLong()));
                 sRes.append("\n");
             }
             in.close();
@@ -253,15 +254,13 @@ public class VysledkyActivity extends AppCompatActivity {
 
 
     private void showTeamResults(Result r) {
-        StringBuffer sRes = new StringBuffer();
+        String sRes = hintsToString(r) +
+                "\n" +
+                hintsFailedToString(r) +
+                "\n" +
+                pointToString(r);
 
-        sRes.append(hintsToString(r));
-        sRes.append("\n");
-        sRes.append(hintsFailedToString(r));
-        sRes.append("\n");
-        sRes.append(pointToString(r));
-
-        Okynka.zobrazOkynko(this, sRes.toString());
+        Okynka.zobrazOkynko(this, sRes);
     }
 
 }

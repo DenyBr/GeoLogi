@@ -5,8 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.text.Normalizer;
-import java.util.ArrayList;
 
 /**
  * Created by bruzlzde on 23.2.2018.

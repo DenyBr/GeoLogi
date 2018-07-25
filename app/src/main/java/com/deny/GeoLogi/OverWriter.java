@@ -1,8 +1,8 @@
 package com.deny.GeoLogi;
 
 interface OverWriter<T> {
-    public boolean bOverWrite(T member);
-    public void overwrite (T member);
-    public boolean bEquals(T member);
-    public T copy();
+    boolean bOverWrite(T member);
+    void overwrite (T member);
+    boolean bEquals(T member);
+    T copy();
 }

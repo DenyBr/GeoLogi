@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,7 @@ public class Global {
     //public final static int iUpdateInterval = 300000; //miliseconds
    // public final static int iUpdateInterval = 30000; //miliseconds
 
+    public static long iConTimeout = 15000;
     private static long lTime = System.currentTimeMillis();
     private static double dLat = 0;
     private static double dLong = 0;
@@ -22,6 +25,8 @@ public class Global {
     private static Location location = null;
     private static LocationManager locationManager = null;
     private static boolean bPaused = true;
+
+
 
     private Global() {
         //
@@ -170,7 +175,22 @@ public class Global {
         Global.lTime = lTime;
     }
 
-    // Define a listener that responds to location updates
+    public static boolean isConnected(Context context) {
+        ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        try {
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) return true;
+          }
+        catch (Exception e) {
+            Log.d("TAG", "isConnected: "+e.getMessage());
+        }
+
+        return false;
+    }
+
+
+        // Define a listener that responds to location updates
     private static LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "Location update: " + location.toString());

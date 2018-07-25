@@ -26,7 +26,7 @@ import java.util.List;
 public class Settings extends AppCompatActivity {
 
     Nastaveni pNastaveni = Nastaveni.getInstance(this);
-    ArrayList<Hra> hry = new ArrayList<Hra>();
+    ArrayList<Hra> hry = new ArrayList<>();
     int iVybranaHra;
     int iVybranyOddil;
     VyberOddil updateOddily = new VyberOddil();
@@ -82,9 +82,9 @@ public class Settings extends AppCompatActivity {
             }
 
 
-            Spinner sp = (Spinner) findViewById(R.id.spinHry);
+            Spinner sp = findViewById(R.id.spinHry);
 
-            List<String> lHry = new ArrayList<String>();
+            List<String> lHry = new ArrayList<>();
             int iPoziceVybraneho = 0;
 
             for (int i = 0; i < hry.size(); i++) {
@@ -94,7 +94,7 @@ public class Settings extends AppCompatActivity {
                 }
             }
 
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_spinner_item, lHry);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sp.setAdapter(dataAdapter);
@@ -114,10 +114,10 @@ public class Settings extends AppCompatActivity {
             //Okynka.zobrazOkynko(Settings.this, "Oddilu je : "+ Uzivatele.getInstance().aOddily.size());
 
 
-            Spinner sp = (Spinner) findViewById(R.id.spinOddily);
+            Spinner sp = findViewById(R.id.spinOddily);
             int iVybranyOddil = 0;
 
-            ArrayList<String> ao = new ArrayList<String>();
+            ArrayList<String> ao = new ArrayList<>();
 
             for(int i = 0; i< Uzivatele.getInstance().aOddily.size(); i++) {
                 ao.add(Uzivatele.getInstance().aOddily.get(i).getsNazev());
@@ -127,7 +127,7 @@ public class Settings extends AppCompatActivity {
                 }*/
             }
 
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(Settings.this,
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(Settings.this,
                     android.R.layout.simple_spinner_item, ao);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sp.setAdapter(dataAdapter);
@@ -152,7 +152,7 @@ public class Settings extends AppCompatActivity {
         TextView tvHeslo = (EditText) findViewById(R.id.etHesloH);
         tvHeslo.setEnabled(!Global.isbSimulationMode());
 
-        EditText etUpdate = (EditText) findViewById(R.id.etInterval);
+        EditText etUpdate = findViewById(R.id.etInterval);
 
         int iUpdate = 0;
         try {
@@ -166,8 +166,8 @@ public class Settings extends AppCompatActivity {
             Okynka.zobrazOkynko(this, "Interval aktualizace nesmí být kratší než 30s");
         } else {
             //pNastaveni.setProperty("Uzivatel", tvOddil.getText().toString());
-            Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
-            Spinner spHra = (Spinner) findViewById(R.id.spinHry);
+            Spinner spOddil = findViewById(R.id.spinOddily);
+            Spinner spHra = findViewById(R.id.spinHry);
 
             //Okynka.zobrazOkynko(Settings.this, "x"+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsHeslo()  + "=" + tvHeslo.getText()+"x");
 
@@ -241,17 +241,17 @@ public class Settings extends AppCompatActivity {
         //to remove the action bar (title bar)
         getSupportActionBar().hide();
 
-        EditText etUpdate = (EditText) findViewById(R.id.etInterval);
+        EditText etUpdate = findViewById(R.id.etInterval);
         etUpdate.setText(""+(pNastaveni.getiUpdate()/1000));
 
-        Spinner spHra = (Spinner) findViewById(R.id.spinHry);
+        Spinner spHra = findViewById(R.id.spinHry);
         spHra.setOnItemSelectedListener(new VyberHry());
         spHra.setEnabled(!Global.isbSimulationMode());
 
-        Spinner spOddil = (Spinner) findViewById(R.id.spinOddily);
+        Spinner spOddil = findViewById(R.id.spinOddily);
         spOddil.setOnItemSelectedListener(new VyberOddilu());
 
-        EditText tvHeslo = (EditText) findViewById(R.id.etHesloH);
+        EditText tvHeslo = findViewById(R.id.etHesloH);
         tvHeslo.setText(pNastaveni.getProperty("Heslo", ""));
         tvHeslo.setEnabled(!Global.isbSimulationMode());
 

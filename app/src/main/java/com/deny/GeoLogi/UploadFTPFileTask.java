@@ -9,13 +9,12 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 
 
 public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
     private final String TAG = "UploadFtp";
     Context ctx = null;
-
-
 
     UploadFTPFileTask(Context context) {
         ctx = context;
@@ -47,9 +46,15 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
 
             Log.d(TAG, "Upload: " + sFilename);
 
-            con.connect("109.205.76.29");
+            InetAddress address = InetAddress.getByName("ftpx.forpsi.com");
 
-            if (con.login("bruzl", "ASDKL."))
+            con = new FTPClient();
+            con.connect(address.getHostAddress());
+
+            con.setDataTimeout((int) Global.iConTimeout);
+            con.setConnectTimeout((int) Global.iConTimeout);
+
+            if (con.login("tchcz", "dobrojeprisjetitised"))
             {
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);

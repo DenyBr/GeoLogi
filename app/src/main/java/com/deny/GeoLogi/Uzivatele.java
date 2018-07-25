@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 
 public class Uzivatele {
-    public ArrayList<Uzivatel> aOddily = new ArrayList<Uzivatel>();
+    public ArrayList<Uzivatel> aOddily = new ArrayList<>();
     private static Uzivatele instance=null;
     Runnable r_callback=null;
 
@@ -47,7 +47,7 @@ public class Uzivatele {
 
         try {
             JSONArray rows = object.getJSONArray("rows");
-            aOddily = new ArrayList<Uzivatel>();
+            aOddily = new ArrayList<>();
 
             for (int r = 0; r < rows.length(); ++r) {
                 JSONObject row = rows.getJSONObject(r);

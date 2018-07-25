@@ -30,18 +30,16 @@ public class Simulator {
         if (z!=null) {
             Log.d(TAG, "Message to be shown: " + z.getsPredmet());
 
-            StringBuffer s = new StringBuffer("Zprava, ktera by mela byt zobrazena: ");
+            String s = "Zprava, ktera by mela byt zobrazena: " + z.getsPredmet() +
+                    "\n\n" +
+                    checkHints(ctx, z) +
+                    "\n" +
+                    checkTime(ctx, z, zpravyKomplet) +
+                    "\n" +
+                    checkLocation(ctx, z) +
+                    "\n";
 
-            s.append(z.getsPredmet());
-            s.append("\n\n");
-            s.append(checkHints(ctx, z));
-            s.append("\n");
-            s.append(checkTime(ctx, z, zpravyKomplet));
-            s.append("\n");
-            s.append(checkLocation(ctx, z));
-            s.append("\n");
-
-            Okynka.zobrazOkynko(ctx, s.toString());
+            Okynka.zobrazOkynko(ctx, s);
         }
         else {
             Okynka.zobrazOkynko(ctx, "Další zpráva pro vybraného uživatele nebyla nalezena");
@@ -107,7 +105,7 @@ public class Simulator {
     private static String checkHints (Context ctx, Zprava z) {
         Log.d(TAG, "ENTER: checkHints");
 
-        StringBuffer sRes = new StringBuffer("");
+        StringBuilder sRes = new StringBuilder("");
 
         if (!z.getsPovinneIndicie().equals("")) {
             List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\s,]+"));
@@ -216,10 +214,15 @@ public class Simulator {
         @Override
         public void run() {
             IndicieSeznam.getInstance().addHint("Indicie testovaci"+iAktSimInd);
-            GeoBod b = new GeoBod(49.19 + iAktSimInd/10000, 16.65 + iAktSimInd/10000, "Test"+iAktSimInd, true);
+            GeoBod b = new GeoBod(49.19 + ((double) iAktSimInd)/10000, 16.65 + ((double) iAktSimInd)/10000, "Test"+iAktSimInd, true);
 
             try {
                 GeoBody.getInstance().sfBodyNavsvivene.addOrRewrite(b);
+                //a ulozime a sesynchronizujeme
+                GeoBody.getInstance().sfBodyNavsvivene.writeFile();
+                GeoBody.getInstance().sfBodyNavsvivene.syncFileNow();
+
+                GeoBody.getInstance().aktualizujMapu();
             } catch (Exception e) {
                 Log.d(TAG, "Chyba simulovanych bodu" + e.getMessage());
             }
@@ -234,7 +237,7 @@ public class Simulator {
             int delay = rGen.nextInt(3000);
 
             Log.d(TAG, "Adding "+iAktSimInd);
-            Log.d(TAG, "Adding "+b.toString());
+            Log.d(TAG, "Adding "+b.getdLat()+" " + b.getdLong() + " " +b.getPopis());
 
             if (iAktSimInd>0 && iAktSimInd<100) {
                 handler.postDelayed(pridejJednu,
@@ -246,7 +249,7 @@ public class Simulator {
     static void simulujPridavaniIndicii(boolean bOdZacatku) {
         bSmerPridavani = bOdZacatku;
 
-        if (bSmerPridavani == true) {
+        if (bSmerPridavani) {
             iAktSimInd = 0;
         }
         else {

@@ -8,8 +8,11 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.FileOutputStream;
+import java.net.InetAddress;
 
 public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
+    private static final String TAG = "DownloadFTP";
+
     Context ctx = null;
     AsyncResultFTPDownload callback = null;
 
@@ -48,10 +51,14 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
 
             Log.d("ftp", "Download " + sFilenameServer + " do "+ sFileNameLocal);
 
-            con = new FTPClient();
-            con.connect("109.205.76.29");
+            InetAddress address = InetAddress.getByName("ftpx.forpsi.com");
 
-            if (con.login("bruzl", "ASDKL."))
+            con = new FTPClient();
+            con.setDataTimeout((int) Global.iConTimeout);
+            con.setConnectTimeout((int) Global.iConTimeout);
+            con.connect(address.getHostAddress());
+
+            if (con.login("tchcz", "dobrojeprisjetitised"))
             {
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);
@@ -72,7 +79,7 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
         }
 
         return "-1";

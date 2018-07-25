@@ -3,7 +3,6 @@ package com.deny.GeoLogi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 
 /**
  * Created by bruzlzde on 26.2.2018.

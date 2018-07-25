@@ -100,7 +100,7 @@ public class GeoBod implements Serializable, OverWriter<GeoBod> {
 
     @Override
     public boolean bEquals(GeoBod to) {
-        return ((abs(to.getdLat() - getdLat()) < 0.00001) && (abs(to.getdLong() - getdLong()) < 0.00001));
+        return ((abs(to.getdLat() - getdLat()) < 0.000001) && (abs(to.getdLong() - getdLong()) < 0.000001));
     }
 
     @Override

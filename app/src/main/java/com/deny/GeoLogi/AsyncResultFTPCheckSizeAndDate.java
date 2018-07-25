@@ -1,8 +1,6 @@
 package com.deny.GeoLogi;
 
 
-import java.sql.Timestamp;
-
 /**
  * Inspired by kstanoev
  *

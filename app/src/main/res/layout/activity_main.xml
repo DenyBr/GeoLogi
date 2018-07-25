@@ -128,7 +128,6 @@
                 android:id="@+id/listview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tblrow"
                 android:layout_span="8"
                 android:layout_weight="6" />
         </TableRow>

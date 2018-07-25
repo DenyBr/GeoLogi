@@ -23,7 +23,7 @@ public class Nastenka extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nastenka);
 
-        mWebView = (WebView) findViewById( R.id.vysledky_webview);
+        mWebView = findViewById( R.id.vysledky_webview);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);

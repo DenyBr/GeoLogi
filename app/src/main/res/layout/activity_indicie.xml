@@ -52,7 +52,6 @@
             >
 
             <ListView
-                android:layout_below="@+id/tblrow"
                 android:id="@+id/listview"
 
                 android:layout_span="10"

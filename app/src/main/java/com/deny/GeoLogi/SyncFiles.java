@@ -89,8 +89,9 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     //vola se jednak pravidelne tak jak je nastaveno
     //a muze se volat "rucne" - napriklad kduyz uzivatel zada novou indicii
     public void syncFileNow() {
-        if (!bFinished) {
+        if ((!bFinished) && Global.isConnected(ctx)) {
             Log.d(TAG, "ENTER: syncFileNow " + sFilename);
+
 
             new CheckFTPFileSizeAndDateTask(ctx, new AsyncResultFTPCheckSizeAndDate() {
                 @Override
@@ -112,22 +113,22 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
         Log.d(TAG, "processDateAndSize. Local file: size: " + localFile.length()+ "timestamp:" + (localFile.lastModified()/100000));
 
-        //the version on the net does not exist => upload local file
-        if (0==lSize) {
-            upload();
-        }
-        else {
-            //version on the net has different size or is newer than local file => need to check the content
-            if ((lSize != localFile.length()) || (localFile.lastModified()/100000<lTimestamp)) {
-                new DownloadFTPFileTask(ctx, new AsyncResultFTPDownload() {
-                    @Override
-                    public void onResult(int iRes) {
-                        processDownload(iRes);
-                    }
-                }).execute(sFilename, sFilename+"tmp");
+        if (Global.isConnected(ctx)) {
+            //the version on the net does not exist => upload local file
+            if (0 == lSize) {
+                upload();
+            } else {
+                //version on the net has different size or is newer than local file => need to check the content
+                if ((lSize != localFile.length()) || (localFile.lastModified() / 100000 < lTimestamp)) {
+                    new DownloadFTPFileTask(ctx, new AsyncResultFTPDownload() {
+                        @Override
+                        public void onResult(int iRes) {
+                            processDownload(iRes);
+                        }
+                    }).execute(sFilename, sFilename + "tmp");
+                }
             }
         }
-
 
         Log.d(TAG, "LEAVE: processDateAndSize: ");
     }
@@ -163,7 +164,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
 
             if (bAdd) {
                 T cp = (T) newItem.copy();
-                Log.d(TAG, "Adding");
+                Log.d(TAG, "Adding" + ((T) cp ).toString());
                 localList.add(cp);
             }
         }
@@ -216,7 +217,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
     }
 
     public void readFile () {
-        localList = new ArrayList<T>();
+        localList = new ArrayList<>();
         readFile(sFilename, localList);
 
         Log.d(TAG, "LEAVE: lokalni seznam - nacteno: " + localList.size());
