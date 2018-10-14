@@ -137,4 +137,12 @@ public class MapaActivity extends Activity {
         Log.d(TAG, "onDestroy called");
     }
 
+    private void showUsers () {
+        if (Nastaveni.getInstance(this).getisSdileniPolohy()) {
+            //nactem seznam oddilu
+            
+
+        }
+    }
+
 }

@@ -37,6 +37,7 @@
             />
         <activity
             android:name=".IndicieActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"
             />
         <activity
@@ -50,10 +51,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".VysledkyActivity">
+        </activity>+
+        <activity android:name=".VysledkyActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-        </activity>
+        />
     </application>
 
 </manifest>

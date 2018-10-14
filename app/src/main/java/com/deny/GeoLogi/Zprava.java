@@ -28,10 +28,14 @@ public class Zprava implements Serializable {
     private String sIndicieZeSkupiny;
     private String sPovinneIndicie;
     private String sNezobrazovatPokudMajiIndicii;
+    private String sZobrazitPriUdalosti;
+    private String sProvestAkci;
     private boolean bRead;
     private boolean bZobrazeno;
     private Timestamp tsCasZobrazeni;
     private int iBarva;
+    private String sCas;
+
 
     public Zprava(boolean bPublic,
                   int iId,
@@ -50,7 +54,10 @@ public class Zprava implements Serializable {
                   String sIndicieZeSkupiny,
                   String sPovinneIndicie,
                   String sNezobrazovatPokudMajiIndicii,
-                  int iBarva)
+                  String sZobrazitPriUdalosti,
+                  String sProvestAkci,
+                  int iBarva,
+                  String sCas)
     {
         setbPublic(bPublic);
         setiId(iId);
@@ -68,8 +75,11 @@ public class Zprava implements Serializable {
         setiPocetIndicii(iPocetIndicii);
         setsIndicieZeSkupiny(sIndicieZeSkupiny);
         setsPovinneIndicie(sPovinneIndicie);
+        setsZobrazitPriUdalosti(sZobrazitPriUdalosti);
+        setsProvestAkci(sProvestAkci);
         setsNezobrazovatPokudMajiIndicii(sNezobrazovatPokudMajiIndicii);
         setiBarva(iBarva);
+        setsCas(sCas);
     }
 
     public boolean getbPublic() {return bPublic;}
@@ -91,7 +101,9 @@ public class Zprava implements Serializable {
     public String getsNezobrazovatPokudMajiIndicii( ) { return this.sNezobrazovatPokudMajiIndicii;}
     public String getsIndicieZeSkupiny() {return sIndicieZeSkupiny; }
     public int getiBarva() { return iBarva; }
-
+    public String getsZobrazitPriUdalosti() { return sZobrazitPriUdalosti; }
+    public String getsProvestAkci() { return sProvestAkci; }
+    public String getsCas() { return sCas; }
 
     public void setbPublic (boolean bPublic) {this.bPublic = bPublic;}
     public void setiId( int iId) {  this.iId=iId;}
@@ -116,6 +128,9 @@ public class Zprava implements Serializable {
         this.bZobrazeno = bZobrazeno;}
     public void setsIndicieZeSkupiny(String sIndicieZeSkupiny) {this.sIndicieZeSkupiny = sIndicieZeSkupiny; }
     public void setiBarva(int iBarva) { this.iBarva = iBarva; Log.d ("TAG", "Barva " + iBarva);}
+    public void setsZobrazitPriUdalosti(String sZobrazitPriUdalosti) { this.sZobrazitPriUdalosti = sZobrazitPriUdalosti; }
+    public void setsProvestAkci(String sProvestAkci) { this.sProvestAkci = sProvestAkci; }
+    public void setsCas(String sCas) { this.sCas = sCas; }
 
     private void readObject(
             ObjectInputStream aInputStream

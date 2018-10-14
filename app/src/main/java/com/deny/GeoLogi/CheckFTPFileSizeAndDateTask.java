@@ -65,14 +65,14 @@ public class CheckFTPFileSizeAndDateTask extends AsyncTask<String, Void, String>
 
             Log.d("ftp", "Check file " + sFilename);
 
-            InetAddress address = InetAddress.getByName("ftpx.forpsi.com");
+            InetAddress address = InetAddress.getByName(Nastaveni.getInstance(ctx).getsFTP());
 
             con = new FTPClient();
             con.connect(address.getHostAddress());
             con.setDataTimeout((int) Global.iConTimeout);
             con.setConnectTimeout((int) Global.iConTimeout);
 
-            if (con.login("tchcz", "dobrojeprisjetitised"))
+            if (con.login(Nastaveni.getInstance(ctx).getsFTPUser(), Nastaveni.getInstance(ctx).getsFTPHeslo()))
             {
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);

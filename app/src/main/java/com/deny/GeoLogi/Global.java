@@ -9,6 +9,11 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.sql.Timestamp;
+
 import static android.content.Context.LOCATION_SERVICE;
 
 public class Global {
@@ -26,7 +31,7 @@ public class Global {
     private static LocationManager locationManager = null;
     private static boolean bPaused = true;
 
-
+    private static Timestamp tLastLocUpdate;
 
     private Global() {
         //
@@ -190,12 +195,47 @@ public class Global {
     }
 
 
-        // Define a listener that responds to location updates
+    private static void StoreLocation() {
+        String sFileName =Global.simPrexix() + Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "lokace.bin";
+
+
+        if (Nastaveni.getInstance(ctx).getisSdileniPolohyAktivni()) {
+            Timestamp now = new Timestamp(Global.getTime());
+            if ((now.getTime()-tLastLocUpdate.getTime())>10000) {
+
+                try {
+                    FileOutputStream fileOut = ctx.openFileOutput(sFileName, Context.MODE_PRIVATE);
+                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
+                    out.writeObject(location);
+
+                    out.flush();
+                    out.close();
+
+                    fileOut.flush();
+                    fileOut.close();
+
+                    new UploadFTPFileTask(ctx).execute(sFileName);
+
+                    tLastLocUpdate = now;
+
+                } catch (IOException ex) {
+                    Okynka.zobrazOkynko(ctx, "Chyba: " + ex.getMessage());
+                }
+            }
+            Log.d(TAG, "LEAVE: write");
+        }
+    }
+
+
+    // Define a listener that responds to location updates
     private static LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "Location update: " + location.toString());
 
             Global.location = location;
+
+            StoreLocation();
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {

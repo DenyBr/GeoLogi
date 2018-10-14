@@ -46,7 +46,7 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
 
             Log.d(TAG, "Upload: " + sFilename);
 
-            InetAddress address = InetAddress.getByName("ftpx.forpsi.com");
+            InetAddress address = InetAddress.getByName(Nastaveni.getInstance(ctx).getsFTP());
 
             con = new FTPClient();
             con.connect(address.getHostAddress());
@@ -54,7 +54,7 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
             con.setDataTimeout((int) Global.iConTimeout);
             con.setConnectTimeout((int) Global.iConTimeout);
 
-            if (con.login("tchcz", "dobrojeprisjetitised"))
+            if (con.login(Nastaveni.getInstance(ctx).getsFTPUser(), Nastaveni.getInstance(ctx).getsFTPHeslo()))
             {
                 con.enterLocalPassiveMode(); // important!
                 con.setFileType(FTP.BINARY_FILE_TYPE);

@@ -81,6 +81,17 @@ public class Nastaveni extends Properties {
 
     public String getsIdWorkseet() {return getProperty("IdWorkseet", "");
     }
+    public boolean getisNaCas() {return Boolean.parseBoolean(getProperty("NaCas", ""));}
+
+    public boolean getisSdileniPolohy() {return Boolean.parseBoolean(getProperty("SdileniPolohy", ""));}
+
+    public boolean getisSdileniPolohyAktivni() {return Boolean.parseBoolean(getProperty("SdileniPolohyAktivni", ""));}
+
+    public String getsFTP() {return getProperty("FTP", "");}
+
+    public String getsFTPUser() {return getProperty("FTPUser", "");}
+
+    public String getsFTPHeslo() {return getProperty("FTPHeslo", "");}
 
     public void store (Context context) {
         try {

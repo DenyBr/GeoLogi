@@ -57,7 +57,7 @@ public class SyncFiles<T extends OverWriter&Serializable> {
                         public void run() {
                             syncFileNow();
                         }
-                    }, 1, iPerioda);
+                    }, 1000, iPerioda);
 
             Log.d(TAG, "LEAVE: SyncFiles: " + sFilename);
         }

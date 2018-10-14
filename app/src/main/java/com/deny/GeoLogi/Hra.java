@@ -12,15 +12,24 @@ public class Hra {
     private String sIdWorkseet;
     private String sNastenka;
     private boolean bVerejna;
+    private boolean bNaCas;
+    private boolean bSdileniPolohy;
+    private String sFTP;
+    private String sFTPUser;
+    private String sFTPHeslo;
 
 
-    public Hra(String idHra, String sHra, String sIdWorkseet, String sNastenka, boolean bVerejna) {
+    public Hra(String idHra, String sHra, String sIdWorkseet, String sNastenka, boolean bVerejna, boolean bNaCas, boolean bSdileniPolohy, String sFTP, String sFTPUser, String sFTPHeslo) {
         this.sHra = sHra;
         this.sIdWorkseet = sIdWorkseet;
         this.sNastenka = sNastenka;
         this.bVerejna = bVerejna;
         this.idHra = idHra;
-
+        this.bNaCas = bNaCas;
+        this.bSdileniPolohy = bSdileniPolohy;
+        this.sFTP = sFTP;
+        this.sFTPUser = sFTPUser;
+        this.sFTPHeslo = sFTPHeslo;
     }
 
     public String getsHra() {
@@ -42,4 +51,23 @@ public class Hra {
     }
 
 
+
+    public boolean isbNaCas() {
+        return bNaCas;
+    }
+
+    public String getsFTP() {
+        return sFTP;
+    }
+
+    public String getsFTPUser() {
+        return sFTPUser;
+    }
+    public String getsFTPHeslo() {
+        return sFTPHeslo;
+    }
+
+    public boolean isbSdileniPolohy() {
+        return bSdileniPolohy;
+    }
 }

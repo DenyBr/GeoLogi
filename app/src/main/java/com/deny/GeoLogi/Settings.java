@@ -77,7 +77,43 @@ public class Settings extends AppCompatActivity {
                 } catch (Exception e) {
                 }
 
-                Hra hra = new Hra(sId, sHra, sIdWorksheet, sNastenka, bVerejna);
+
+                String sSdileniPolohy = "";
+                boolean bSdileniPolohy = false;
+                try {
+                    sSdileniPolohy = columns.getJSONObject(5).getString("v");
+                    bSdileniPolohy = (sSdileniPolohy.toLowerCase().equals("Ano"));
+                } catch (Exception e) {
+                }
+
+
+                String sNaCas = "";
+                boolean bNaCas = false;
+                try {
+                    sNaCas = columns.getJSONObject(6).getString("v");
+                    bNaCas = (sNaCas.toLowerCase().equals("Ano"));
+                } catch (Exception e) {
+                }
+
+                String sFTP = "";
+                try {
+                    sFTP = columns.getJSONObject(7).getString("v");
+                } catch (Exception e) {
+                }
+
+                String sFTPUser = "";
+                try {
+                    sFTPUser = columns.getJSONObject(8).getString("v");
+                } catch (Exception e) {
+                }
+                String sFTPHeslo = "";
+                try {
+                    sFTPHeslo = columns.getJSONObject(9).getString("v");
+                } catch (Exception e) {
+                }
+
+                Hra hra = new Hra(sId, sHra, sIdWorksheet, sNastenka, bVerejna, bNaCas, bSdileniPolohy, sFTP, sFTPUser, sFTPHeslo);
+
                 hry.add(hra);
             }
 
@@ -177,9 +213,15 @@ public class Settings extends AppCompatActivity {
                 pNastaveni.setProperty("Uzivatel", Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).getsNazev());
                 pNastaveni.setProperty("Hra", hry.get(spHra.getSelectedItemPosition()).getsHra());
                 pNastaveni.setProperty("IDHra", hry.get(spHra.getSelectedItemPosition()).getIdHra());
-                pNastaveni.setProperty("Verejna", "" + hry.get(spHra.getSelectedItemPosition()).isbVerejna());
                 pNastaveni.setProperty("Nastenka", hry.get(spHra.getSelectedItemPosition()).getsNastenka());
                 pNastaveni.setProperty("IdWorkseet", hry.get(spHra.getSelectedItemPosition()).getsIdWorkseet());
+                pNastaveni.setProperty("Verejna", ""+hry.get(spHra.getSelectedItemPosition()).isbVerejna());
+                pNastaveni.setProperty("NaCas", ""+hry.get(spHra.getSelectedItemPosition()).isbNaCas());
+                pNastaveni.setProperty("SdileniPolohy", ""+hry.get(spHra.getSelectedItemPosition()).isbSdileniPolohy());
+                pNastaveni.setProperty("SdileniPolohyAktivni", ""+Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbSdiletPolohu());
+                pNastaveni.setProperty("FTP", "" + hry.get(spHra.getSelectedItemPosition()).getsFTP());
+                pNastaveni.setProperty("FTPUser", "" + hry.get(spHra.getSelectedItemPosition()).getsFTPUser());
+                pNastaveni.setProperty("FTPHeslo", "" + hry.get(spHra.getSelectedItemPosition()).getsFTPHeslo());
                 pNastaveni.setProperty("Root", "" + Uzivatele.getInstance().aOddily.get(spOddil.getSelectedItemPosition()).isbRoot());
                 pNastaveni.setProperty("Simulation", "" + Global.isbSimulationMode());
 

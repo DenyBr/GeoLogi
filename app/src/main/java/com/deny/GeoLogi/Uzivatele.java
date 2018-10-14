@@ -76,9 +76,14 @@ public class Uzivatele {
                 } catch (Exception e) {
                 }
 
-                Uzivatel o = new Uzivatel(iId, sOddil, sHeslo, bRoot);
-                aOddily.add(o);
+                boolean bSdiletPolohu = false;
+                try {
+                    bRoot = columns.getJSONObject(4).getBoolean("v");
+                } catch (Exception e) {
+                }
 
+                Uzivatel o = new Uzivatel(iId, sOddil, sHeslo, bRoot, bSdiletPolohu);
+                aOddily.add(o);
             }
 
             if (r_callback!=null) r_callback.run();
