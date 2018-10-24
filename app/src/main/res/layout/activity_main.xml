@@ -15,6 +15,39 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:minHeight="0dp"
+            android:visibility="gone"
+            android:id="@+id/timeline">
+
+            <TextView
+                android:id="@+id/casnic1"
+                android:gravity="left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+           <TextView
+                android:id="@+id/cas"
+                android:gravity="center|center_vertical"
+                android:layout_span="2"
+                android:layout_width="wrap_content"
+                android:textSize="30dp"
+                android:background="#000000"
+                android:textColor="#cc0000"
+                android:text="1:00:00"
+
+                />
+            <TextView
+                android:id="@+id/cas_vysledek"
+                android:gravity="center|center_vertical"
+                android:layout_span="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                />
+
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:minHeight="15dp">
 
             <TextView

@@ -198,16 +198,19 @@ public class Global {
     private static void StoreLocation() {
         String sFileName =Global.simPrexix() + Nastaveni.getInstance(ctx).getsIdHry() + Nastaveni.getInstance(ctx).getiIDOddilu() + "lokace.bin";
 
-
         if (Nastaveni.getInstance(ctx).getisSdileniPolohyAktivni()) {
-            Timestamp now = new Timestamp(Global.getTime());
-            if ((now.getTime()-tLastLocUpdate.getTime())>10000) {
 
-                try {
+            Timestamp now = new Timestamp(Global.getTime());
+            Log.d(TAG, "Ukladam polohu " + now + " " + sFileName);
+
+            if ((null==tLastLocUpdate) || (now.getTime()-tLastLocUpdate.getTime())>10000) {
+             try {
                     FileOutputStream fileOut = ctx.openFileOutput(sFileName, Context.MODE_PRIVATE);
                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                    Log.d(TAG, "Ukladam polohu - soubor otevren" + sFileName);
 
-                    out.writeObject(location);
+                    out.writeDouble(location.getLongitude());
+                    out.writeDouble(location.getLatitude());
 
                     out.flush();
                     out.close();
@@ -215,9 +218,12 @@ public class Global {
                     fileOut.flush();
                     fileOut.close();
 
+                    Log.d(TAG, "Poloha ulozena, inicializuje se odesilani na server");
+
                     new UploadFTPFileTask(ctx).execute(sFileName);
 
                     tLastLocUpdate = now;
+
 
                 } catch (IOException ex) {
                     Okynka.zobrazOkynko(ctx, "Chyba: " + ex.getMessage());
@@ -228,6 +234,8 @@ public class Global {
     }
 
 
+
+
     // Define a listener that responds to location updates
     private static LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -235,7 +243,7 @@ public class Global {
 
             Global.location = location;
 
-            StoreLocation();
+            if (location!=null) StoreLocation();
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {

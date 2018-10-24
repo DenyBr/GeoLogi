@@ -73,7 +73,7 @@ public class Settings extends AppCompatActivity {
                 boolean bVerejna = false;
                 try {
                     sVerejna = columns.getJSONObject(4).getString("v");
-                    bVerejna = (sVerejna.toLowerCase().equals("Ano"));
+                    bVerejna = (sVerejna.toLowerCase().equals("ano"));
                 } catch (Exception e) {
                 }
 
@@ -82,7 +82,7 @@ public class Settings extends AppCompatActivity {
                 boolean bSdileniPolohy = false;
                 try {
                     sSdileniPolohy = columns.getJSONObject(5).getString("v");
-                    bSdileniPolohy = (sSdileniPolohy.toLowerCase().equals("Ano"));
+                    bSdileniPolohy = (sSdileniPolohy.toLowerCase().equals("ano"));
                 } catch (Exception e) {
                 }
 
@@ -91,7 +91,7 @@ public class Settings extends AppCompatActivity {
                 boolean bNaCas = false;
                 try {
                     sNaCas = columns.getJSONObject(6).getString("v");
-                    bNaCas = (sNaCas.toLowerCase().equals("Ano"));
+                    bNaCas = (sNaCas.toLowerCase().equals("ano"));
                 } catch (Exception e) {
                 }
 

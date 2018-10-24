@@ -78,7 +78,7 @@ public class Uzivatele {
 
                 boolean bSdiletPolohu = false;
                 try {
-                    bRoot = columns.getJSONObject(4).getBoolean("v");
+                    bSdiletPolohu = columns.getJSONObject(4).getBoolean("v");
                 } catch (Exception e) {
                 }
 

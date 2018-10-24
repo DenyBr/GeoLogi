@@ -33,6 +33,7 @@ public class Zprava implements Serializable {
     private boolean bRead;
     private boolean bZobrazeno;
     private Timestamp tsCasZobrazeni;
+    private Timestamp tsCasNacteni;
     private int iBarva;
     private String sCas;
 
@@ -104,6 +105,9 @@ public class Zprava implements Serializable {
     public String getsZobrazitPriUdalosti() { return sZobrazitPriUdalosti; }
     public String getsProvestAkci() { return sProvestAkci; }
     public String getsCas() { return sCas; }
+    public Timestamp getTsCasNacteni() { return tsCasNacteni; }
+
+    public void setTsCasNacteni(Timestamp tsCasNacteni) {this.tsCasNacteni = tsCasNacteni;}
 
     public void setbPublic (boolean bPublic) {this.bPublic = bPublic;}
     public void setiId( int iId) {  this.iId=iId;}

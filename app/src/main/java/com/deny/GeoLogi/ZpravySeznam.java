@@ -10,6 +10,7 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -31,7 +32,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 
@@ -52,10 +56,36 @@ public class ZpravySeznam implements Handler.Callback {
     boolean bConnectionLost = false;
     final Handler updateHandler = new Handler();
     Handler.Callback guiUpdate =null;
+    Timestamp tsGameStarted = null;
+    Timestamp tsGameFinished = null;
+    long lTimeLimit = 0;
+    boolean bTimeLimitedGame = false;
+    boolean bCasVyprsel = false;
+    boolean bCilDosazen = false;
+
+
+    boolean bCardFalse1Received = false;
+    boolean bCardFalse2Received = false;
+    boolean bCardFalse3Received = false;
+    boolean bCardTrueReceived = false;
+
+    HashSet<String> ssReceivedEvents = new HashSet<String>();
+    LinkedHashSet<String> ssEventsToSend = new LinkedHashSet<String>();
+
+    private IOServer ioServer;
+
 
     public static ZpravySeznam getInstance(Context context) {
         if (null==ourInstance) {
             ourInstance=new ZpravySeznam(context) ;
+        }
+
+        return ourInstance;
+    }
+
+    public static ZpravySeznam getInstance() throws Exception {
+        if (null==ourInstance) {
+            throw new Exception(TAG + "Instance nebyla jeste vytvorena");
         }
 
         return ourInstance;
@@ -71,6 +101,9 @@ public class ZpravySeznam implements Handler.Callback {
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationRingtone = RingtoneManager.getRingtone(context.getApplicationContext(), notification);
         v = (Vibrator)context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+
+        ioServer = new IOServer(context, 5001);
+
     }
 
     public void registerGuiCallback(Handler.Callback callback) {
@@ -83,6 +116,14 @@ public class ZpravySeznam implements Handler.Callback {
         this.context = context;
 
         updateHandler.removeCallbacks(updateRunabble);
+
+        bCardFalse1Received = false;
+        bCardFalse2Received = false;
+        bCardFalse3Received = false;
+        bCardTrueReceived = false;
+        ssReceivedEvents = new HashSet<String>();
+        ssEventsToSend = new LinkedHashSet<String>();
+
 
         synchronized (lock) {
             //Save currently selected gam and user to detect change later
@@ -111,7 +152,6 @@ public class ZpravySeznam implements Handler.Callback {
             }
         }
 
-
         //register callback which will be called in case of update of Hints
         //instantiate Hints singleton and read stored Hints
         IndicieSeznam.setCallback(this);
@@ -126,6 +166,8 @@ public class ZpravySeznam implements Handler.Callback {
         tsLastUpdate = null;
 
         casovyupdate();
+
+        rekonstruujCas();
 
         Log.d(TAG, "LEAVE: read");
     }
@@ -273,20 +315,39 @@ public class ZpravySeznam implements Handler.Callback {
                     } catch (Exception e) {
                     }
 
+                    String sZobrazitPriUdalosti = "";
+                    try {
+                        sZobrazitPriUdalosti = columns.getJSONObject(17).getString("v");
+                    } catch (Exception e) {
+                    }
+
+                    String sProvestAkci = "";
+                    try {
+                        sProvestAkci = columns.getJSONObject(18).getString("v");
+                    } catch (Exception e) {
+                    }
+
                     String sColor = "";
                     try {
-                        sColor = columns.getJSONObject(17).getString("v");
+                        sColor = columns.getJSONObject(19).getString("v");
                     } catch (Exception e) {
                     }
 
                     int iColor = 0;
                     if (!sColor.equals("")) {
                         try {
-                            iColor = Integer.valueOf(sColor, 16);
+                            iColor = Integer.valueOf(sColor, 19);
                         } catch (Exception e) {
                             Okynka.zobrazOkynko(context, "Chybný formát barvy u zpravy " + sPredmet);
                         }
                     }
+
+                    String sCas = "";
+                    try {
+                        sCas = columns.getJSONObject(20).getString("v");
+                    } catch (Exception e) {
+                    }
+
 
                     Zprava zprava = new Zprava(bPublic,
                             iId,
@@ -305,7 +366,10 @@ public class ZpravySeznam implements Handler.Callback {
                             sIndicieZeSkupiny,
                             sPovinneIndicie,
                             sNezobrazovatPokudMajiIndicii,
-                            iColor
+                            sZobrazitPriUdalosti,
+                            sProvestAkci,
+                            iColor,
+                            sCas
                     );
 
                     pridejNeboPrepis(zprava);
@@ -344,6 +408,9 @@ public class ZpravySeznam implements Handler.Callback {
             z_zapsana.setsIndicieZeSkupiny(z.getsIndicieZeSkupiny());
             z_zapsana.setsPovinneIndicie(z.getsPovinneIndicie());
             z_zapsana.setiBarva(z.getiBarva());
+            z_zapsana.setsProvestAkci(z.getsProvestAkci());
+            z_zapsana.setsZobrazitPriUdalosti(z.getsZobrazitPriUdalosti());
+            z_zapsana.setsCas(z.getsCas());
             z_zapsana.setsNezobrazovatPokudMajiIndicii(z.getsNezobrazovatPokudMajiIndicii());
             Log.d(TAG, "Message overwritten");
         }
@@ -358,15 +425,170 @@ public class ZpravySeznam implements Handler.Callback {
 
     //vraci true, pokud maji tu spravnou indicii
     private boolean zkontrolujJestliMajiIndicie (Zprava z) {
-        List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\s,]+"));
+        List<String> items = Arrays.asList(z.getsPovinneIndicie().split("[\\\\,]+"));
 
         for (int i=0; i<items.size(); i++) {
-            if ((!items.get(i).equals(""))&&(!IndicieSeznam.getInstance(context).uzMajiIndicii(items.get(i)))) return false;
+            if ((!items.get(i).equals(""))&&(!IndicieSeznam.getInstance(context).uzMajiIndicii(items.get(i)))) {
+                Log.d(TAG, "Nemaji indicii: "+items.get(i));
+                return false;
+            }
         }
 
         return true;
     }
 
+    public void handleIOMessage (String sMessage) {
+        Log.d(TAG, "ENTER; HandleIOMessage: " + sMessage);
+
+        Log.d(TAG, sMessage.substring(0, 4).toLowerCase());
+        Log.d(TAG, sMessage.substring(4, 8).toLowerCase());
+
+
+        if (sMessage.substring(0, 4).toLowerCase().equals("card")) {
+            Log.d(TAG,"Udaost je od ctecky karet");
+            if (sMessage.substring(4, 8).toLowerCase().equals("true")) {
+                bCardTrueReceived = true;
+                Log.d(TAG,"Spravna karta");
+            }
+            else
+            {
+                Log.d(TAG,"Spatna karta");
+                if (!bCardFalse1Received) bCardFalse1Received=true;
+                else if (!bCardFalse2Received) bCardFalse2Received=true;
+                else if (!bCardFalse3Received) bCardFalse3Received=true;
+            }
+        } else {
+           ssReceivedEvents.add(sMessage);
+        }
+
+        zkontrolujZpravy(true);
+    }
+
+    private boolean zkontrolujCasoveUdalosti(Zprava z) {
+        Log.d(TAG, "zkontrolujCasoveUdalosti: "+z.getsCas());
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        if (z.getsCas().trim().equals("")) return true;
+
+        if (z.getsCas().contains("Plus")) {
+            lTimeLimit += Long.valueOf(z.getsCas().trim().substring(5));
+            Log.d(TAG, "Pricitam cas: "+Long.valueOf(z.getsCas().trim().substring(5)));
+
+            bTimeLimitedGame = true;
+            return true;
+        }
+        if (z.getsCas().contains("Minus")) {
+            lTimeLimit -= Long.valueOf(z.getsCas().trim().substring(6));
+            Log.d(TAG, "Odecitam cas: "+Long.valueOf(z.getsCas().trim().substring(6)));
+
+            bTimeLimitedGame = true;
+            return true;
+        }
+
+        if ((z.getsCas().trim().contains("Start")) || (z.getsCas().trim().equals("Start"))) {
+            if (z.getbZobrazeno()) {
+                tsGameStarted = z.getTsCasNacteni();
+            }
+            else {
+                tsGameStarted = now;
+            }
+            Log.d(TAG, "Hra spustena");
+            return true;
+        }
+
+        if ((z.getsCas().contains("Cil") || (z.getsCas().trim().equals("Cil")))) {
+            if (z.getTsCasNacteni()!=null) tsGameFinished=z.getTsCasNacteni();
+                                      else tsGameFinished=now;
+            Log.d(TAG, "Hra dokoncena uspesne");
+            bCilDosazen = true;
+            return true;
+        }
+
+        if ((z.getsCas().contains("Timeout") || (z.getsCas().trim().equals("Timeout"))) &&
+                bTimeLimitedGame &&
+                !bCilDosazen &&
+                tsGameStarted!=null &&
+                ((now.getTime()-tsGameStarted.getTime())>lTimeLimit*1000)
+               ) {
+            Log.d(TAG, "Hra dokoncena - cas vyprsel");
+
+            if (z.getTsCasNacteni()!=null) tsGameFinished=z.getTsCasNacteni();
+                                       else tsGameFinished=now;
+            bCilDosazen = false;
+            bCasVyprsel = true;
+            return true;
+        }
+
+        return false;
+    }
+
+     private void rekonstruujCas() {
+        bCasVyprsel = false;
+        bCilDosazen = false;
+        bTimeLimitedGame = false;
+        tsGameStarted = null;
+        tsGameFinished = null;
+        lTimeLimit = 0;
+
+        for (int i=0; i<zpravyZobraz.size(); i++) {
+           Zprava z = zpravyZobraz.get(i);
+
+           if (z.getbZobrazeno()) {
+               zkontrolujCasoveUdalosti(z);
+           }
+        }
+    }
+
+
+    private boolean zkontrolujIOUdalosti(Zprava z) {
+        //pokud zrava nema zadnou udalost, tak OK
+        if (z.getsZobrazitPriUdalosti().trim().equals("")) return true;
+
+        //vyhodnoceni karet
+        //pokud uz pouzili spravnou kartu, tak uz na spatny kaslem
+        if (bCardTrueReceived)
+        {
+            if (z.getsZobrazitPriUdalosti().equals("SpravnaKarta")) return true;
+        } else {
+            //pokud nepouzili spravnou, tak musime vyhodnotit, kolik spatnych uz pouzili
+            if (z.getsZobrazitPriUdalosti().equals("SpatnaKarta1")) return bCardFalse1Received;
+            if (z.getsZobrazitPriUdalosti().equals("SpatnaKarta2")) return bCardFalse2Received;
+            if (z.getsZobrazitPriUdalosti().equals("SpatnaKarta3")) return bCardFalse3Received;
+        }
+
+        //vyhodnoseni ostatnich IO udalosti
+        if (ssReceivedEvents.contains(z.getsZobrazitPriUdalosti())) {
+            ssEventsToSend.add(z.getsProvestAkci());
+            return true;
+        }
+        return false;
+    }
+
+    private void rekonstuujIO() {
+        //toto tu je kvuli restartu aplikace v prubehu hry.
+        //protoze obdrzene udalosti doufam povedou k zobrazeni zpravy, tak muzeme rekonstruovat
+
+        for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
+            Zprava z = zpravyKomplet.get(i);
+            if (z.getbZobrazeno()) {
+                if (!(z.getsProvestAkci().trim().equals(""))) {
+                    ssEventsToSend.add(z.getsProvestAkci());
+                }
+
+                if (!(z.getsZobrazitPriUdalosti().trim().equals(""))) {
+                    if ((z.getsZobrazitPriUdalosti().trim().equals("SpravnaKarta")))
+                        bCardTrueReceived = true;
+                    else if ((z.getsZobrazitPriUdalosti().trim().equals("SpatnaKarta1")))
+                        bCardFalse1Received = true;
+                    else if ((z.getsZobrazitPriUdalosti().trim().equals("SpatnaKarta2")))
+                        bCardFalse2Received = true;
+                    else if ((z.getsZobrazitPriUdalosti().trim().equals("SpatnaKarta3")))
+                        bCardFalse3Received = true;
+                    else ssReceivedEvents.add(z.getsZobrazitPriUdalosti().trim());
+                }
+            }
+        }
+    }
 
     void zkontrolujZpravy (boolean bPrekreslit) {
         ArrayList<Zprava> zpravy = new ArrayList<>();
@@ -375,6 +597,13 @@ public class ZpravySeznam implements Handler.Callback {
         String sNova = "";
 
         Log.d(TAG, "ENTER: zkontrolujZpravy: " + zpravyKomplet.size());
+
+
+        Log.d(TAG, "Rekonstruuj stav prijatych a odeslanych zprav");
+        rekonstuujIO();
+        if (IOServer.sTextToSend.equals("") && !ssEventsToSend.isEmpty()) {
+            IOServer.sTextToSend = (String) ssEventsToSend.toArray()[ 0 ];
+        }
 
         synchronized (lock) {
             try {
@@ -390,7 +619,8 @@ public class ZpravySeznam implements Handler.Callback {
                             "  Pocet indicii? " + (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) +
                             "  Spravne indicie? " + zkontrolujJestliMajiIndicie(z) +
                             "  Nezobrazovaci indicie? " + ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(context).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))) +
-                            "  Lokace? " + zkontrolujLokaci(z));
+                            "  Lokace? " + zkontrolujLokaci(z) +
+                            "  IOUdalosti? " + zkontrolujIOUdalosti(z));
 
                     //zkotrnolujeme, ze se ma zprava zobrazit
                     if (z.getbZobrazeno() // uz byla nekdy videt
@@ -400,8 +630,11 @@ public class ZpravySeznam implements Handler.Callback {
                                     && (zkontrolujCas(z)) //je cas na zobrazeni zpravy
                                     && (IndicieSeznam.indiciiZeSkupiny(z.getsIndicieZeSkupiny()) >= z.getiPocetIndicii()) //maji dost indiciii
                                     && (zkontrolujJestliMajiIndicie(z)) //a maji ty spravne
-                                    && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(context).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii()))))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
-                    {
+                                    && ((z.getsNezobrazovatPokudMajiIndicii().equals("")) || (!IndicieSeznam.getInstance(context).uzMajiIndicii(z.getsNezobrazovatPokudMajiIndicii())))) //neni to zprava. ktera se nema zobrazovat, pokud ziskali nejakou jinou indicii
+                                    && zkontrolujIOUdalosti(z)
+                                    && zkontrolujCasoveUdalosti(z))
+                    //toto musi byt posledni, aby nebyl cas pricten nebo odecten vicekrat
+                        {
                         if (zkontrolujLokaci(z)) //jsou na cilovem bode nebo na nem byli
                         {
                             //pokud ano, tak pridame zpravu do seznamu zobrazovanych
@@ -432,6 +665,15 @@ public class ZpravySeznam implements Handler.Callback {
                                 sNova = z.getsPredmet();
 
                                 z.setbZobrazeno(true);
+                                if (z.getTsCasNacteni()==null) z.setTsCasNacteni(new Timestamp(System.currentTimeMillis()));
+
+
+                                if (!z.getsProvestAkci().equals("")) {
+                                    Log.d(TAG, "IO akce: " + z.getsProvestAkci());
+
+                                    ssEventsToSend.add(z.getsProvestAkci());
+                                    IOServer.sTextToSend=z.getsProvestAkci();
+                                }
                             }
                         } else {
                             //pokud je vsechno splneno, ale na lokaci jeste nebyli, je mozna potreba pridac cilovy bod do seznamu hledanych
@@ -523,6 +765,7 @@ public class ZpravySeznam implements Handler.Callback {
 
             }
         }
+
         Log.d(TAG, "LEAVE: zkontrolujZpravy: celkem zprav: "+ zpravyKomplet.size()+" viditelnych zprav: " + zpravy.size());
     }
 
@@ -594,7 +837,6 @@ public class ZpravySeznam implements Handler.Callback {
         boolean bZmenaHry = !sVybrano.equals(Global.simPrexix()+ Nastaveni.getInstance(context).getsIdHry()+Nastaveni.getInstance(context).getiIDOddilu());
         Log.d(TAG, "ENTER:Casovy update ");
 
-
         if (!bZmenaHry) {
             if (!Nastaveni.getInstance(context).getsHra().equals("")) {
                 int iMin = GeoBody.getInstance(context).iVzdalenostNejblizsiho(context);
@@ -615,6 +857,8 @@ public class ZpravySeznam implements Handler.Callback {
         updateHandler.postDelayed(updateRunabble, iTimeout);
     }
 
+
+
     private Runnable updateRunabble = new Runnable() {
         @Override
         public void run() {
@@ -624,6 +868,7 @@ public class ZpravySeznam implements Handler.Callback {
 
     @Override
     public boolean handleMessage(Message message) {
+
         zkontrolujZpravy(false);
         return true;
     }
@@ -669,6 +914,8 @@ public class ZpravySeznam implements Handler.Callback {
             return false;
         }
     }
+
+
+
+
 }
-
-

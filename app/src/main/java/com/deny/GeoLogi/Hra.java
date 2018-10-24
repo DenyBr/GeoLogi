@@ -1,5 +1,7 @@
 package com.deny.GeoLogi;
 
+import android.util.Log;
+
 /**
  * Created by bruzlzde on 22.3.2018.
  *
@@ -7,6 +9,8 @@ package com.deny.GeoLogi;
  */
 
 public class Hra {
+    private final String TAG = "Hra";
+
     private String idHra;
     private String sHra;
     private String sIdWorkseet;
@@ -30,6 +34,8 @@ public class Hra {
         this.sFTP = sFTP;
         this.sFTPUser = sFTPUser;
         this.sFTPHeslo = sFTPHeslo;
+
+        Log.d(TAG, "idHra: "+this.idHra + "Hra: " + this.sHra + "SdileniPolohy: "+bSdileniPolohy);
     }
 
     public String getsHra() {
@@ -49,8 +55,6 @@ public class Hra {
     public boolean isbVerejna() {
         return bVerejna;
     }
-
-
 
     public boolean isbNaCas() {
         return bNaCas;

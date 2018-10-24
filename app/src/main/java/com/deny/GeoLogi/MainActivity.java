@@ -2,6 +2,9 @@ package com.deny.GeoLogi;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -12,12 +15,16 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 
 
 /*Hlavni obrazovka aplikace
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private static final String TAG = "MAIN";
     ListView listview;
     int iSirka=0;
+    Handler updateHandler = new Handler();
+    ToneGenerator toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +92,131 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         ZpravySeznam.getInstance(this).registerGuiCallback(this);
         ZpravySeznam.getInstance(this).read(this);
 
+        updateHandler.postDelayed(updateCasRunabble,10);
+
         Log.d(TAG, "LEAVE: Init");
     }
 
+
+
+    private Runnable updateCasRunabble = new Runnable() {
+        @Override
+        public void run() {
+            if (!Global.isbPaused()) updateCas();
+        }
+    };
+
+    private void updateCas() {
+        //TODO: toto patri refaktorovat do ZpravySeznam, tady je to spatne z pohledu encapsulace
+        TableRow radek = (TableRow) findViewById(R.id.timeline);
+
+        if (Nastaveni.getInstance(this).getisNaCas()) {
+
+            radek.setVisibility(View.VISIBLE);
+
+            TextView nadpis = findViewById(R.id.cas);
+            //TextView popis = findViewById(R.id.cas_vysledek);
+            if (nadpis != null) {
+                //nadpis.setHeight(20);
+                long lCas = 0;
+                long now = System.currentTimeMillis();
+
+                if (ZpravySeznam.getInstance(this).bTimeLimitedGame) {
+                    //zobrazujeme zbyvajici cas
+                    if (ZpravySeznam.getInstance(this).tsGameStarted!=null) {
+                        //hra byla spustena
+                        if ((ZpravySeznam.getInstance(this).bCilDosazen))  {
+                            //hra by;a dokoncena
+                            if ((ZpravySeznam.getInstance(this).tsGameFinished != null)) {
+                                lCas = ZpravySeznam.getInstance(this).tsGameStarted.getTime() -
+                                       ZpravySeznam.getInstance(this).tsGameFinished.getTime() +
+                                       ZpravySeznam.getInstance(this).lTimeLimit * 1000;
+                                //popis.setText("hra ukoncena: "+lCas);
+                            } else {
+                                //toto je spatne
+                                lCas = Long.MIN_VALUE;
+                                //popis.setText("chyba mereni casu: "+lCas);
+                            }
+                        }
+                        else if (ZpravySeznam.getInstance(this).bCasVyprsel)
+                        {
+                            lCas = 0;
+                            //popis.setText("hra ukoncena: cas vyprsel");
+                        }
+                        else {
+                            lCas = ZpravySeznam.getInstance(this).tsGameStarted.getTime() -
+                                    now +
+                                    ZpravySeznam.getInstance(this).lTimeLimit * 1000;
+                            //popis.setText("hra cas bezi: "+lCas);
+
+                            if (lCas<=0) {
+                                lCas = 0;
+                                ZpravySeznam.getInstance(this).bCasVyprsel=true;
+                                if (ZpravySeznam.getInstance(this).tsGameFinished==null) {
+                                    ZpravySeznam.getInstance(this).tsGameFinished=new Timestamp(now);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        //hra jeste nebyla spustena - zobrazujeme casobou dotaci
+                        lCas = ZpravySeznam.getInstance(this).lTimeLimit * 1000;
+                        //popis.setText("hra jeste nebyla spustena");
+                    }
+                }
+                else {
+                    //zobrazujeme uplynuly cas
+                   if (ZpravySeznam.getInstance(this).tsGameStarted!=null) {
+                    //hra byla spustena
+                        if ((ZpravySeznam.getInstance(this).tsGameFinished != null)) {
+                            lCas =  ZpravySeznam.getInstance(this).tsGameFinished.getTime() -
+                                    ZpravySeznam.getInstance(this).tsGameStarted.getTime();
+                           // popis.setText("hra skoncila - namereny stav: "+lCas);
+                        }
+                        else {
+                            lCas =  now -
+                                    ZpravySeznam.getInstance(this).tsGameStarted.getTime();
+                            //popis.setText("hra ukoncena: cas bezi: "+lCas);
+                        }
+                   }
+                }
+                if (lCas==Long.MIN_VALUE)
+                    nadpis.setText("chyba");
+
+                else {
+                    if ((lCas>0) && (ZpravySeznam.getInstance(this).tsGameStarted!=null)) {
+                        lCas=lCas/1000;
+                        if (((lCas) < 60) ||
+                                ((lCas < 300) && (lCas % 5 == 0)) ||
+                                ((lCas < 600) && (lCas % 10 == 0)) ||
+                                (((lCas % 60 == 0)))) {
+
+                            if (!Global.isbPaused()) {
+                                toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+                            }
+                        }
+                    }
+
+                    if (lCas<0) lCas=0;
+
+                    long hours = lCas/3600;
+                    long minutes = (lCas%3600)/60;
+                    long seconds = (lCas%60);
+
+                    nadpis.setText(String.format ("%02d:%02d:%02d", hours, minutes, seconds));
+                }
+
+            }
+
+
+            updateHandler.postDelayed(updateCasRunabble,1000);
+        }
+
+        else
+        {
+            radek.setVisibility(View.GONE);
+        }
+    }
 
     public void syncClickHandler(View view) {
        ZpravySeznam.getInstance(this).serverUpdate(true);
@@ -170,6 +301,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
         Log.d(TAG, "Spusteno");
 
+        Global.setCtx(this);
+
         //chceme full screan kvuli malejm telefonum
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -210,8 +343,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     @Override
     public boolean handleMessage(Message msg) {
-        updateView();
-        return true;
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // Stuff that updates the UI
+                updateView();
+            }
+        });
+
+         return true;
     }
 
     @Override
@@ -272,8 +413,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                     openWebWiew(z.getsLink());
                 }
                 z.setbRead(true);
-                if (null == z.getTsCasZobrazeni())
+                if (null == z.getTsCasZobrazeni()) {
                     z.setTsCasZobrazeni(new Timestamp(Global.getTime()));
+                }
 
                 ZpravySeznam.getInstance(MainActivity.this).zkontrolujZpravy(true);
             }

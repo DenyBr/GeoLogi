@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,8 +14,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TableRow;
 import android.widget.TextView;
-
-import com.deny.GeoLogi.R;
 
 public class UvodniStranka extends AppCompatActivity {
     /**
@@ -28,6 +25,7 @@ public class UvodniStranka extends AppCompatActivity {
 
     private long tsClick=0;
     private int iNumfClicks;
+    private CardServer cardServer;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -106,6 +104,8 @@ public class UvodniStranka extends AppCompatActivity {
         intentSettings = new Intent(this, Settings.class);
         intentMain = new Intent(this, MainActivity.class);
         intentResults = new Intent(this, VysledkyActivity.class);
+
+        cardServer = new CardServer(this, 6000);
     }
 
 
