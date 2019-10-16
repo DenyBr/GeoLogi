@@ -81,7 +81,10 @@ public class Nastaveni extends Properties {
 
     public String getsIdWorkseet() {return getProperty("IdWorkseet", "");
     }
-    public boolean getisNaCas() {return Boolean.parseBoolean(getProperty("NaCas", ""));}
+    public boolean getisNaCas() {
+        Log.d(TAG, "NaCas "+Boolean.parseBoolean(getProperty("NaCas", "")));
+        return Boolean.parseBoolean(getProperty("NaCas", ""));
+     }
 
     public boolean getisSdileniPolohy() {return Boolean.parseBoolean(getProperty("SdileniPolohy", ""));}
 

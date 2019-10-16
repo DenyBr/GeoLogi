@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -78,22 +79,25 @@ public class Settings extends AppCompatActivity {
                 }
 
 
-                String sSdileniPolohy = "";
-                boolean bSdileniPolohy = false;
-                try {
-                    sSdileniPolohy = columns.getJSONObject(5).getString("v");
-                    bSdileniPolohy = (sSdileniPolohy.toLowerCase().equals("ano"));
-                } catch (Exception e) {
-                }
-
 
                 String sNaCas = "";
                 boolean bNaCas = false;
                 try {
-                    sNaCas = columns.getJSONObject(6).getString("v");
+                    sNaCas = columns.getJSONObject(5).getString("v");
                     bNaCas = (sNaCas.toLowerCase().equals("ano"));
+                    Log.d("NaCas","NaCas: "+sNaCas + " " + bNaCas);
+
                 } catch (Exception e) {
                 }
+
+                String sSdileniPolohy = "";
+                boolean bSdileniPolohy = false;
+                try {
+                    sSdileniPolohy = columns.getJSONObject(6).getString("v");
+                    bSdileniPolohy = (sSdileniPolohy.toLowerCase().equals("ano"));
+                } catch (Exception e) {
+                }
+
 
                 String sFTP = "";
                 try {

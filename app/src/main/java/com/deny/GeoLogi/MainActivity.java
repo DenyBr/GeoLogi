@@ -102,11 +102,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private Runnable updateCasRunabble = new Runnable() {
         @Override
         public void run() {
-            if (!Global.isbPaused()) updateCas();
+            if (!Global.isbPaused())
+                updateCas();
         }
     };
 
     private void updateCas() {
+        Log.d(TAG, "updateCas");
         //TODO: toto patri refaktorovat do ZpravySeznam, tady je to spatne z pohledu encapsulace
         TableRow radek = (TableRow) findViewById(R.id.timeline);
 
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             radek.setVisibility(View.VISIBLE);
 
             TextView nadpis = findViewById(R.id.cas);
-            //TextView popis = findViewById(R.id.cas_vysledek);
+            TextView popis = findViewById(R.id.cas_vysledek);
             if (nadpis != null) {
                 //nadpis.setHeight(20);
                 long lCas = 0;
@@ -155,13 +157,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                                 if (ZpravySeznam.getInstance(this).tsGameFinished==null) {
                                     ZpravySeznam.getInstance(this).tsGameFinished=new Timestamp(now);
                                 }
+                                ZpravySeznam.getInstance(this).zkontrolujZpravy(false);
                             }
                         }
                     }
                     else {
                         //hra jeste nebyla spustena - zobrazujeme casobou dotaci
                         lCas = ZpravySeznam.getInstance(this).lTimeLimit * 1000;
-                        //popis.setText("hra jeste nebyla spustena");
+                    //    popis.setText("hra jeste nebyla spustena "+ZpravySeznam.getInstance(this).lTimeLimit);
                     }
                 }
                 else {
@@ -171,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                         if ((ZpravySeznam.getInstance(this).tsGameFinished != null)) {
                             lCas =  ZpravySeznam.getInstance(this).tsGameFinished.getTime() -
                                     ZpravySeznam.getInstance(this).tsGameStarted.getTime();
-                           // popis.setText("hra skoncila - namereny stav: "+lCas);
+                            //popis.setText("hra skoncila - namereny stav: "+lCas);
                         }
                         else {
                             lCas =  now -
@@ -180,18 +183,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                         }
                    }
                 }
+
+                Log.d(TAG, "su tady " + lCas);
+
                 if (lCas==Long.MIN_VALUE)
                     nadpis.setText("chyba");
-
                 else {
+                    lCas=lCas/1000;
                     if ((lCas>0) && (ZpravySeznam.getInstance(this).tsGameStarted!=null)) {
-                        lCas=lCas/1000;
                         if (((lCas) < 60) ||
                                 ((lCas < 300) && (lCas % 5 == 0)) ||
                                 ((lCas < 600) && (lCas % 10 == 0)) ||
                                 (((lCas % 60 == 0)))) {
 
-                            if (!Global.isbPaused()) {
+                            if (!Global.isbPaused() && !(ZpravySeznam.getInstance(this).bCasVyprsel && !(ZpravySeznam.getInstance(this).bCilDosazen))) {
                                 toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
                             }
                         }
@@ -205,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
                     nadpis.setText(String.format ("%02d:%02d:%02d", hours, minutes, seconds));
                 }
-
             }
 
 
@@ -268,9 +272,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
             Okynka.zobrazOkynko(this, "Chyba: " + ex.getMessage());
         }
     }
-
-
-
 
     public void testClickHandler(View view) {
         Log.d(TAG, "Simulace - next step");

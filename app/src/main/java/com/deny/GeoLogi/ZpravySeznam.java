@@ -465,20 +465,24 @@ public class ZpravySeznam implements Handler.Callback {
     }
 
     private boolean zkontrolujCasoveUdalosti(Zprava z) {
-        Log.d(TAG, "zkontrolujCasoveUdalosti: "+z.getsCas());
+        Log.d(TAG, "zkontrolujCasoveUdalosti: "+z.getsCas()+" "+z.getiId()+" " + z.getTsCasNacteni());
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
         if (z.getsCas().trim().equals("")) return true;
 
         if (z.getsCas().contains("Plus")) {
-            lTimeLimit += Long.valueOf(z.getsCas().trim().substring(5));
-            Log.d(TAG, "Pricitam cas: "+Long.valueOf(z.getsCas().trim().substring(5)));
+            if (z.getTsCasNacteni()!=null) {
+                lTimeLimit += Long.valueOf(z.getsCas().trim().substring(5));
+                Log.d(TAG, "Pricitam cas: " + Long.valueOf(z.getsCas().trim().substring(5)));
 
-            bTimeLimitedGame = true;
+                bTimeLimitedGame = true;
+            }
             return true;
         }
         if (z.getsCas().contains("Minus")) {
-            lTimeLimit -= Long.valueOf(z.getsCas().trim().substring(6));
+            if (z.getTsCasNacteni()!=null) {
+                lTimeLimit -= Long.valueOf(z.getsCas().trim().substring(6));
+            }
             Log.d(TAG, "Odecitam cas: "+Long.valueOf(z.getsCas().trim().substring(6)));
 
             bTimeLimitedGame = true;
@@ -486,7 +490,7 @@ public class ZpravySeznam implements Handler.Callback {
         }
 
         if ((z.getsCas().trim().contains("Start")) || (z.getsCas().trim().equals("Start"))) {
-            if (z.getbZobrazeno()) {
+            if (z.getTsCasNacteni()!=null) {
                 tsGameStarted = z.getTsCasNacteni();
             }
             else {
@@ -498,7 +502,7 @@ public class ZpravySeznam implements Handler.Callback {
 
         if ((z.getsCas().contains("Cil") || (z.getsCas().trim().equals("Cil")))) {
             if (z.getTsCasNacteni()!=null) tsGameFinished=z.getTsCasNacteni();
-                                      else tsGameFinished=now;
+
             Log.d(TAG, "Hra dokoncena uspesne");
             bCilDosazen = true;
             return true;
@@ -510,12 +514,14 @@ public class ZpravySeznam implements Handler.Callback {
                 tsGameStarted!=null &&
                 ((now.getTime()-tsGameStarted.getTime())>lTimeLimit*1000)
                ) {
-            Log.d(TAG, "Hra dokoncena - cas vyprsel");
+            if (z.getTsCasNacteni() != null) {
+                Log.d(TAG, "Hra dokoncena - cas vyprsel");
 
-            if (z.getTsCasNacteni()!=null) tsGameFinished=z.getTsCasNacteni();
-                                       else tsGameFinished=now;
-            bCilDosazen = false;
-            bCasVyprsel = true;
+                tsGameFinished = z.getTsCasNacteni();
+
+                bCilDosazen = false;
+                bCasVyprsel = true;
+            }
             return true;
         }
 
@@ -533,7 +539,7 @@ public class ZpravySeznam implements Handler.Callback {
         for (int i=0; i<zpravyZobraz.size(); i++) {
            Zprava z = zpravyZobraz.get(i);
 
-           if (z.getbZobrazeno()) {
+           if (z.getTsCasNacteni()!=null) {
                zkontrolujCasoveUdalosti(z);
            }
         }
@@ -598,13 +604,6 @@ public class ZpravySeznam implements Handler.Callback {
 
         Log.d(TAG, "ENTER: zkontrolujZpravy: " + zpravyKomplet.size());
 
-
-        Log.d(TAG, "Rekonstruuj stav prijatych a odeslanych zprav");
-        rekonstuujIO();
-        if (IOServer.sTextToSend.equals("") && !ssEventsToSend.isEmpty()) {
-            IOServer.sTextToSend = (String) ssEventsToSend.toArray()[ 0 ];
-        }
-
         synchronized (lock) {
             try {
                 GeoBody.getInstance(context).aBody = new ArrayList<>();
@@ -666,12 +665,11 @@ public class ZpravySeznam implements Handler.Callback {
 
                                 z.setbZobrazeno(true);
                                 if (z.getTsCasNacteni()==null) z.setTsCasNacteni(new Timestamp(System.currentTimeMillis()));
-
+                                zkontrolujCasoveUdalosti(z);
 
                                 if (!z.getsProvestAkci().equals("")) {
                                     Log.d(TAG, "IO akce: " + z.getsProvestAkci());
 
-                                    ssEventsToSend.add(z.getsProvestAkci());
                                     IOServer.sTextToSend=z.getsProvestAkci();
                                 }
                             }
@@ -746,6 +744,7 @@ public class ZpravySeznam implements Handler.Callback {
 
                             Log.d(TAG, "Sending notification");
                             mNotificationManager.notify(0, mBuilder.build());
+
                         }
                     } catch(Exception e){
                         // nedelej nic
@@ -757,6 +756,12 @@ public class ZpravySeznam implements Handler.Callback {
 
                 if (zpravyKomplet.size() > 0) {
                     write(context);
+                }
+
+                Log.d(TAG, "Rekonstruuj stav prijatych a odeslanych zprav");
+                rekonstuujIO();
+                if (IOServer.sTextToSend.equals("") && !ssEventsToSend.isEmpty()) {
+                    IOServer.sTextToSend = (String) ssEventsToSend.toArray()[ 0 ];
                 }
 
             }

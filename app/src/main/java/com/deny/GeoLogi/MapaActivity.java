@@ -8,6 +8,9 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -15,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.util.Log;
 
 
@@ -58,7 +62,7 @@ public class MapaActivity extends Activity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         map = (MapView) findViewById(R.id.mapview);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setTileSource(TileSourceFactory.USGS_TOPO); //MAPNIK);
 
         MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(map);
         myLocationoverlay.enableFollowLocation();
@@ -71,6 +75,9 @@ public class MapaActivity extends Activity {
 
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
+
+        //pokus(map);
+        //map.getOverlayManager().getTilesOverlay().setColorFilter(duotoneColorFilter(0xffffff, 0xA9A9A9, 100));
 
         IMapController mapController = map.getController();
         mapController.setZoom(13);
@@ -200,7 +207,7 @@ public class MapaActivity extends Activity {
 
             //this method is called in statup and then it needs to repeat every 10 seconds till the activity is closed
             if (!bClosed) {
-                updateHandler.postDelayed(new UsersUpdated(), 10000);
+                updateHandler.postDelayed(new UsersUpdated(), 3000);
             }
 
             Log.d(TAG, "LEAVE: UsersUpdated");
@@ -275,5 +282,101 @@ public class MapaActivity extends Activity {
         map.getOverlays().add(sfpo_uzivatele);
 
         Log.d(TAG, "LEAVE: updateOnFileDownload");
+    }
+
+    private void pokus (MapView m) {
+
+        //taking cue from https://medium.com/square-corner-blog/welcome-to-the-color-matrix-64d112e3f43d
+        ColorMatrix inverseMatrix = new ColorMatrix(new float[]{
+                -1.0f, 0.0f, 0.0f, 0.0f, 255f,
+                0.0f, -1.0f, 0.0f, 0.0f, 255f,
+                0.0f, 0.0f, -1.0f, 0.0f, 255f,
+                0.0f, 0.0f, 0.0f, 1.0f, 0.0f
+        });
+
+        int destinationColor = Color.parseColor("#FF2A2A2A");
+        float lr = (255.0f - Color.red(destinationColor)) / 255.0f;
+        float lg = (255.0f - Color.green(destinationColor)) / 255.0f;
+        float lb = (255.0f - Color.blue(destinationColor)) / 255.0f;
+        ColorMatrix grayscaleMatrix = new ColorMatrix(new float[]{
+                lr, lg, lb, 0, 0, //
+                lr, lg, lb, 0, 0, //
+                lr, lg, lb, 0, 0, //
+                0, 0, 0, 0, 255, //
+        });
+        grayscaleMatrix.preConcat(inverseMatrix);
+        int dr = Color.red(destinationColor);
+        int dg = Color.green(destinationColor);
+        int db = Color.blue(destinationColor);
+        float drf = dr / 255f;
+        float dgf = dg / 255f;
+        float dbf = db / 255f;
+        ColorMatrix tintMatrix = new ColorMatrix(new float[]{
+                drf, 0, 0, 0, 0, //
+                0, dgf, 0, 0, 0, //
+                0, 0, dbf, 0, 0, //
+                0, 0, 0, 1, 0, //
+        });
+        tintMatrix.preConcat(grayscaleMatrix);
+        float lDestination = drf * lr + dgf * lg + dbf * lb;
+        float scale = 1f - lDestination;
+        float translate = 1 - scale * 0.5f;
+        ColorMatrix scaleMatrix = new ColorMatrix(new float[]{
+                scale, 0, 0, 0, dr * translate, //
+                0, scale, 0, 0, dg * translate, //
+                0, 0, scale, 0, db * translate, //
+                0, 0, 0, 1, 0, //
+        });
+        scaleMatrix.preConcat(tintMatrix);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(scaleMatrix);
+        m.getOverlayManager().getTilesOverlay().setColorFilter(filter);
+    }
+
+    public ColorFilter duotoneColorFilter(@ColorInt int colorBlack, @ColorInt int colorWhite, float contrast) {
+        ColorMatrix cm = new ColorMatrix();
+
+        ColorMatrix cmBlackWhite = new ColorMatrix();
+        float lumR = 0.2125f;
+        float lumG = 0.7154f;
+        float lumB = 0.0721f;
+        float[] blackWhiteArray = new float[]{
+                lumR, lumG, lumB, 0, 0,
+                lumR, lumG, lumB, 0, 0,
+                lumR, lumG, lumB, 0, 0,
+                0, 0, 0, 1, 0};
+        cmBlackWhite.set(blackWhiteArray);
+
+        ColorMatrix cmContrast = new ColorMatrix();
+        float scale = contrast + 1.0f;
+        float translate = (-0.5f * scale + 0.5f) * 255f;
+        float[] contrastArray = new float[]{
+                scale, 0, 0, 0, translate,
+                0, scale, 0, 0, translate,
+                0, 0, scale, 0, translate,
+                0, 0, 0, 1, 0};
+        cmContrast.set(contrastArray);
+
+        ColorMatrix cmDuoTone = new ColorMatrix();
+        float r1 = Color.red(colorWhite);
+        float g1 = Color.green(colorWhite);
+        float b1 = Color.blue(colorWhite);
+        float r2 = Color.red(colorBlack);
+        float g2 = Color.green(colorBlack);
+        float b2 = Color.blue(colorBlack);
+        float r1r2 = (r1 - r2) / 255f;
+        float g1g2 = (g1 - g2) / 255f;
+        float b1b2 = (b1 - b2) / 255f;
+        float[] duoToneArray = new float[]{
+                r1r2, 0, 0, 0, r2,
+                g1g2, 0, 0, 0, g2,
+                b1b2, 0, 0, 0, b2,
+                0, 0, 0, 1, 0};
+        cmDuoTone.set(duoToneArray);
+
+        cm.postConcat(cmBlackWhite);
+        cm.postConcat(cmContrast);
+        cm.postConcat(cmDuoTone);
+
+        return new ColorMatrixColorFilter(cm);
     }
 }

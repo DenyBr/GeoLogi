@@ -203,7 +203,7 @@ public class Global {
             Timestamp now = new Timestamp(Global.getTime());
             Log.d(TAG, "Ukladam polohu " + now + " " + sFileName);
 
-            if ((null==tLastLocUpdate) || (now.getTime()-tLastLocUpdate.getTime())>10000) {
+            if ((null==tLastLocUpdate) || (now.getTime()-tLastLocUpdate.getTime())>3000) {
              try {
                     FileOutputStream fileOut = ctx.openFileOutput(sFileName, Context.MODE_PRIVATE);
                     ObjectOutputStream out = new ObjectOutputStream(fileOut);
