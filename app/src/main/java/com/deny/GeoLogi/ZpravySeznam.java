@@ -72,7 +72,7 @@ public class ZpravySeznam implements Handler.Callback {
     HashSet<String> ssReceivedEvents = new HashSet<String>();
     LinkedHashSet<String> ssEventsToSend = new LinkedHashSet<String>();
 
-    private IOServer ioServer;
+    IOServer ioServer;
 
 
     public static ZpravySeznam getInstance(Context context) {
@@ -577,7 +577,7 @@ public class ZpravySeznam implements Handler.Callback {
         for (int i = zpravyKomplet.size() - 1; i >= 0; i--) {
             Zprava z = zpravyKomplet.get(i);
             if (z.getbZobrazeno()) {
-                if (!(z.getsProvestAkci().trim().equals(""))) {
+                if (!(z.getsProvestAkci().trim().equals("")) && (!z.getsProvestAkci().contains("Speak:"))) {
                     ssEventsToSend.add(z.getsProvestAkci());
                 }
 

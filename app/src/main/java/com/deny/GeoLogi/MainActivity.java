@@ -198,6 +198,21 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
                             if (!Global.isbPaused() && !(ZpravySeznam.getInstance(this).bCasVyprsel && !(ZpravySeznam.getInstance(this).bCilDosazen))) {
                                 toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+                                //ioServer
+                                try {
+                                    String say = "";
+                                    if ((lCas <= 60) && (lCas%5==0)) {
+                                        say="Speak: " + String.valueOf(lCas);
+                                    } else if ((lCas % 30 == 0)) {
+                                        say = "Speak: "+ String.valueOf(lCas / 60) + " minut" + ((lCas%60!=0)?" a " + String.valueOf(lCas%60) + " sekund":"");
+                                    }
+
+                                    if (IOServer.sTextToSend.equals("") && !say.equals("")) {
+                                        IOServer.sTextToSend = say;
+                                    }
+                                } catch (Exception e) {
+                                    //ignore error - no problem it will just not speak :-)
+                                }
                             }
                         }
                     }

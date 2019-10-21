@@ -62,7 +62,7 @@ public class MapaActivity extends Activity {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         map = (MapView) findViewById(R.id.mapview);
-        map.setTileSource(TileSourceFactory.USGS_TOPO); //MAPNIK);
+        map.setTileSource(TileSourceFactory.MAPNIK);
 
         MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(map);
         myLocationoverlay.enableFollowLocation();
