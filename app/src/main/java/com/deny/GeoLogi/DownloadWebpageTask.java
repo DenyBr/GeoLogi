@@ -31,8 +31,12 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
 
         // params comes from the execute() call: params[0] is the url.
         try {
+            Log.d(TAG, "Starting download task");
+
             return downloadUrl(urls[0]);
         } catch (IOException e) {
+            Log.d(TAG, "Error while starting download task");
+
             return "";
         }
     }
@@ -55,6 +59,8 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
 
     private String downloadUrl(String urlString) throws IOException {
         InputStream is = null;
+        Log.d(TAG, "Downloading: "+urlString);
+
 
         try {
             URL url = new URL(urlString);
@@ -67,13 +73,13 @@ public class DownloadWebpageTask extends AsyncTask<String, Void, String> {
             conn.connect();
             int responseCode = conn.getResponseCode();
 
-            Log.d("conn", "HTTP Response Code: "+responseCode);
+            Log.d(TAG, "HTTP Response Code: "+responseCode);
 
             is = conn.getInputStream();
 
             String contentAsString = convertStreamToString(is);
 
-            Log.d("result: ", contentAsString);
+            Log.d(TAG, contentAsString);
 
             if (responseCode==200) {
                 return contentAsString;

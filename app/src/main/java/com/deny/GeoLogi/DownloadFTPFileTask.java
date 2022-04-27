@@ -65,6 +65,12 @@ public class DownloadFTPFileTask extends AsyncTask<String, Void, String> {
 
                 FileOutputStream out = ctx.openFileOutput(sFileNameLocal, Context.MODE_PRIVATE);
 
+                if (!Global.FTP_PREFIX.equals("")) {
+                    if (!con.changeWorkingDirectory(Global.FTP_PREFIX)) {
+                        Log.e(TAG, "Chdir failed");
+                    }
+                }
+
                 result = con.retrieveFile(sFilenameServer, out);
 
                 Log.d("ftp", "Vysledek downloadu:  " + result);

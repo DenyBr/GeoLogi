@@ -25,7 +25,7 @@ public class UvodniStranka extends AppCompatActivity {
 
     private long tsClick=0;
     private int iNumfClicks;
-    private CardServer cardServer;
+    private static CardServer cardServer = null;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -105,7 +105,7 @@ public class UvodniStranka extends AppCompatActivity {
         intentMain = new Intent(this, MainActivity.class);
         intentResults = new Intent(this, VysledkyActivity.class);
 
-        cardServer = new CardServer(this, 6000);
+        if (cardServer == null)  cardServer = new CardServer(this, 6000);
     }
 
 

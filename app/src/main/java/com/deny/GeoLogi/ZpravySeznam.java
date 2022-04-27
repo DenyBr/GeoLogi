@@ -72,7 +72,7 @@ public class ZpravySeznam implements Handler.Callback {
     HashSet<String> ssReceivedEvents = new HashSet<String>();
     LinkedHashSet<String> ssEventsToSend = new LinkedHashSet<String>();
 
-    IOServer ioServer;
+    static IOServer ioServer=null;
 
 
     public static ZpravySeznam getInstance(Context context) {
@@ -102,7 +102,9 @@ public class ZpravySeznam implements Handler.Callback {
         notificationRingtone = RingtoneManager.getRingtone(context.getApplicationContext(), notification);
         v = (Vibrator)context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 
-        ioServer = new IOServer(context, 5001);
+        if (ioServer==null) {
+            ioServer= new IOServer(context, 5001);
+        }
 
     }
 
@@ -919,8 +921,4 @@ public class ZpravySeznam implements Handler.Callback {
             return false;
         }
     }
-
-
-
-
 }

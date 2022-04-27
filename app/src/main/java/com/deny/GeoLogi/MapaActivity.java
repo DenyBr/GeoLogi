@@ -205,9 +205,9 @@ public class MapaActivity extends Activity {
                 }
             }
 
-            //this method is called in statup and then it needs to repeat every 10 seconds till the activity is closed
+            //this method is called in statup and then it needs to repeat every second till the activity is closed
             if (!bClosed) {
-                updateHandler.postDelayed(new UsersUpdated(), 3000);
+                updateHandler.postDelayed(new UsersUpdated(), 1000);
             }
 
             Log.d(TAG, "LEAVE: UsersUpdated");
@@ -248,11 +248,15 @@ public class MapaActivity extends Activity {
     private void updateOnFileDownload(int iRes) {
         Log.d(TAG, "ENTER: updateOnFileDownload " + iRes);
 
+        Paint styleUzivatele = new Paint();
+        styleUzivatele.setColor(Color.parseColor("#000000"));
+
+
         Paint textStyleUzivatele = new Paint();
         textStyleUzivatele.setStyle(Paint.Style.FILL);
-        textStyleUzivatele.setColor(Color.parseColor("#0000FF"));
-        textStyleUzivatele.setTextAlign(Paint.Align.CENTER);
-        textStyleUzivatele.setTextSize(36);
+        textStyleUzivatele.setColor(Color.parseColor("#000000"));
+        //textStyleUzivatele.setTextAlign(Paint.Align.CENTER);
+        //textStyleUzivatele.setTextSize(36);
 
         if (sfpo_uzivatele!=null) {
             map.getOverlays().remove(sfpo_uzivatele);
@@ -260,7 +264,7 @@ public class MapaActivity extends Activity {
 
         SimpleFastPointOverlayOptions opt = SimpleFastPointOverlayOptions.getDefaultStyle()
                 .setAlgorithm(SimpleFastPointOverlayOptions.RenderingAlgorithm.MAXIMUM_OPTIMIZATION)
-                .setRadius(7).setIsClickable(false).setCellSize(15).setTextStyle(textStyleUzivatele);        ;
+                .setRadius(7).setIsClickable(false).setCellSize(15).setTextStyle(textStyleUzivatele).setPointStyle(styleUzivatele);        ;
 
         ArrayList<IGeoPoint> aUzivatele= new ArrayList<IGeoPoint>();
 
@@ -270,8 +274,13 @@ public class MapaActivity extends Activity {
                     String sId = "" + Uzivatele.getInstance().aOddily.get(i).getiId();
                     String sFileNameLokace = Global.simPrexix() + Nastaveni.getInstance(MapaActivity.this).getsIdHry() + sId + "lokace.binres";
 
-                    Location loc = getLocationFromFile(sFileNameLokace);
-                    aUzivatele.add(new LabelledGeoPoint(loc.getLatitude(), loc.getLongitude(), Uzivatele.getInstance().aOddily.get(i).getsNazev()));
+                    try {
+                        Location loc = getLocationFromFile(sFileNameLokace);
+                        if (loc!=null) aUzivatele.add(new LabelledGeoPoint(loc.getLatitude(), loc.getLongitude(), "" /*Uzivatele.getInstance().aOddily.get(i).getsNazev()*/));
+                    } catch (Exception e) {
+
+                    }
+
                 }
             }
         }
@@ -280,6 +289,7 @@ public class MapaActivity extends Activity {
         sfpo_uzivatele = new SimpleFastPointOverlay(pt_uzivatele, opt);
 
         map.getOverlays().add(sfpo_uzivatele);
+        map.invalidate();
 
         Log.d(TAG, "LEAVE: updateOnFileDownload");
     }

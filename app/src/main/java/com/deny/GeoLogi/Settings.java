@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Settings extends AppCompatActivity {
+    private final String TAG = "Settings";
 
     Nastaveni pNastaveni = Nastaveni.getInstance(this);
     ArrayList<Hra> hry = new ArrayList<>();
@@ -40,6 +41,8 @@ public class Settings extends AppCompatActivity {
 
     private void processJson(JSONObject object) {
         try {
+            Log.d(TAG, "Zpracovavam seznam her");
+
             JSONArray rows = object.getJSONArray("rows");
 
             for (int r = 1; r < rows.length(); ++r) {
@@ -85,7 +88,7 @@ public class Settings extends AppCompatActivity {
                 try {
                     sNaCas = columns.getJSONObject(5).getString("v");
                     bNaCas = (sNaCas.toLowerCase().equals("ano"));
-                    Log.d("NaCas","NaCas: "+sNaCas + " " + bNaCas);
+                    Log.d(TAG,"NaCas: "+sNaCas + " " + bNaCas);
 
                 } catch (Exception e) {
                 }
@@ -151,9 +154,6 @@ public class Settings extends AppCompatActivity {
     public class VyberOddil implements Runnable {
 
         public void run() {
-            //Okynka.zobrazOkynko(Settings.this, "Oddilu je : "+ Uzivatele.getInstance().aOddily.size());
-
-
             Spinner sp = findViewById(R.id.spinOddily);
             int iVybranyOddil = 0;
 
@@ -305,9 +305,12 @@ public class Settings extends AppCompatActivity {
         //jinak zakaz vyber hry
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+
         try {
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "Stahuju seznam her");
+
+            if ((networkInfo != null) && networkInfo.isConnected()) {
                 new DownloadWebpageTask(new AsyncResultJSON() {
                     @Override
                     public void onResult(JSONObject object) {

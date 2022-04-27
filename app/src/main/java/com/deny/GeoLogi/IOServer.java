@@ -61,7 +61,7 @@ public class IOServer {
             try {
                 serverSocket = new ServerSocket(SERVERPORT);
 
-                Log.d(TAG, "CardServer port otevren");
+                Log.d(TAG, "IOServer port otevren "+ SERVERPORT);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d(TAG, "Chyba pri otevirani serveroveho portu: "+e.getMessage());
@@ -106,7 +106,6 @@ public class IOServer {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     String sOdesilame = sTextToSend;
-                    sTextToSend="";
 
                     if (!sOdesilame.equals("")) {
                         Log.d(TAG, "Odesilame: "+sOdesilame);
@@ -115,7 +114,20 @@ public class IOServer {
 
                         out.write(writebuffer);
                         out.flush();
+                        Log.d(TAG, "Odeslano: "+sOdesilame);
+
                     }
+
+                    sTextToSend="";
+
+                    byte[] readbuffer =  new byte[100];
+
+                    if (input.available()>0) {
+                        Log.d(TAG, "cteme: "+input.available());
+                        int res = input.read(readbuffer);
+                        Log.d(TAG, "precteno: "+res);
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     Thread.currentThread().interrupt();

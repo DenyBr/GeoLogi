@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
 
     }
 
+    private static boolean casBezi = false;
+
     private void Init () {
         Log.d(TAG, "ENTER: Init");
 
@@ -92,7 +94,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         ZpravySeznam.getInstance(this).registerGuiCallback(this);
         ZpravySeznam.getInstance(this).read(this);
 
-        updateHandler.postDelayed(updateCasRunabble,10);
+        if (!casBezi) {
+            updateHandler.postDelayed(updateCasRunabble,10);
+            casBezi = true;
+        } else {
+            updateHandler.removeCallbacks(updateCasRunabble);
+
+            updateHandler.postDelayed(updateCasRunabble,10);
+            casBezi = true;
+        }
+
+
 
         Log.d(TAG, "LEAVE: Init");
     }
@@ -102,10 +114,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
     private Runnable updateCasRunabble = new Runnable() {
         @Override
         public void run() {
-            if (!Global.isbPaused())
+            //if (!Global.isbPaused())
                 updateCas();
         }
     };
+
+    static long  lastSpeak=0;
 
     private void updateCas() {
         Log.d(TAG, "updateCas");
@@ -113,12 +127,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
         TableRow radek = (TableRow) findViewById(R.id.timeline);
 
         if (Nastaveni.getInstance(this).getisNaCas()) {
-
+            Log.d(TAG, "Prekresluju1");
             radek.setVisibility(View.VISIBLE);
 
             TextView nadpis = findViewById(R.id.cas);
             TextView popis = findViewById(R.id.cas_vysledek);
             if (nadpis != null) {
+                Log.d(TAG, "Prekresluju2");
+
                 //nadpis.setHeight(20);
                 long lCas = 0;
                 long now = System.currentTimeMillis();
@@ -196,15 +212,23 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback 
                                 ((lCas < 600) && (lCas % 10 == 0)) ||
                                 (((lCas % 60 == 0)))) {
 
-                            if (!Global.isbPaused() && !(ZpravySeznam.getInstance(this).bCasVyprsel && !(ZpravySeznam.getInstance(this).bCilDosazen))) {
-                                toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+                            Log.d(TAG, "last " + lastSpeak + " now "+lCas);
+                            if ((Math.abs(lastSpeak-lCas)>1) && !(ZpravySeznam.getInstance(this).bCasVyprsel && !(ZpravySeznam.getInstance(this).bCilDosazen))) {
+                                if (!Global.isbPaused()) toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
                                 //ioServer
                                 try {
+
                                     String say = "";
                                     if ((lCas <= 60) && (lCas%5==0)) {
                                         say="Speak: " + String.valueOf(lCas);
+                                        Log.d(TAG, "mluvim " + lCas);
+
+                                        lastSpeak = lCas;
+
                                     } else if ((lCas % 30 == 0)) {
-                                        say = "Speak: "+ String.valueOf(lCas / 60) + " minut" + ((lCas%60!=0)?" a " + String.valueOf(lCas%60) + " sekund":"");
+                                        say = "Speak: Opuste chatu do "+ String.valueOf(lCas / 60) + " minut" + ((lCas%60!=0)?" a " + String.valueOf(lCas%60) + " sekund":"");
+                                        Log.d(TAG, "mluvim " + lCas);
+                                        lastSpeak = lCas;
                                     }
 
                                     if (IOServer.sTextToSend.equals("") && !say.equals("")) {

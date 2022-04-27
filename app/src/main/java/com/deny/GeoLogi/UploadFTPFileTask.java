@@ -61,6 +61,11 @@ public class UploadFTPFileTask extends AsyncTask<String, Void, String> {
 
                 FileInputStream in = ctx.openFileInput( sFilename);
 
+                if (!Global.FTP_PREFIX.equals("")) {
+                    if (!con.changeWorkingDirectory(Global.FTP_PREFIX)) {
+                        Log.e(TAG, "Chdir failed");
+                    }
+                }
                 boolean result = con.storeFile(sFilename, in);
 
                 Log.d(TAG, "Vysledek uploadu:  " + result);

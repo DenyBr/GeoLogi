@@ -165,7 +165,7 @@ class GeoBody {
         int iDistance=100;
 
         //pri priblizovani zkratime timeout
-        if (iMin < 20) { iTimeout = 1000; iDistance=1;}
+        if ((iMin < 20) || (Nastaveni.getInstance().getisSdileniPolohyAktivni())) { iTimeout = 1000; iDistance=1;}
         else if (iMin < 30) {iTimeout = 2000; iDistance=1;}
         else if (iMin < 50) {iTimeout = 3000; iDistance=2;}
         else if (iMin < 100) {iTimeout = 10000; iDistance=20;}

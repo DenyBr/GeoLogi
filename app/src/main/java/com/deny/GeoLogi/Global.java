@@ -31,6 +31,9 @@ public class Global {
     private static LocationManager locationManager = null;
     private static boolean bPaused = true;
 
+    public static String FTP_PREFIX = "/htdocs";
+
+
     private static Timestamp tLastLocUpdate;
 
     private Global() {
